@@ -1,9 +1,9 @@
-local levelMap = require("levelMap")
+local levelMapExported = require("levelMapExported")
 
-local minX = levelMap.minX
-local maxX = levelMap.maxX
-local minZ = levelMap.minZ
-local maxZ = levelMap.maxZ
+local minX = levelMapExported.minX
+local maxX = levelMapExported.maxX
+local minZ = levelMapExported.minZ
+local maxZ = levelMapExported.maxZ
 
 local OFFSET = 50
 local TILE_HALF = 24
@@ -27,8 +27,8 @@ local function DrawOnePath(path)
   path = path or {}
   local coords = {}
   for i=1, #path do
-    local tileOneX = (levelMap.tiles[path[i]].x) * OFFSET
-    local tileOneZ = (levelMap.tiles[path[i]].z) * OFFSET * Z_FLIP
+    local tileOneX = (levelMapExported.tiles[path[i]].x) * OFFSET
+    local tileOneZ = (levelMapExported.tiles[path[i]].z) * OFFSET * Z_FLIP
     coords[#coords + 1] = tileOneX
     coords[#coords + 1] = tileOneZ
   end
@@ -46,7 +46,7 @@ local function DrawProhibitedConnection(coords)
 end
   
 local function DrawPaths()
-  for tileKey, tileData in pairs(levelMap.tiles) do
+  for tileKey, tileData in pairs(levelMapExported.tiles) do
     if tileData.myPath then
       DrawOnePath(tileData.myPath)
     end
@@ -54,7 +54,7 @@ local function DrawPaths()
 end
 
 local function DrawProhibitedConnections()
-  for tileKey, tileData in pairs(levelMap.tiles) do
+  for tileKey, tileData in pairs(levelMapExported.tiles) do
     for d = 1, #DIRECTIONS do
       local direction = DIRECTIONS[d]
       local coords = {}
@@ -74,7 +74,7 @@ local function DrawRooms()
   for i=minX, maxX do
     for j=minZ, maxZ do
       local tileKey = GetMapTileKey(i,j)
-      local tileData = levelMap.tiles[tileKey]
+      local tileData = levelMapExported.tiles[tileKey]
       if tileData then
         local x = tileData.x * OFFSET
         local z = tileData.z * OFFSET * Z_FLIP

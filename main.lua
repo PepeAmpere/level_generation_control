@@ -5,13 +5,13 @@ MapExt = require("libs.map.MapExt") -- needed for Map to work
 Map = require("libs.map.Map")
 
 -- run the levele generation
-levelMap = require ("generator")
+local levelMap = require ("libs.generator.generator")
 
 -- saved on this level to avoid saving in Unreal
-MapExt.SaveMapToFile("levelMap.lua", levelMap)
+MapExt.SaveMapToFile("levelMapExported.lua", levelMap)
 
 -- BELOW JUST LOVE 2D debugging
-local draw = require("draw")
+local draw = require("libs.draw.draw")
 local gamera = require("libs.gamera.gamera")
 local camera = gamera.new(-5000,-5000,5000,5000)
 camera:setWorld(-5000,-5000,10000,10000)
