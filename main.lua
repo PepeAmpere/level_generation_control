@@ -14,11 +14,13 @@ MapExt.SaveMapToFile("levelMapExported.lua", levelMap)
 local draw = require("libs.draw.draw")
 local gamera = require("libs.gamera.gamera")
 local camera = gamera.new(-5000,-5000,5000,5000)
+local positionCenterX = 900
+local positionCenterY = 450
 camera:setWorld(-5000,-5000,10000,10000)
 camera:setWindow(0,0,1900,1000)
 camera:setPosition(
-	(0 + 900) * 0.5,
-	(0 + 450) * 0.5
+	(0 + positionCenterX) * 0.5,
+	(0 + positionCenterY) * 0.5
 )
 local UI_STATES = {
   pan = false,
@@ -43,6 +45,7 @@ function love.draw()
   camera:draw(draw.DrawRooms) 
   camera:draw(draw.DrawPaths)
   camera:draw(draw.DrawProhibitedConnections)
+  camera:draw(draw.DrawPassLevel)
 end
 
 function love.mousepressed(x, y, button) 
@@ -60,4 +63,14 @@ function love.mousemoved(x, y, dx, dy, istouch)
     local wx, wy = camera:getPosition()
     camera:setPosition(wx - dx, wy - dy)
   end
+end
+
+function love.wheelmoved(x, y)
+  local mx,my = love.mouse.getPosition()
+  if y > 0 then
+    camera:setScale(camera:getScale()+0.05)
+  elseif y < 0 then
+    camera:setScale(camera:getScale()-0.05)
+  end
+  camera:setPosition(mx,my)
 end

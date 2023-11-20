@@ -53,6 +53,26 @@ local function DrawPaths()
   end
 end
 
+local function DrawPassLevel()
+  for tileKey, tileData in pairs(levelMapExported.tiles) do
+    for d = 1, #DIRECTIONS do
+      local direction = DIRECTIONS[d]
+      if tileData[direction] then
+        local x = tileData.x * OFFSET + DIRECTIONS_LINES[direction].x * (TILE_HALF-10)
+        local z = (tileData.z * OFFSET + DIRECTIONS_LINES[direction].z * (TILE_HALF-10)) * Z_FLIP
+        love.graphics.setColor(32,32,32,255)
+        love.graphics.rectangle("fill", x, z, 7, 7)
+        love.graphics.setColor(192,192,192,255)
+        love.graphics.print(
+          tostring(#tileData[direction].passedByPaths), 
+          x,
+          z,
+          0, 0.5, 0.5, 0, 0, 0, 0 ) -- r, sx, sy, ox, oy, kx, ky 
+      end
+    end
+  end
+end
+
 local function DrawProhibitedConnections()
   for tileKey, tileData in pairs(levelMapExported.tiles) do
     for d = 1, #DIRECTIONS do
@@ -97,5 +117,6 @@ end
 return {
   DrawRooms = DrawRooms,
   DrawPaths = DrawPaths,
+  DrawPassLevel = DrawPassLevel,
   DrawProhibitedConnections = DrawProhibitedConnections
 }
