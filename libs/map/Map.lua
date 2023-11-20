@@ -12,6 +12,16 @@ local GetOppositeDirection = MapExt.GetOppositeDirection
 
 local DIRECTIONS = GetDirections()
 
+local function GetNeighborTable(x, z, minX, maxX, minZ, maxZ)
+  local neighborTileKey = GetMapTileKey(x, z, minX, maxX, minZ, maxZ)
+  if neighborTileKey then
+    return {
+      tileKey = neighborTileKey,
+      passedByPaths = {},
+    }
+  end
+end
+
 local function MakeMeTile(x, z, minX, maxX, minZ, maxZ)
   return {
     x = x,
@@ -20,10 +30,10 @@ local function MakeMeTile(x, z, minX, maxX, minZ, maxZ)
     roomType = "undefined",
     blocked = false,
     myPath = {},
-    north = GetMapTileKey(x, z + 1, minX, maxX, minZ, maxZ),
-    east = GetMapTileKey(x + 1, z, minX, maxX, minZ, maxZ),
-    south = GetMapTileKey(x, z - 1, minX, maxX, minZ, maxZ),
-    west = GetMapTileKey(x - 1, z, minX, maxX, minZ, maxZ),
+    north = GetNeighborTable(x, z + 1, minX, maxX, minZ, maxZ),
+    east = GetNeighborTable(x + 1, z, minX, maxX, minZ, maxZ),
+    south = GetNeighborTable(x, z - 1, minX, maxX, minZ, maxZ),
+    west = GetNeighborTable(x - 1, z, minX, maxX, minZ, maxZ),
   }
 end
 
@@ -56,9 +66,15 @@ local Map = new
 function mapIndex:DeleteConnection(tileKey, direction)
   local tiles = self.tiles
   if tiles[tileKey][direction] then
-    local tileKeyInDirection = tiles[tileKey][direction]
+    local tileKeyInDirection = self:GetNeigborTileKey(tileKey, direction)
     tiles[tileKeyInDirection][GetOppositeDirection(direction)] = nil
     tiles[tileKey][direction] = nil
+  end
+end
+
+function mapIndex:GetNeigborTileKey(tileKey, direction)
+  if self.tiles[tileKey][direction] then
+    return self.tiles[tileKey][direction].tileKey
   end
 end
 
@@ -94,6 +110,24 @@ function mapIndex:SetTilePath(tileKey, path)
   return self
 end
 
+function mapIndex:SetTilesPassed(tileAkey, tileBkey, pathKey)  
+  for d=1, #DIRECTIONS do
+    local selectedDirection = DIRECTIONS[d]
+    local neighborKey = self:GetNeigborTileKey(tileAkey, selectedDirection)
+    if 
+      neighborKey == tileBkey
+    then
+      local tileAPaths = self.tiles[tileAkey][selectedDirection].passedByPaths
+      local tileBDirection = GetOppositeDirection(selectedDirection)
+      local tileBPaths = self.tiles[tileBkey][tileBDirection].passedByPaths
+
+      tileAPaths[#tileAPaths + 1] = pathKey
+      tileBPaths[#tileBPaths + 1] = pathKey
+    end
+  end
+  return self
+end
+
 function mapIndex:SetTileRoomType(tileKey, roomType)
   self.tiles[tileKey].roomType = roomType
   local typeData = roomTypes[roomType]
@@ -108,6 +142,20 @@ end
 
 function mapIndex:SetTileVisited(tileKey, visitedValue)
   self.tiles[tileKey].alreadyVisited = visitedValue
+  return self
+end
+
+function mapIndex:TrackAllPathsPasses()
+  for tileKey, tileData in pairs(self.tiles) do
+    local path = self:GetTilePath(tileKey)
+    if path then 
+      for i=1, #path-1 do
+        local tileA = path[i]
+        local tileB = path[i+1]
+        self:SetTilesPassed(tileA, tileB, tileKey)
+      end
+    end
+  end
   return self
 end
 

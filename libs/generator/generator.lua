@@ -96,8 +96,7 @@ for i=1, mapLimits do -- maximum is number of tiles (= adding one tile per itera
     local newDirections = RandomizeDirection(DIRECTIONS)
     for d = 1, #newDirections do
       local selectedDirection = newDirections[d]
-      local myTileData = levelMap:GetTileData(tileKey)
-      local neighbourTileKey = myTileData[selectedDirection]
+      local neighbourTileKey = levelMap:GetNeigborTileKey(tileKey, selectedDirection)
 
       if
         neighbourTileKey and
@@ -124,5 +123,8 @@ for i=1, mapLimits do -- maximum is number of tiles (= adding one tile per itera
     break
   end
 end
+
+-- calculate intensity of each path per-tile and per-direction
+levelMap:TrackAllPathsPasses()
 
 return levelMap
