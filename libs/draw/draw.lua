@@ -2,25 +2,25 @@ local levelMapExported = require("levelMapExported")
 
 local minX = levelMapExported.minX
 local maxX = levelMapExported.maxX
-local minZ = levelMapExported.minZ
-local maxZ = levelMapExported.maxZ
+local minY = levelMapExported.minY
+local maxY = levelMapExported.maxY
 
 local OFFSET = 50
 local TILE_HALF = 24
-local Z_FLIP = -1
+local Y_FLIP = -1
 
 local CopyPath = MapExt.CopyPath
 local GetDirections = MapExt.GetDirections
-local function GetMapTileKey(x,z) return MapExt.GetMapTileKey(x, z, minX, maxX, minZ, maxZ) end
+local function GetMapTileKey(x,y) return MapExt.GetMapTileKey(x, y, minX, maxX, minY, maxY) end
 local GetOppositeDirection = MapExt.GetOppositeDirection
 local MakePathString = MapExt.MakePathString
 
 local DIRECTIONS = GetDirections()
 local DIRECTIONS_LINES = {
-  ["north"] = {x = 0, z = 1},
-  ["east"] = {x = 1, z = 0},
-  ["south"] = {x = 0, z = -1},
-  ["west"] = {x = -1, z = 0},
+  ["north"] = {x = 0, y = 1},
+  ["east"] = {x = 1, y = 0},
+  ["south"] = {x = 0, y = -1},
+  ["west"] = {x = -1, y = 0},
 }
 
 local function DrawOnePath(path)
@@ -28,9 +28,9 @@ local function DrawOnePath(path)
   local coords = {}
   for i=1, #path do
     local tileOneX = (levelMapExported.tiles[path[i]].x) * OFFSET
-    local tileOneZ = (levelMapExported.tiles[path[i]].z) * OFFSET * Z_FLIP
+    local tileOneY = (levelMapExported.tiles[path[i]].y) * OFFSET * Y_FLIP
     coords[#coords + 1] = tileOneX
-    coords[#coords + 1] = tileOneZ
+    coords[#coords + 1] = tileOneY
   end
   if #path > 1 then
     love.graphics.setLineWidth(4)
@@ -59,14 +59,14 @@ local function DrawPassLevel()
       local direction = DIRECTIONS[d]
       if tileData[direction] then
         local x = tileData.x * OFFSET + DIRECTIONS_LINES[direction].x * (TILE_HALF-10)
-        local z = (tileData.z * OFFSET + DIRECTIONS_LINES[direction].z * (TILE_HALF-10)) * Z_FLIP
+        local y = (tileData.y * OFFSET + DIRECTIONS_LINES[direction].y * (TILE_HALF-10)) * Y_FLIP
         love.graphics.setColor(32,32,32,255)
-        love.graphics.rectangle("fill", x, z, 7, 7)
+        love.graphics.rectangle("fill", x, y, 7, 7)
         love.graphics.setColor(192,192,192,255)
         love.graphics.print(
           tostring(#tileData[direction].passedByPaths), 
           x,
-          z,
+          y,
           0, 0.5, 0.5, 0, 0, 0, 0 ) -- r, sx, sy, ox, oy, kx, ky 
       end
     end
@@ -81,9 +81,9 @@ local function DrawProhibitedConnections()
       if not tileData[direction] then
         DrawProhibitedConnection({
           tileData.x * OFFSET,
-          tileData.z * OFFSET * Z_FLIP,
+          tileData.y * OFFSET * Y_FLIP,
           tileData.x * OFFSET + DIRECTIONS_LINES[direction].x * TILE_HALF,
-          tileData.z * OFFSET * Z_FLIP + DIRECTIONS_LINES[direction].z * TILE_HALF * Z_FLIP,
+          tileData.y * OFFSET * Y_FLIP + DIRECTIONS_LINES[direction].y * TILE_HALF * Y_FLIP,
         })
       end
     end
@@ -92,22 +92,22 @@ end
 
 local function DrawRooms()
   for i=minX, maxX do
-    for j=minZ, maxZ do
+    for j=minY, maxY do
       local tileKey = GetMapTileKey(i,j)
       local tileData = levelMapExported.tiles[tileKey]
       if tileData then
         local x = tileData.x * OFFSET
-        local z = tileData.z * OFFSET * Z_FLIP
+        local y = tileData.y * OFFSET * Y_FLIP
 
         local color = roomTypes[tileData.roomType].displayColor
         love.graphics.setColor(unpack(color))
         
         love.graphics.polygon(
           'fill', 
-          x-TILE_HALF, z-TILE_HALF, 
-          x+TILE_HALF, z-TILE_HALF,
-          x+TILE_HALF, z+TILE_HALF,
-          x-TILE_HALF, z+TILE_HALF				
+          x-TILE_HALF, y-TILE_HALF, 
+          x+TILE_HALF, y-TILE_HALF,
+          x+TILE_HALF, y+TILE_HALF,
+          x-TILE_HALF, y+TILE_HALF				
         )
       end
     end

@@ -3,18 +3,18 @@
 
 -- rules of spawning
 local minX = -4
-local minZ = -4
+local minY = -4
 local maxX = 4
-local maxZ = 4
-local mapLimits = ((minX - maxX) - 1)  * ((minZ - maxZ) - 1)
+local maxY = 4
+local mapLimits = ((minX - maxX) - 1)  * ((minY - maxY) - 1)
 
 -- global for easier Unreal debugging
-levelMap = Map(minX, maxX, minZ, maxZ)
+levelMap = Map(minX, maxX, minY, maxY)
 
 -- functions localization
 local CopyPath = MapExt.CopyPath
 local GetDirections = MapExt.GetDirections
-local function GetMapTileKey(x,z) return MapExt.GetMapTileKey(x, z, minX, maxX, minZ, maxZ) end
+local function GetMapTileKey(x,y) return MapExt.GetMapTileKey(x, y, minX, maxX, minY, maxY) end
 local GetOppositeDirection = MapExt.GetOppositeDirection
 local MakePathString = MapExt.MakePathString
 local RandomizeDirection = MapExt.RandomizeDirection
@@ -60,11 +60,11 @@ local mandatoryRooms = {
 }
 
 for _, roomTypeName in ipairs(mandatoryRooms) do
-  local randomX, randomZ, tileKey
+  local randomX, randomY, tileKey
   for i=1, 100 do
     randomX = math.floor(math.random(minX+2, maxX-2) / 2) * 2
-    randomZ = math.floor(math.random(minZ+2, maxZ-2) / 2) * 2
-    tileKey = GetMapTileKey(randomX, randomZ)
+    randomY = math.floor(math.random(minY+2, maxY-2) / 2) * 2
+    tileKey = GetMapTileKey(randomX, randomY)
     if reservedTiles[tileKey] == nil then
       break
     end
@@ -74,12 +74,12 @@ for _, roomTypeName in ipairs(mandatoryRooms) do
     randomX = minX
   end
   if (roomTypeName == "dinnersLeft") then
-    levelMap:SetTileRoomType(GetMapTileKey(randomX+1, randomZ), "dinnersRight")
-    reservedTiles [GetMapTileKey(randomX+1, randomZ)] = true
+    levelMap:SetTileRoomType(GetMapTileKey(randomX+1, randomY), "dinnersRight")
+    reservedTiles [GetMapTileKey(randomX+1, randomY)] = true
   end
 
   reservedTiles[tileKey] = true
-  levelMap:SetTileRoomType(GetMapTileKey(randomX, randomZ), roomTypeName)
+  levelMap:SetTileRoomType(GetMapTileKey(randomX, randomY), roomTypeName)
 end
 
 -- PATHS to all tiles GENERATION

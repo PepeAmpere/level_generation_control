@@ -26,12 +26,12 @@ local function GetDirections()
   return directions
 end
 
-local function GetMapTileKey(x, z, minX, maxX, minZ, maxZ)
+local function GetMapTileKey(x, y, minX, maxX, minY, maxY)
   if x < minX then return nil end
   if x > maxX then return nil end
-  if z < minZ then return nil end
-  if z > maxZ then return nil end
-  return x .. "_" .. z
+  if y < minY then return nil end
+  if y > maxY then return nil end
+  return x .. "_" .. y
 end
 
 local function GetOppositeDirection(direction)

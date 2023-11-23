@@ -12,8 +12,8 @@ local GetOppositeDirection = MapExt.GetOppositeDirection
 
 local DIRECTIONS = GetDirections()
 
-local function GetNeighborTable(x, z, minX, maxX, minZ, maxZ)
-  local neighborTileKey = GetMapTileKey(x, z, minX, maxX, minZ, maxZ)
+local function GetNeighborTable(x, y, minX, maxX, minY, maxY)
+  local neighborTileKey = GetMapTileKey(x, y, minX, maxX, minY, maxY)
   if neighborTileKey then
     return {
       tileKey = neighborTileKey,
@@ -22,39 +22,39 @@ local function GetNeighborTable(x, z, minX, maxX, minZ, maxZ)
   end
 end
 
-local function MakeMeTile(x, z, minX, maxX, minZ, maxZ)
+local function MakeMeTile(x, y, minX, maxX, minY, maxY)
   return {
     x = x,
-    z = z,
+    y = y,
     alreadyVisited = false,
     roomType = "undefined",
     blocked = false,
     myPath = {},
-    north = GetNeighborTable(x, z + 1, minX, maxX, minZ, maxZ),
-    east = GetNeighborTable(x + 1, z, minX, maxX, minZ, maxZ),
-    south = GetNeighborTable(x, z - 1, minX, maxX, minZ, maxZ),
-    west = GetNeighborTable(x - 1, z, minX, maxX, minZ, maxZ),
+    north = GetNeighborTable(x, y + 1, minX, maxX, minY, maxY),
+    east = GetNeighborTable(x + 1, y, minX, maxX, minY, maxY),
+    south = GetNeighborTable(x, y - 1, minX, maxX, minY, maxY),
+    west = GetNeighborTable(x - 1, y, minX, maxX, minY, maxY),
   }
 end
 
-local function new(minX, maxX, minZ, maxZ)
+local function new(minX, maxX, minY, maxY)
   minX = minX or -1
   maxX = maxX or 1
-  minZ = minZ or -1
-  maxZ = maxZ or 1
+  minY = minY or -1
+  maxY = maxY or 1
   local tiles = {}
   for x = minX, maxX do
-    for z = minZ, maxZ do
-      local tileKey = GetMapTileKey(x, z, minX, maxX, minZ, maxZ)
-      tiles[tileKey] = MakeMeTile(x, z, minX, maxX, minZ, maxZ)
+    for y = minY, maxY do
+      local tileKey = GetMapTileKey(x, y, minX, maxX, minY, maxY)
+      tiles[tileKey] = MakeMeTile(x, y, minX, maxX, minY, maxY)
     end
   end
   return setmetatable(
     {
       minX = minX,
       maxX = maxX,
-      minZ = minZ,
-      maxZ = maxZ,
+      minY = minY,
+      maxY = maxY,
       tiles = tiles,
     },
     mapMeta

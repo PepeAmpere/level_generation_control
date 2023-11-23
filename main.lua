@@ -1,12 +1,16 @@
 -- globalize the libs (to integrate both in replit, love 2D and also Unreal)
+-- data
 roomTypes = require("libs.rooms.roomTypes")
 
+-- libs
+Vec3 = require("libs.core.vec3.Vec3")
 MapExt = require("libs.map.MapExt") -- needed for Map to work
 Map = require("libs.map.Map")
 
 -- run the levele generation
 local levelMap = require ("libs.generator.generator")
 
+-- == UNREAL INTEGRATION WILL NEED ABOVE CODE in the Lua Wrapper == --
 -- saved on this level to avoid saving in Unreal
 MapExt.SaveMapToFile("levelMapExported.lua", levelMap)
 
