@@ -1,3 +1,9 @@
+#run = "lua main.lua"
+entrypoint = "main.lua"
 run = "love ."
 
-entrypoint = "main.lua"
+[languages.lua]
+pattern = "**/*.lua"
+
+[languages.lua.languageServer]
+start = ["lua-language-server"]

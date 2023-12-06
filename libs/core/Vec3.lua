@@ -1,9 +1,9 @@
 -- taken out of https://bitbucket.org/notabots/core/src/master/
 -- version from 2023-11-12, updated separately before replit starts to support submodules
 local moduleInfo = {
-  name = "vec3",
+  name = "Vec3",
   desc = "Vector object and its methods.",
-  author = "PepeAmpere", -- inspired by work Gordon MacPherson and Michal Mojzik, wrote from scratch
+  author = "PepeAmpere", -- inspired by work of Gordon MacPherson and Michal Mojzik, wrote from scratch
   date = "2017-09-08",
   license = "MIT",
 }
@@ -16,10 +16,10 @@ local atan2 = math.atan2
 local type = type
 
 -- defining the metatable and access 
-local vector = {}
+local vectorIndex = {}
 local vectorMeta = {}
-vectorMeta.__index = vector
-vectorMeta.__metatable = false -- access
+vectorMeta.__index = vectorIndex
+-- vectorMeta.__metatable = false -- access
 
 local function new(x, y, z)
   return setmetatable(
@@ -33,9 +33,9 @@ local function new(x, y, z)
 end
 
 local function is3DVector(vectorOne)
-  return 	type(vectorOne) == "table" and 
-      type(vectorOne.x) == "number" and 
-      type(vectorOne.y) == "number" and 
+  return 	type(vectorOne) == "table" and
+      type(vectorOne.x) == "number" and
+      type(vectorOne.y) == "number" and
       type(vectorOne.z) == "number"
 end
 
@@ -101,23 +101,6 @@ function vectorMeta:__unm()
     -self.y,
     -self.z
   )
-end      
-
-function vector:Add(vectorOne)
-  self = self + vectorOne
-  return self -- copy
-end
-
-function vector:Sub(vectorOne)
-  self = self - vectorOne
-  return self -- copy
-end
-
-function vector:Mul(multiplier)
-  self.x = self.x * multiplier
-  self.y = self.y * multiplier
-  self.z = self.z * multiplier
-  return self -- copy(?)
 end
 
 function vectorMeta:__tostring()
@@ -128,31 +111,58 @@ function vectorMeta:__concat()
   return "Vec3(" .. self.x .. "," .. self.y .. "," .. self.z .. ")"
 end
 
-function vector:Length()
+function vectorIndex:Add(vectorOne)
+  self = self + vectorOne
+  return self -- copy
+end
+
+function vectorIndex:Sub(vectorOne)
+  self = self - vectorOne
+  return self -- copy
+end
+
+function vectorIndex:Mul(multiplier)
+  self.x = self.x * multiplier
+  self.y = self.y * multiplier
+  self.z = self.z * multiplier
+  return self -- copy(?)
+end
+
+function vectorIndex:X()
+  return self.x
+end
+function vectorIndex:Y()
+  return self.y
+end
+function vectorIndex:Z()
+  return self.z
+end
+
+function vectorIndex:Length()
   return self:LengthSQ()^0.5
 end
 
-function vector:Length2D()
+function vectorIndex:Length2D()
   return ((self.x * self.x) + (self.z * self.z))^0.5
 end
 
-function vector:LengthSQ()
+function vectorIndex:LengthSQ()
   return ((self.x * self.x) + (self.y * self.y) + (self.z * self.z))
 end
 
-function vector:Distance(vectorOne)
+function vectorIndex:Distance(vectorOne)
   return (self - vectorOne):Length()
 end
 
-function vector:Distance2D(vectorOne)
+function vectorIndex:Distance2D(vectorOne)
   return (self - vectorOne):Length2D()
 end
 
-function vector:DistanceSQ(vectorOne)
+function vectorIndex:DistanceSQ(vectorOne)
   return (self - vectorOne):LengthSQ()
 end
 
-function vector:DistanceToLine(lineVectorOne, lineVectorTwo)
+function vectorIndex:DistanceToLine(lineVectorOne, lineVectorTwo)
   local lineVector = (lineVectorTwo - lineVectorOne)
   local pointVector = (self - lineVectorOne)
   local rotAlpha = atan2(-lineVector.z, lineVector.y)
@@ -169,14 +179,14 @@ function vector:DistanceToLine(lineVectorOne, lineVectorTwo)
   return Vec3(0, rotatedPoint.y, rotatedPoint.z):Length()
 end
 
-function vector:Zero()
+function vectorIndex:Zero()
   self.x = 0
   self.y = 0
   self.z = 0
   return self -- in place?, otherwise use 'new'
 end
 
-function vector:Copy()
+function vectorIndex:Copy()
   return new(
     self.x,
     self.y,
@@ -184,7 +194,7 @@ function vector:Copy()
   )
 end
 
-function vector:GetNormal()
+function vectorIndex:GetNormal()
   local length = self:Length()
   return new(
     self.x / length,
@@ -193,16 +203,16 @@ function vector:GetNormal()
   ) -- copy
 end
 
-function vector:Normalize()
+function vectorIndex:Normalize()
   local length = self:Length()
   return self:Mul(1 / length) -- in place
 end
 
-function vector:DotProduct(angleOne)
+function vectorIndex:DotProduct(angleOne)
   return (self.x * vectorOne.x) + (self.y * vectorOne.y) + (self.z * vectorOne.z)
 end
 
-function vector:CrossProduct(vectorOne)
+function vectorIndex:CrossProduct(vectorOne)
   return new(
     (self.y * vectorOne.z) - (vectorOne.y * self.z),
     (self.z * vectorOne.x) - (vectorOne.z * self.x),
@@ -210,11 +220,11 @@ function vector:CrossProduct(vectorOne)
   )
 end
 
-function vector:Lerp(vectorOne, alpha)
+function vectorIndex:Lerp(vectorOne, alpha)
   return self + ((vectorOne - self) * alpha)
 end
 
-function vector:Transform(matrix)
+function vectorIndex:Transform(matrix)
   local x = self.x
   local y = self.y
   local z = self.z
@@ -229,7 +239,7 @@ end
 -- SPRING SPECIFIC -- 
 
 --- Convert vector in 2D heading in degrees between 0-360
-function vector:ToHeading() -- azimuth
+function vectorIndex:ToHeading() -- azimuth
   local angleInRads = atan2(self.x, self.z)
   -- angleInRads
   -- N (north) = PI
@@ -246,7 +256,7 @@ end
 
 -- Rotates vector around Y axis by given angle in degrees in-place.
 -- A mathematically correct variant = negative angle values implies clockwise rotation.
-function vector:Rotate2D(angleOne)
+function vectorIndex:Rotate2D(angleOne)
   local angleInRads = rad(-angleOne) -- inverted Z axis (it increases in "south" direction in Spring map notation
   return new(
     self.x * cos(angleInRads) - self.z * sin(angleInRads),
@@ -256,18 +266,18 @@ function vector:Rotate2D(angleOne)
 end
 
 --- Rotates vector around Y axis by given azimuth
-function vector:RotateByHeading(angleOne)
+function vectorIndex:RotateByHeading(angleOne)
   return self:Rotate2D(-angleOne) -- just rotation in opoosite direction than mathematic Rotate2D
 end
 
-function vector:ToMap()
+function vectorIndex:ToMap()
   self.x = math.max(math.min(Game.mapSizeX-1, self.x), 0)
   self.z = math.max(math.min(Game.mapSizeZ-1, self.z), 0)
   return self
 end
 
 -- Convert to array with three items, no string keys, as Spring API likes it
-function vector:AsSpringVector()
+function vectorIndex:AsSpringVector()
   return {
     self.x, 
     self.y, 
@@ -275,7 +285,7 @@ function vector:AsSpringVector()
   }
 end
 
-function vector:GetCoordinates()
+function vectorIndex:GetCoordinates()
   return self.x, self.y, self.z
 end
 

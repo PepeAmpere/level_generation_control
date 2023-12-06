@@ -1,31 +1,51 @@
 -- globalize the libs (to integrate both in replit, love 2D and also Unreal)
--- data
-roomTypes = require("libs.rooms.roomTypes")
-
 -- libs
-Vec3 = require("libs.core.vec3.Vec3")
-MapExt = require("libs.map.MapExt") -- needed for Map to work
+
+print(_VERSION)
+if math.type then print(math.type(3)) end
+if love then print(love.getVersion()) end
+
+ArrayExt = require("libs.core.ArrayExt")
+TableExt = require("libs.core.TableExt")
+
+Vec3 = require("libs.core.Vec3")
+
+Edge = require("libs.core.Edge")
+Node = require("libs.core.Node")
+Graph = require("libs.core.Graph")
+Path = require("libs.core.Path")
+
+MapExt = require("libs.map.MapExt") -- needed for Map & Tile to work
+Tile = require("libs.map.Tile")
 Map = require("libs.map.Map")
 
--- run the levele generation
-local levelMap = require ("libs.generator.generator")
+-- data
+tileTypesDefs = require("data.tileTypes")
+questTypesDefs = require("data.questTypes")
 
+-- run the levele generation
+levelMap = require ("libs.generator.questBasedGenerator")
+
+-- ================================================================ --
+-- ================================================================ --
 -- == UNREAL INTEGRATION WILL NEED ABOVE CODE in the Lua Wrapper == --
 -- saved on this level to avoid saving in Unreal
-MapExt.SaveMapToFile("levelMapExported.lua", levelMap)
+-- TableExt.SaveToFile("levelMapExported.lua", levelMap)
 
 -- BELOW JUST LOVE 2D debugging
-local draw = require("libs.draw.draw")
-local gamera = require("libs.gamera.gamera")
-local camera = gamera.new(-5000,-5000,5000,5000)
-local positionCenterX = 900
-local positionCenterY = 450
-camera:setWorld(-5000,-5000,10000,10000)
-camera:setWindow(0,0,1900,1000)
-camera:setPosition(
-	(0 + positionCenterX) * 0.5,
-	(0 + positionCenterY) * 0.5
-)
+Colors = require("libs.drawLove.Colors")
+Draw = require("libs.drawLove.Draw")
+DrawMap = require("libs.drawLove.DrawMap")
+Gamera = require("libs.gamera.gamera")
+
+local DRAW_SIZE = 20000
+local camera = Gamera.new(-DRAW_SIZE,-DRAW_SIZE,DRAW_SIZE,DRAW_SIZE)
+local positionCenterX = 0
+local positionCenterY = 0
+camera:setWorld(-5000,-5000,DRAW_SIZE,DRAW_SIZE)
+camera:setWindow(0,0,640,480)
+camera:setPosition(positionCenterX, positionCenterY)
+
 local UI_STATES = {
   pan = false,
 }
@@ -41,15 +61,19 @@ function love.update(dt)
 end
 
 function love.draw()
-  love.graphics.setBackgroundColor(255, 255, 255)
+  love.graphics.setBackgroundColor(192, 192, 192)
   --simple rectancle drawing in case we do error in the rest of the code
   --love.graphics.setColor(0, 255, 0)
   --love.graphics.rectangle("fill", 0, 0, 100, 100)
-  
-  camera:draw(draw.DrawRooms) 
-  camera:draw(draw.DrawPaths)
-  camera:draw(draw.DrawProhibitedConnections)
-  camera:draw(draw.DrawPassLevel)
+
+  camera:draw(DrawMap.AllTiles) 
+  camera:draw(DrawMap.AllPaths)
+  -- camera:draw(draw.DrawPaths)
+  -- camera:draw(draw.DrawProhibitedConnections)
+  -- camera:draw(draw.DrawPassLevel)
+
+  DrawMap.CameraAndCursorPosition(camera)
+  DrawMap.DebugControl(camera)
 end
 
 function love.mousepressed(x, y, button) 
@@ -64,17 +88,14 @@ function love.mousereleased(x, y, button)
 end
 function love.mousemoved(x, y, dx, dy, istouch)
   if UI_STATES.pan then
-    local wx, wy = camera:getPosition()
-    camera:setPosition(wx - dx, wy - dy)
+    DrawMap.PanMouse(camera, x, y, dx, dy, istouch)
   end
 end
 
 function love.wheelmoved(x, y)
-  local mx,my = love.mouse.getPosition()
-  if y > 0 then
-    camera:setScale(camera:getScale()+0.05)
-  elseif y < 0 then
-    camera:setScale(camera:getScale()-0.05)
-  end
-  camera:setPosition(mx,my)
+  DrawMap.WheelZoom(camera, x, y)
+end
+
+function love.keyreleased(key, scancode) 
+  DrawMap.ControlKeys(camera, key, scancode)
 end

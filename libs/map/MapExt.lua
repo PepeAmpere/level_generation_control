@@ -1,18 +1,24 @@
 -- functions related to map maping which are not methods of the map object
 
-local directions = {
+local DIRECTIONS = {
   "north",
   "east",
   "south",
   "west"
 }
-
-local oppositionTable = {
+local DIR_TO_VEC3 = {
+  north = Vec3(0,1,0),
+  east = Vec3(1,0,0),
+  south = Vec3(0,-1,0),
+  west = Vec3(-1,0,0),
+}
+local RENDER_FLIP_Y = -1
+local OPPOSITION_TABLE = {
   north = "south",
   east = "west",
   south = "north",
   west = "east"
-}
+} 
 
 local function CopyPath(path)
   local newPath = {}
@@ -22,20 +28,24 @@ local function CopyPath(path)
   return newPath
 end
 
+local function FlipCoords2D(coords)
+  for i=1, #coords do
+    if i % 2 == 0 then
+      coords[i] = coords[i] * RENDER_FLIP_Y
+    end
+  end
+  return coords
+end
 local function GetDirections()
-  return directions
+  return DIRECTIONS
 end
 
-local function GetMapTileKey(x, y, minX, maxX, minY, maxY)
-  if x < minX then return nil end
-  if x > maxX then return nil end
-  if y < minY then return nil end
-  if y > maxY then return nil end
-  return x .. "_" .. y
+local function GetMapTileKey(position)
+  return position:X().. "_" .. position:Y()
 end
 
 local function GetOppositeDirection(direction)
-  return oppositionTable[direction]
+  return OPPOSITION_TABLE[direction]
 end
 
 local function MakePathString(path)
@@ -56,53 +66,21 @@ local function RandomizeDirection(directionsTable)
   return newDirectionTable
 end
 
-local function WriteTableToFile(tbl, file, indent)
-  indent = indent or 0
-  local writeIndent = string.rep("  ", indent)
 
-  if indent > 0 then
-    file:write("{\n")
-    -- file:write(writeIndent .. "{\n")
-  else
-    file:write("return {\n")
-  end
-
-  for key, value in pairs(tbl) do
-    if type(key) == "string" then
-      file:write(writeIndent .. "  [\"" .. key .. "\"] = ")
-    else
-      file:write(writeIndent .. "  [" .. tostring(key) .. "] = ")
-    end
-    if type(value) == "table" then
-      WriteTableToFile(value, file, indent + 1)
-    elseif type(value) == "string" then
-      file:write(string.format("%q", value))
-    else
-      file:write(tostring(value))
-    end
-    file:write(",\n")
-  end
-
-  file:write(writeIndent .. "}")
-end
-
-local function SaveMapToFile(fileName, mapData)
-  local file = io.open(fileName, "w")
-  if file then
-    WriteTableToFile(mapData, file, 0)
-    file:close()
-  else
-    print("Error: could not open file for writing")
-  end
-end
 
 return {
+  DIRECTIONS = DIRECTIONS,
+  DIR_TO_VEC3 = DIR_TO_VEC3,
+  HALF_RECT_SIZE = 150,
+  HALF_SIZE = 450,
+  RENDER_FLIP_Y = RENDER_FLIP_Y,
+  OPPOSITION_TABLE = OPPOSITION_TABLE,
+
   CopyPath = CopyPath,
+  FlipCoords2D = FlipCoords2D,
   GetDirections = GetDirections,
   GetMapTileKey = GetMapTileKey,
   GetOppositeDirection = GetOppositeDirection,
   MakePathString = MakePathString,
   RandomizeDirection = RandomizeDirection,
-  SaveMapToFile = SaveMapToFile,
-  WriteTableToFile = WriteTableToFile,
 }

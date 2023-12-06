@@ -1,162 +1,75 @@
--- dependency on MapExt which is loaded externally to reduce environment specific code
+-- dependency on 
+-- * MapExt
+-- * Edge
+-- * Node
+-- * Graph
+-- * Tile
+-- which is loaded externally to reduce environment specific code
 
-local mapIndex = {}
-local mapMeta = {}
-mapMeta.__index = mapIndex
-mapMeta.__metatable = false -- access
-
-local CopyPath = MapExt.CopyPath
-local GetDirections = MapExt.GetDirections
 local GetMapTileKey = MapExt.GetMapTileKey
-local GetOppositeDirection = MapExt.GetOppositeDirection
 
-local DIRECTIONS = GetDirections()
+local Map = {}
+Map.__index = Map
+setmetatable(Map, Graph)
 
-local function GetNeighborTable(x, y, minX, maxX, minY, maxY)
-  local neighborTileKey = GetMapTileKey(x, y, minX, maxX, minY, maxY)
-  if neighborTileKey then
-    return {
-      tileKey = neighborTileKey,
-      passedByPaths = {},
-    }
-  end
-end
-
-local function MakeMeTile(x, y, minX, maxX, minY, maxY)
-  return {
-    x = x,
-    y = y,
-    alreadyVisited = false,
-    roomType = "undefined",
-    blocked = false,
-    myPath = {},
-    north = GetNeighborTable(x, y + 1, minX, maxX, minY, maxY),
-    east = GetNeighborTable(x + 1, y, minX, maxX, minY, maxY),
-    south = GetNeighborTable(x, y - 1, minX, maxX, minY, maxY),
-    west = GetNeighborTable(x - 1, y, minX, maxX, minY, maxY),
-  }
-end
-
-local function new(minX, maxX, minY, maxY)
+function Map.new(minX, maxX, minY, maxY, tileSize)
+  local i = setmetatable({}, Map) -- make new instance
   minX = minX or -1
   maxX = maxX or 1
   minY = minY or -1
   maxY = maxY or 1
-  local tiles = {}
-  for x = minX, maxX do
-    for y = minY, maxY do
-      local tileKey = GetMapTileKey(x, y, minX, maxX, minY, maxY)
-      tiles[tileKey] = MakeMeTile(x, y, minX, maxX, minY, maxY)
+  tileSize = tileSize or 1
+
+  local nodes = {}
+  for x = minX*tileSize, maxX*tileSize, tileSize do
+    for y = minY*tileSize, maxY*tileSize, tileSize do
+      local tileKey = GetMapTileKey(Vec3(x, y, 0))
+      local newTile = Tile.newFromNode(Node.new(tileKey, Vec3(x, y, 0)), tileSize)
+      newTile:SetTag("tile")
+      nodes[tileKey] = newTile
     end
   end
-  return setmetatable(
-    {
-      minX = minX,
-      maxX = maxX,
-      minY = minY,
-      maxY = maxY,
-      tiles = tiles,
-    },
-    mapMeta
-  ) 
-end
 
-local Map = new
+  i.nodes = nodes
+  i.edges = {}
 
-function mapIndex:DeleteConnection(tileKey, direction)
-  local tiles = self.tiles
-  if tiles[tileKey][direction] then
-    local tileKeyInDirection = self:GetNeigborTileKey(tileKey, direction)
-    tiles[tileKeyInDirection][GetOppositeDirection(direction)] = nil
-    tiles[tileKey][direction] = nil
+  for _, node in pairs(nodes) do
+    i:TransformTileToType(node, tileTypesDefs["Undefined"])
   end
+  return i
 end
 
-function mapIndex:GetNeigborTileKey(tileKey, direction)
-  if self.tiles[tileKey][direction] then
-    return self.tiles[tileKey][direction].tileKey
-  end
-end
-
-function mapIndex:GetTileBlocked(tileKey)
-  return self.tiles[tileKey].blocked
-end
-
-function mapIndex:GetTileData(tileKey)
-  return self.tiles[tileKey]
-end
-
-function mapIndex:GetTilePath(tileKey)
-  local pathCopy = CopyPath(self.tiles[tileKey].myPath)
-  return pathCopy
-end
-
-function mapIndex:GetTileRoomType(tileKey)
-  return self.tiles[tileKey].roomType
-end
-
-function mapIndex:GetTileVisited(tileKey)
-  return self.tiles[tileKey].alreadyVisited
-end
-
-function mapIndex:SetTileBlocked(tileKey)
-  self.tiles[tileKey].blocked = true
-
-  return self
-end
-
-function mapIndex:SetTilePath(tileKey, path)
-  self.tiles[tileKey].myPath = path  
-  return self
-end
-
-function mapIndex:SetTilesPassed(tileAkey, tileBkey, pathKey)  
-  for d=1, #DIRECTIONS do
-    local selectedDirection = DIRECTIONS[d]
-    local neighborKey = self:GetNeigborTileKey(tileAkey, selectedDirection)
-    if 
-      neighborKey == tileBkey
-    then
-      local tileAPaths = self.tiles[tileAkey][selectedDirection].passedByPaths
-      local tileBDirection = GetOppositeDirection(selectedDirection)
-      local tileBPaths = self.tiles[tileBkey][tileBDirection].passedByPaths
-
-      tileAPaths[#tileAPaths + 1] = pathKey
-      tileBPaths[#tileBPaths + 1] = pathKey
+function Map:GetTiles()
+  local nodes = self:GetNodes()
+  local filtered = {}
+  for nodeID, node in pairs(nodes) do
+    if node:HasTag("tile") then
+      filtered[nodeID] = node
     end
   end
-  return self
+
+  return filtered -- this is table: nodeID => nodeObject
 end
 
-function mapIndex:SetTileRoomType(tileKey, roomType)
-  self.tiles[tileKey].roomType = roomType
-  local typeData = roomTypes[roomType]
-  for d=1, #DIRECTIONS do
-    if typeData.doors[DIRECTIONS[d]] then
-    else
-      self:DeleteConnection(tileKey, DIRECTIONS[d])
-    end
+function Map:GetTile(tileID)
+  return self:GetNode(tileID)
+end
+
+function Map:TransformTileToType(tile, tileTypeDefinition)
+  local tileID = tile:GetID()
+
+  local function TypeMatcher(edge) return edge:IsTypeOf("multiedge") end
+  local function TagsMatcher(edge) return edge:HasTag("sp")  end
+  local tileStructuralEdges = tile:GetAllEdges(TypeMatcher, TagsMatcher)
+
+  for edgeID,_  in pairs(tileStructuralEdges) do
+    self:RemoveEdge(self.edges[edgeID])
   end
-  return self
-end
+  
+  -- transform tile iself
+  tile:TransformToType(tileTypeDefinition)
 
-function mapIndex:SetTileVisited(tileKey, visitedValue)
-  self.tiles[tileKey].alreadyVisited = visitedValue
-  return self
-end
-
-function mapIndex:TrackAllPathsPasses()
-  for tileKey, tileData in pairs(self.tiles) do
-    local path = self:GetTilePath(tileKey)
-    if path then 
-      for i=1, #path-1 do
-        local tileA = path[i]
-        local tileB = path[i+1]
-        self:SetTilesPassed(tileA, tileB, tileKey)
-      end
-    end
-  end
-  return self
+  -- transform map
 end
 
 return Map
