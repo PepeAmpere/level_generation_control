@@ -1,4 +1,4 @@
-local nodesData = {
+local nodesDefs = {
   ["Cabinet"] = { relativePosition = Vec3(-300, 300, 0), tags = {"is"} },
   ["EastEntrance"] = { relativePosition = Vec3(0, 400, 0), tags = {"tc"} },
   ["PhotoWall"] = { relativePosition = Vec3(100, 0, 0) },
@@ -13,7 +13,7 @@ local nodesData = {
   ["SouthEntrance"] = { relativePosition = Vec3(-400, 0, 0), tags = {"tc"} },
 }
 
-local edgesData = {
+local edgesDefs = {
   { edgeType = "directional", tags = {"pp"}, from = "RoomNextToRitualTable", to = "RitualTable" },
   { edgeType = "directional", tags = {"pp"}, from = "RitualTable", to = "RoomNextToRitualTable" },
   { edgeType = "directional", tags = {"pp"}, from = "RoomNextToRitualTable", to = "PhotoWall" },
@@ -38,14 +38,14 @@ local edgesData = {
   },
 }
 
-local drawData = {
+local drawDefs = {
     "x", "x", "x",
     "w", "w", "w",
     "w", "w", "w",
 }
 
 return {
-  nodesData = nodesData,
-  edgesData = edgesData,
-  drawData = drawData,
+  nodesDefs = nodesDefs,
+  edgesDefs = edgesDefs,
+  drawDefs = drawDefs,
 }

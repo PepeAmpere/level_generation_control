@@ -44,6 +44,21 @@ local function GetMapTileKey(position)
   return position:X().. "_" .. position:Y()
 end
 
+local function GetNodeKey(tileID, nodeName)
+  return tileID .. "_" .. nodeName
+end
+
+local function GetEdgeKey(nodesNames, edgeTags)
+  local finalName = ""
+  for i = 1, #nodesNames do
+    finalName = finalName .. "_" .. nodesNames[i]
+  end
+  for i = 1, #edgeTags do
+    finalName = finalName .. "_" .. edgeTags[i]
+  end
+  return finalName
+end
+
 local function GetOppositeDirection(direction)
   return OPPOSITION_TABLE[direction]
 end
@@ -80,6 +95,8 @@ return {
   FlipCoords2D = FlipCoords2D,
   GetDirections = GetDirections,
   GetMapTileKey = GetMapTileKey,
+  GetNodeKey = GetNodeKey,
+  GetEdgeKey = GetEdgeKey,
   GetOppositeDirection = GetOppositeDirection,
   MakePathString = MakePathString,
   RandomizeDirection = RandomizeDirection,

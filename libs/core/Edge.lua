@@ -19,7 +19,7 @@ function Edge:GetNodesFrom()
   return self.nodesFrom
 end
 
-function Edge:GtNodesTo()
+function Edge:GetNodesTo()
   return self.nodesTo
 end
 

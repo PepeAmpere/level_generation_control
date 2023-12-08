@@ -17,7 +17,15 @@ local startTile = levelMap:GetTile(GetMapTileKey(Vec3(0,0,0)))
 levelMap:TransformTileToType(startTile, tileTypesDefs["RitualRoom"])
 
 -- experimental conversion
-local randomCrossTile = levelMap:GetTile(GetMapTileKey(Vec3(math.random(2,3)*900,math.random(2,3)*900,0)))
+local randomCrossTile = levelMap:GetTile(
+  GetMapTileKey(
+    Vec3(
+      math.random(2,3)*900,
+      math.random(2,3)*900,
+      0
+    )
+  )
+)
 levelMap:TransformTileToType(randomCrossTile, tileTypesDefs["Crossroad"])
 
 return levelMap

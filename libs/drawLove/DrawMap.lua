@@ -26,7 +26,7 @@ local SUBTILES_POSITIONS = {
 }
 
 -- functions localization
-local GetMapTileKey = MapExt.GetMapTileKey
+-- local GetMapTileKey = MapExt.GetMapTileKey
 
 -- testing data
 local testingNodes = {}
@@ -47,7 +47,8 @@ local textfields = {}
 local function DrawTile(tile)
   local tileType = tile:GetType()
   local tilePosition = tile:GetPosition()
-  local drawData = tileTypesDefs[tileType].drawData
+
+  local drawData = tileTypesDefs[tileType].drawDefs
   for i=1, #drawData do
     local rectanglePosition = tilePosition + SUBTILES_POSITIONS[i]
     local color = TILE_KEY_TO_COLOR[drawData[i]]
@@ -66,6 +67,25 @@ local function DrawTile(tile)
       textfields[stringToWrite] = text
     end
   end
+
+  love.graphics.setColor(0,0,0,255)
+  love.graphics.rectangle(
+    "line",
+    tilePosition:X() - 3*RECT_SIZE2, (tilePosition:Y() + 3*RECT_SIZE2)*RENDER_FLIP_Y,
+    6*RECT_SIZE2, 6*RECT_SIZE2
+  )
+end
+
+local function AllEdges()
+  for _, edge in pairs(levelMap.edges) do
+    Draw.Edge(edge)
+  end
+end
+
+local function AllNodes()
+  for _, node in pairs(levelMap.nodes) do
+    Draw.Node(node)
+  end
 end
 
 local function AllPaths()
@@ -74,7 +94,7 @@ end
 
 local function AllTiles()
   local tiles = levelMap:GetTiles()
-  for tileID, tile in pairs(tiles) do
+  for _, tile in pairs(tiles) do
     DrawTile(tile)
   end
 end
@@ -125,7 +145,7 @@ local function ControlKeys(camera, key, scancode)
   local scaleInverted = 1/scale
   local delta = RECT_SIZE2 * scaleInverted
   local y = 0
-  
+
   if key == "left" then cx = cx - delta end
   if key == "right" then cx = cx + delta end
   if key == "up" then cy = cy - delta end
@@ -165,6 +185,8 @@ local function PanMouse(camera, x, y, dx, dy, istouch)
 end
 
 return {
+  AllEdges = AllEdges,
+  AllNodes = AllNodes,
   AllPaths = AllPaths,
   AllTiles = AllTiles,
   CameraAndCursorPosition = CameraAndCursorPosition,

@@ -44,7 +44,16 @@ local function SaveToFile(fileName, tbl)
   end
 end
 
+local function ShallowCopy(tbl)
+  local tblCopy = {}
+  for key, value in pairs(tbl) do
+    tblCopy[key] = value
+  end
+  return tblCopy
+end
+
 return {
   SaveToFile = SaveToFile,
+  ShallowCopy = ShallowCopy,
   WriteUsingFunction = WriteUsingFunction,
 }

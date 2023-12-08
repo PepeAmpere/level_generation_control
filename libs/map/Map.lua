@@ -1,4 +1,5 @@
--- dependency on 
+-- dependency on
+-- * ArrayExt
 -- * MapExt
 -- * Edge
 -- * Node
@@ -7,6 +8,8 @@
 -- which is loaded externally to reduce environment specific code
 
 local GetMapTileKey = MapExt.GetMapTileKey
+local GetNodeKey = MapExt.GetNodeKey
+local GetEdgeKey = MapExt.GetEdgeKey
 
 local Map = {}
 Map.__index = Map
@@ -24,8 +27,17 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
   for x = minX*tileSize, maxX*tileSize, tileSize do
     for y = minY*tileSize, maxY*tileSize, tileSize do
       local tileKey = GetMapTileKey(Vec3(x, y, 0))
-      local newTile = Tile.newFromNode(Node.new(tileKey, Vec3(x, y, 0)), tileSize)
-      newTile:SetTag("tile")
+      local newTile = Tile.newFromNode(
+        Node.new(
+          tileKey,
+          Vec3(x, y, 0),
+          nil,
+          {
+            tile = true
+          }
+        ),
+        tileSize
+      )
       nodes[tileKey] = newTile
     end
   end
@@ -33,14 +45,15 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
   i.nodes = nodes
   i.edges = {}
 
-  for _, node in pairs(nodes) do
-    i:TransformTileToType(node, tileTypesDefs["Undefined"])
+  local allTileNodes = TableExt.ShallowCopy(nodes)
+  for _, tile in pairs(allTileNodes) do
+    i:TransformTileToType(tile, tileTypesDefs["Undefined"])
   end
   return i
 end
 
 function Map:GetTiles()
-  local nodes = self:GetNodes()
+  local nodes = self.nodes
   local filtered = {}
   for nodeID, node in pairs(nodes) do
     if node:HasTag("tile") then
@@ -56,20 +69,68 @@ function Map:GetTile(tileID)
 end
 
 function Map:TransformTileToType(tile, tileTypeDefinition)
-  local tileID = tile:GetID()
+  -- print("Transforming tile " .. tile.id .. " to " .. tileTypeDefinition.name)
 
-  local function TypeMatcher(edge) return edge:IsTypeOf("multiedge") end
-  local function TagsMatcher(edge) return edge:HasTag("sp")  end
-  local tileStructuralEdges = tile:GetAllEdges(TypeMatcher, TagsMatcher)
+  -- remove all nodes and edges
+  local allTileNodes = tile:GetAllNodes()
 
-  for edgeID,_  in pairs(tileStructuralEdges) do
-    self:RemoveEdge(self.edges[edgeID])
+  for _, tileNode in pairs(allTileNodes) do
+    self:RemoveNode(tileNode)
   end
-  
-  -- transform tile iself
+
+  -- transform tile type itself
   tile:TransformToType(tileTypeDefinition)
 
-  -- transform map
+  -- add new nodes and edges
+  local nodesTypesInstances = {}
+  for nodeType, nodeDef in pairs(tileTypeDefinition.nodesDefs) do
+    local newNodeName = GetNodeKey(tile:GetID(), nodeType)
+    local tags = nodeDef.tags or {}
+    self.nodes[newNodeName] = Node.new(
+      newNodeName,
+      tile:GetPosition() + nodeDef.relativePosition,
+      nodeType,
+      ArrayExt.ConvertToTable(tags)
+    )
+    nodesTypesInstances[nodeType] = self.nodes[newNodeName]
+  end
+
+  for _, edgeDef in pairs(tileTypeDefinition.edgesDefs) do
+    local nodeTypes = {}
+    if edgeDef.nodes then
+      local nodesRefereces = {}
+      for _, nodeType in pairs(edgeDef.nodes) do
+        nodeTypes[#nodeTypes + 1] = nodeType
+        nodesRefereces[nodeType] = nodesTypesInstances[nodeType]
+      end
+      local newEdgeName = GetEdgeKey(nodeTypes, edgeDef.tags)
+      self.edges[newEdgeName] = Edge.new(
+        newEdgeName,
+        nodesRefereces,
+        nodesRefereces,
+        edgeDef.edgeType,
+        ArrayExt.ConvertToTable(edgeDef.tags)
+      )
+    else
+      nodeTypes[1] = edgeDef.from
+      nodeTypes[2] = edgeDef.to
+
+      local newEdgeName = GetEdgeKey(nodeTypes, edgeDef.tags)
+      self.edges[newEdgeName] = Edge.new(
+        newEdgeName,
+        {nodesTypesInstances[edgeDef.from]}, -- 1 item array
+        {nodesTypesInstances[edgeDef.to]}, -- 1 item array
+        edgeDef.edgeType,
+        ArrayExt.ConvertToTable(edgeDef.tags)
+      )
+    end
+  end
+
+--[[
+  for k,v in pairs (self.edges) do
+    print(k,v)
+  end
+  ]]--
 end
 
 return Map

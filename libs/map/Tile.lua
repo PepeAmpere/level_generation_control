@@ -10,7 +10,6 @@ local DIR_TO_VEC3 = MapExt.DIR_TO_VEC3
 -- functions localization
 local GetMapTileKey = MapExt.GetMapTileKey
 
-
 local Tile = {}
 Tile.__index = Tile
 setmetatable(Tile, Node)
@@ -27,6 +26,23 @@ function Tile.newFromNode(node, tileSize)
     west = GetMapTileKey(i.position + DIR_TO_VEC3.west * tileSize),
   }
   return i
+end
+
+function Tile:GetAllNodes()
+  local function TypeMatcher(edge) return edge:IsTypeOf("multiedge") end
+  local function TagsMatcher(edge) return edge:HasTag("sp")  end
+  local tileStructuralEdges = self:GetAllEdges(TypeMatcher, TagsMatcher)
+
+  local tileNodes = {}
+  for _, edge in pairs(tileStructuralEdges) do
+    for nodeID, node in pairs(edge:GetNodesFrom()) do
+      tileNodes[nodeID] = node
+    end
+    for nodeID, node in pairs(edge:GetNodesTo()) do
+      tileNodes[nodeID] = node
+    end
+  end
+  return tileNodes
 end
 
 function Tile:GetNeighborTileKey(direction)

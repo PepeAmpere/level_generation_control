@@ -1,4 +1,5 @@
--- dependency on 
+-- dependency on
+-- * ArrayExt
 -- * Vec3
 -- which is loaded externally to reduce environment specific code
 
@@ -23,13 +24,13 @@ function Node:GetAllEdges(TypeMatcher, TagsMatcher)
 
   for _, edge in pairs(self.edgesOut) do
     if TypeMatcher(edge) and TagsMatcher(edge) then
-      selectedEdges[edge.id] = true
+      selectedEdges[edge.id] = edge
     end
   end
 
   for _, edge in pairs(self.edgesIn) do
     if TypeMatcher(edge) and TagsMatcher(edge) then
-      selectedEdges[edge.id] = true
+      selectedEdges[edge.id] = edge
     end
   end
 

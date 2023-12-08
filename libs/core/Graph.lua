@@ -23,7 +23,7 @@ function Graph.new(nodesList, edgesList)
   local edges = {} -- edge key => object reference
 
   if edgesList == nil then edgesList = {} end
-  for _, edge in ipairs(orderedEdges) do
+  for _, edge in ipairs(edgesList) do
     local edgeID = edge:GetID()
     edges[edgeID] = edge
   end
@@ -56,6 +56,25 @@ function Graph:RemoveEdge(edge)
   end
 
   self.edges[edgeID] = nil
+end
+
+function Graph:RemoveNode(node)
+  local nodeID = node:GetID()
+  local edgesToRemove = {}
+
+  for _, edge in pairs(node.edgesOut) do
+    edgesToRemove[edge.id] = edge
+  end
+
+  for _, edge in pairs(node.edgesIn) do
+    edgesToRemove[edge.id] = edge
+  end
+
+  for _, edge in pairs(edgesToRemove) do
+    self:RemoveEdge(edge)
+  end
+
+  self.nodes[nodeID] = nil
 end
 
 
