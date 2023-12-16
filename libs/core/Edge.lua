@@ -1,14 +1,26 @@
+-- runtime dependency on
+-- * Node
+
 local Edge = {}
 Edge.__index = Edge
 
 function Edge.new(id, nodesFrom, nodesTo, edgeType, tags)
   local i = setmetatable({}, Edge) -- make new instance
   i.id = id
-  i.nodesFrom = nodesFrom or {}
-  i.nodesTo = nodesTo or {}
+  i.nodesFrom = nodesFrom or {} -- array, index => node (to keep the order for multiedges)
+  i.nodesTo = nodesTo or {} -- array, index => node (to keep the order for multiedges)
   i.edgeType = edgeType or "Undefined"
   i.tags = tags or {}
   return i
+end
+
+function Edge:DisconnectFromNodes()
+  for _, node in ipairs(self.nodesTo) do
+    node:RemoveEdge(self)
+  end
+  for _, node in ipairs(self.nodesFrom) do
+    node:RemoveEdge(self)
+  end
 end
 
 function Edge:GetID()

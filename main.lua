@@ -34,6 +34,7 @@ local tileKey = MapExt.GetMapTileKey(Vec3(0, 0, 0))
 TableExt.SaveToFile("levelMapExported.lua", levelMap.nodes)
 
 -- BELOW JUST LOVE 2D debugging
+-- lovebird = require "libs.lovebird.init
 Colors = require("libs.drawLove.Colors")
 Draw = require("libs.drawLove.Draw")
 DrawMap = require("libs.drawLove.DrawMap")
@@ -44,11 +45,11 @@ local camera = Gamera.new(-DRAW_SIZE,-DRAW_SIZE,DRAW_SIZE,DRAW_SIZE)
 local positionCenterX = 0
 local positionCenterY = 0
 camera:setWorld(-5000,-5000,DRAW_SIZE,DRAW_SIZE)
-camera:setWindow(0,0,640,480)
+camera:setWindow(0,0,1024,768)
 camera:setPosition(positionCenterX, positionCenterY)
 
 local UI_STATES = {
-  pan = false,
+pan = false,
 }
 
 function love.load()
@@ -56,49 +57,50 @@ function love.load()
 end
 
 function love.update(dt)
-  if dt < 1/10 then
-    love.timer.sleep(1/10 - dt)
-  end
+if dt < 1/10 then
+  love.timer.sleep(1/10 - dt)
+end
+-- lovebird.update()
 end
 
 function love.draw()
-  love.graphics.setBackgroundColor(192, 192, 192)
-  --simple rectancle drawing in case we do error in the rest of the code
-  --love.graphics.setColor(0, 255, 0)
-  --love.graphics.rectangle("fill", 0, 0, 100, 100)
+love.graphics.setBackgroundColor(192, 192, 192)
+--simple rectancle drawing in case we do error in the rest of the code
+--love.graphics.setColor(0, 255, 0)
+--love.graphics.rectangle("fill", 0, 0, 100, 100)
 
-  camera:draw(DrawMap.AllTiles)
-  -- camera:draw(DrawMap.AllPaths)
-  camera:draw(DrawMap.AllNodes)
-  camera:draw(DrawMap.AllEdges)
-  -- camera:draw(draw.DrawPaths)
-  -- camera:draw(draw.DrawProhibitedConnections)
-  -- camera:draw(draw.DrawPassLevel)
+camera:draw(DrawMap.AllTiles)
+-- camera:draw(DrawMap.AllPaths)
+camera:draw(DrawMap.AllNodes)
+camera:draw(DrawMap.AllEdges)
+-- camera:draw(draw.DrawPaths)
+-- camera:draw(draw.DrawProhibitedConnections)
+-- camera:draw(draw.DrawPassLevel)
 
-  DrawMap.CameraAndCursorPosition(camera)
-  DrawMap.DebugControl(camera)
+DrawMap.CameraAndCursorPosition(camera)
+DrawMap.DebugControl(camera)
 end
 
 function love.mousepressed(x, y, button) 
-  if button == 2 then -- right mouse button
-    UI_STATES.pan = true
-  end
+if button == 2 then -- right mouse button
+  UI_STATES.pan = true
+end
 end
 function love.mousereleased(x, y, button)
-  if button == 2 then -- right mouse button
-    UI_STATES.pan = false
-  end
+if button == 2 then -- right mouse button
+  UI_STATES.pan = false
+end
 end
 function love.mousemoved(x, y, dx, dy, istouch)
-  if UI_STATES.pan then
-    DrawMap.PanMouse(camera, x, y, dx, dy, istouch)
-  end
+if UI_STATES.pan then
+  DrawMap.PanMouse(camera, x, y, dx, dy, istouch)
+end
 end
 
 function love.wheelmoved(x, y)
-  DrawMap.WheelZoom(camera, x, y)
+DrawMap.WheelZoom(camera, x, y)
 end
 
 function love.keyreleased(key, scancode) 
-  DrawMap.ControlKeys(camera, key, scancode)
+DrawMap.ControlKeys(camera, key, scancode)
 end

@@ -41,48 +41,20 @@ function Graph:GetNodes()
   return self.nodes -- copy or reference?
 end
 
-function Graph:RemoveEdge(edge)
-  local edgeID = edge:GetID()
-  local nodesFrom = edge:GetNodesFrom()
-  for nodeID, _ in pairs(nodesFrom) do
-    local node = self.nodes[nodeID]
-    if node then 
-      node:RemoveEdge(edgeID) 
-    end
-  end
-
-  local nodesTo = edge:GetNodesTo()
-  for nodeID, _ in pairs(nodesTo) do
-    local node = self.nodes[nodeID]
-    if node then 
-      node:RemoveEdge(edgeID) 
-    end
-  end
-
-  self.edges[edgeID] = nil
-end
-
 function Graph:RemoveNode(node)
   local nodeID = node:GetID()
-  local edgesToRemove = {}
 
-  for _, edge in pairs(node.edgesOut) do
-    edgesToRemove[edge:GetID()] = edge
+  local allEdges = node:GetAllEdges()
+
+  -- remove global references from the edges table
+  for edgeID, edge in pairs(allEdges) do
+  self.edges[edgeID] = nil
   end
 
-  for _, edge in pairs(node.edgesIn) do
-    edgesToRemove[edge:GetID()] = edge
-  end
-
-  for _, edge in pairs(edgesToRemove) do
-    if nodeID == "0_0_WestEntrance" then
-     print(edge:GetID())
-    end
-    self:RemoveEdge(edge)
-  end
-
+  -- remove in-node refences to the same tables
+  node:RemoveAllEdges()
+  -- removed node reference itself
   self.nodes[nodeID] = nil
 end
-
 
 return Graph

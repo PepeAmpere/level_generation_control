@@ -51,37 +51,13 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
 
   local allTileNodes = TableExt.ShallowCopy(nodes)
   for _, tile in pairs(allTileNodes) do
-    i:TransformTileToType(tile, tileTypesDefs["Undefined"])
+    i:PopulateTilePerType(tile, tileTypesDefs["Undefined"])
   end
 
   for _, tile in pairs(allTileNodes) do
-    for _, direction in ipairs(DIRECTIONS) do
-      local neighborTileKey = tile:GetNeighborTileKey(direction)
-      local neighborTile = nodes[neighborTileKey]
-      if (neighborTile) then
-        local oppositeDirection = OPPOSITION_TABLE[direction]
-        local _, myConnectorNode = next(tile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[direction]))
-        local _, neighborConnectorNode = next(neighborTile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[oppositeDirection]))
-        local tags = {"connector"}
-        local newEdgeKey = GetEdgeKey(
-          tile:GetID(),
-          {
-            myConnectorNode:GetID(),
-            neighborConnectorNode:GetID(),
-          },
-          tags
-        )
-        i.edges[newEdgeKey] = Edge.new(
-          newEdgeKey,
-          {myConnectorNode}, -- 1 item array
-          {neighborConnectorNode}, -- 1 item array
-          "directional",
-          ArrayExt.ConvertToTable(tags)
-        )
-        myConnectorNode:Connect(neighborConnectorNode, i.edges[newEdgeKey])
-      end
-    end
+    i:ConnectNeighborTiles(tile)
   end
+
   return i
 end
 
@@ -101,17 +77,20 @@ function Map:GetTile(tileID)
   return self:GetNode(tileID)
 end
 
-function Map:TransformTileToType(tile, tileTypeDefinition)
-  -- print("Transforming tile " .. tile.id .. " to " .. tileTypeDefinition.name)
-
+function Map:CleanTile(tile)
   -- remove all nodes and edges
   local allTileNodes = tile:GetAllNodes()
 
+  -- removing nodes tables
   for _, tileNode in pairs(allTileNodes) do
-    print(tileNode:GetID())
+    print("    Removing node: " .. tileNode:GetID())
     self:RemoveNode(tileNode)
-  end
+  end 
+  -- remove structural edges on tile node
+  tile:RemoveAllEdges()
+end
 
+function Map:PopulateTilePerType(tile, tileTypeDefinition)
   -- transform tile type itself
   tile:TransformToType(tileTypeDefinition)
 
@@ -183,6 +162,60 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
       ArrayExt.ConvertToTable(structuralTags)
     )
     tile:Connect(node, self.edges[newEdgeName])
+  end
+end
+
+function Map:TransformTileToType(tile, tileTypeDefinition)
+  print("Transforming tile " .. tile:GetID() .. " to " .. tileTypeDefinition.name)
+  self:CleanTile(tile)
+
+  self:PopulateTilePerType(tile, tileTypeDefinition)
+
+  self:ReconnectTilesAroundTile(tile)
+end
+
+function Map:ReconnectTilesAroundTile(tile)
+  for _, direction in ipairs(DIRECTIONS) do
+    local neighborTileKey = tile:GetNeighborTileKey(direction)
+    local neighborTile = self.nodes[neighborTileKey]
+    if neighborTile then
+      self:ConnectNeighborTiles(neighborTile)
+    end
+  end
+  self:ConnectNeighborTiles(tile)
+end
+
+function Map:ConnectNeighborTiles(tile)
+  for _, direction in ipairs(DIRECTIONS) do
+    local neighborTileKey = tile:GetNeighborTileKey(direction)
+    local neighborTile = self.nodes[neighborTileKey]
+    if (neighborTile) then
+      local oppositeDirection = OPPOSITION_TABLE[direction]
+      local _, myConnectorNode = next(tile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[direction]))
+      local _, neighborConnectorNode = next(neighborTile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[oppositeDirection]))
+      if
+        myConnectorNode ~= nil and
+        neighborConnectorNode ~= nil
+      then
+        local tags = {"connector"}
+        local newEdgeKey = GetEdgeKey(
+          tile:GetID(),
+          {
+            myConnectorNode:GetID(),
+            neighborConnectorNode:GetID(),
+          },
+          tags
+        )
+        self.edges[newEdgeKey] = Edge.new(
+          newEdgeKey,
+          {myConnectorNode}, -- 1 item array
+          {neighborConnectorNode}, -- 1 item array
+          "directional",
+          ArrayExt.ConvertToTable(tags)
+        )
+        myConnectorNode:Connect(neighborConnectorNode, self.edges[newEdgeKey])
+      end
+    end
   end
 end
 

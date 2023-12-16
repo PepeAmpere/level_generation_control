@@ -1,5 +1,5 @@
 -- rules of spawning
-local minX = -1
+local minX = -2
 local minY = -1
 local maxX = 1
 local maxY = 1
