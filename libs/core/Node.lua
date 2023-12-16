@@ -139,6 +139,14 @@ function Node:HasTag(tag)
   return self.tags[tag]
 end
 
+function Node:AddEdgeIn(edge)
+  self.edgesIn[edge:GetID()] = edge
+end
+
+function Node:AddEdgeOut(edge)
+  self.edgesOut[edge:GetID()] = edge
+end
+
 function Node:RemoveEdge(edgeID)
   self.edgesOut[edgeID] = nil
   self.edgesIn[edgeID] = nil

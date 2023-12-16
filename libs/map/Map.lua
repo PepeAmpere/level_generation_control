@@ -107,48 +107,58 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
   for _, edgeDef in pairs(tileTypeDefinition.edgesDefs) do
     local nodeTypes = {}
     if edgeDef.nodes then
-      local nodesRefereces = {}
+      local nodesReferences = {}
       for _, nodeType in pairs(edgeDef.nodes) do
         nodeTypes[#nodeTypes + 1] = nodeType
-        nodesRefereces[#nodesRefereces + 1] = nodesTypesInstances[nodeType]
+        nodesReferences[#nodesReferences + 1] = nodesTypesInstances[nodeType]
       end
-      local newEdgeName = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
-      self.edges[newEdgeName] = Edge.new(
-        newEdgeName,
+      local newEdgeKey = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
+      self.edges[newEdgeKey] = Edge.new(
+        newEdgeKey,
         {tile},
-        nodesRefereces,
+        nodesReferences,
         edgeDef.edgeType,
         ArrayExt.ConvertToTable(edgeDef.tags)
       )
+
+      for _, node in ipairs(nodesReferences) do
+        node:AddEdgeIn(self.edges[newEdgeKey])
+        node:AddEdgeOut(self.edges[newEdgeKey])
+      end
     else
       nodeTypes[1] = edgeDef.from
       nodeTypes[2] = edgeDef.to
 
-      local newEdgeName = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
-      self.edges[newEdgeName] = Edge.new(
-        newEdgeName,
-        {nodesTypesInstances[edgeDef.from]}, -- 1 item array
-        {nodesTypesInstances[edgeDef.to]}, -- 1 item array
+      local newEdgeKey = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
+      local nodeA = nodesTypesInstances[edgeDef.from]
+      local nodeB = nodesTypesInstances[edgeDef.to]
+      self.edges[newEdgeKey] = Edge.new(
+        newEdgeKey,
+        {nodeA}, -- 1 item array
+        {nodeB}, -- 1 item array
         edgeDef.edgeType,
         ArrayExt.ConvertToTable(edgeDef.tags)
       )
+
+      nodeA:Connect(nodeB, self.edges[newEdgeKey])
     end
   end
 
   local allNodes = {} -- array with objects
   for _, node in pairs(nodesTypesInstances) do
     allNodes[#allNodes + 1] = node
-  end
 
-  local structuralTags = {"sp"}
-  local newEdgeName = GetEdgeKey(tile:GetID(), {"OwnedByTile"}, structuralTags)
-  self.edges[newEdgeName] = Edge.new(
-    newEdgeName,
-    {tile}, -- tile node
-    allNodes, -- all nodes array
-    "multiedge",
-    ArrayExt.ConvertToTable(structuralTags)
-  )
+    local structuralTags = {"sp"}
+    local newEdgeName = GetEdgeKey(tile:GetID() .. "_" .. node:GetID(), {"OwnedByTile"}, structuralTags)
+    self.edges[newEdgeName] = Edge.new(
+      newEdgeName,
+      {tile}, -- tile node
+      {node}, -- given node
+      "directional",
+      ArrayExt.ConvertToTable(structuralTags)
+    )
+    tile:Connect(node, self.edges[newEdgeName])
+  end
 end
 
 return Map

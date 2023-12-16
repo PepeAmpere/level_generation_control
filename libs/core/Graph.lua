@@ -46,13 +46,17 @@ function Graph:RemoveEdge(edge)
   local nodesFrom = edge:GetNodesFrom()
   for nodeID, _ in pairs(nodesFrom) do
     local node = self.nodes[nodeID]
-    node:RemoveEdge(edgeID)
+    if node then 
+      node:RemoveEdge(edgeID) 
+    end
   end
 
   local nodesTo = edge:GetNodesTo()
   for nodeID, _ in pairs(nodesTo) do
     local node = self.nodes[nodeID]
-    node:RemoveEdge(edgeID)
+    if node then 
+      node:RemoveEdge(edgeID) 
+    end
   end
 
   self.edges[edgeID] = nil
@@ -63,11 +67,11 @@ function Graph:RemoveNode(node)
   local edgesToRemove = {}
 
   for _, edge in pairs(node.edgesOut) do
-    edgesToRemove[edge.id] = edge
+    edgesToRemove[edge:GetID()] = edge
   end
 
   for _, edge in pairs(node.edgesIn) do
-    edgesToRemove[edge.id] = edge
+    edgesToRemove[edge:GetID()] = edge
   end
 
   for _, edge in pairs(edgesToRemove) do

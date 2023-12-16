@@ -17,7 +17,7 @@ local function WriteUsingFunction(tbl, WriteFunction, indent)
     end
     if 
       type(value) == "table" and
-      indent <= 25 -- preventing infinite recursion
+      indent <= 5 -- preventing infinite recursion
     then
       WriteUsingFunction(value, WriteFunction, indent + 1)
     elseif type(value) == "string" then
