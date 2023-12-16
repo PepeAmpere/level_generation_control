@@ -55,6 +55,22 @@ local function Edge(edge)
       {0, 127, 255, 255}
     )
   end
+
+  if edge:GetType() == "multiedge" then
+    local color = {0, 127, 255, 255}
+    if edge:HasTag("sp") then color = {192, 192, 192, 64} end
+    local centralNode = edge:GetNodesFrom()[1]
+    local nodesTo = edge:GetNodesTo()
+    for i=1, #nodesTo do
+      local node = nodesTo[i]
+      Line(
+        centralNode:GetPosition(),
+        node:GetPosition(),
+        4,
+        color
+      )
+    end
+  end
 end
 
 local function Node(node)

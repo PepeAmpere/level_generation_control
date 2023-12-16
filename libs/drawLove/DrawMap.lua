@@ -20,9 +20,9 @@ local TILE_KEY_TO_COLOR = {
   x = {168, 168, 168, 255},
 }
 local SUBTILES_POSITIONS = {
-  Vec3(-2*RECT_SIZE2, 2*RECT_SIZE2, 0),  Vec3(0, 2*RECT_SIZE2, 0), Vec3(2*RECT_SIZE2, 2*RECT_SIZE2, 0),
-  Vec3(-2*RECT_SIZE2, 0, 0),  Vec3(0, 0, 0), Vec3(2*RECT_SIZE2, 0, 0),
-  Vec3(-2*RECT_SIZE2, -2*RECT_SIZE2, 0),  Vec3(0, -2*RECT_SIZE2, 0), Vec3(2*RECT_SIZE2, -2*RECT_SIZE2, 0),
+  Vec3(2*RECT_SIZE2, -2*RECT_SIZE2, 0),  Vec3(2*RECT_SIZE2, 0, 0), Vec3(2*RECT_SIZE2, 2*RECT_SIZE2, 0),
+  Vec3(0, -2*RECT_SIZE2, 0),  Vec3(0, 0, 0), Vec3(0, 2*RECT_SIZE2, 0),
+  Vec3(-2*RECT_SIZE2, -2*RECT_SIZE2, 0),  Vec3(-2*RECT_SIZE2, 0, 0), Vec3(-2*RECT_SIZE2, 2*RECT_SIZE2, 0),
 }
 
 -- functions localization
@@ -55,24 +55,31 @@ local function DrawTile(tile)
     love.graphics.setColor(unpack(color))
     love.graphics.rectangle(
       "fill",
-      rectanglePosition:X() - RECT_SIZE2, (rectanglePosition:Y() + RECT_SIZE2)*RENDER_FLIP_Y,
+      (rectanglePosition:Y() - RECT_SIZE2), 
+      -rectanglePosition:X() - RECT_SIZE2,
       2*RECT_SIZE2, 2*RECT_SIZE2
     )
     love.graphics.setColor(255,0,255,255)
     local stringToWrite = tostring(rectanglePosition)
     if textfields[stringToWrite] then
-      love.graphics.draw(textfields[stringToWrite], rectanglePosition:X(), rectanglePosition:Y()*RENDER_FLIP_Y)
+      love.graphics.draw(
+        textfields[stringToWrite], 
+        rectanglePosition:Y(), 
+        -rectanglePosition:X()
+      )
     else
       local text = love.graphics.newText(love.graphics.getFont(), stringToWrite)
       textfields[stringToWrite] = text
     end
   end
 
+  local TILE_SPACING = 10
   love.graphics.setColor(0,0,0,255)
   love.graphics.rectangle(
     "line",
-    tilePosition:X() - 3*RECT_SIZE2, (tilePosition:Y() + 3*RECT_SIZE2)*RENDER_FLIP_Y,
-    6*RECT_SIZE2, 6*RECT_SIZE2
+    (tilePosition:Y() - 3*RECT_SIZE2),
+    -tilePosition:X() - 3*RECT_SIZE2, 
+    6*RECT_SIZE2-TILE_SPACING, 6*RECT_SIZE2-TILE_SPACING
   )
 end
 

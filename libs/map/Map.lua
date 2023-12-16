@@ -47,6 +47,14 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
 
   local allTileNodes = TableExt.ShallowCopy(nodes)
   for _, tile in pairs(allTileNodes) do
+--[[     if
+      tile:GetPosition():X() == -900 and
+      tile:GetPosition():Y() == 0
+    then
+      i:TransformTileToType(tile, tileTypesDefs["Crossroad"])
+    else
+      i:TransformTileToType(tile, tileTypesDefs["Undefined"])
+    end ]]--
     i:TransformTileToType(tile, tileTypesDefs["Undefined"])
   end
   return i
@@ -75,6 +83,7 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
   local allTileNodes = tile:GetAllNodes()
 
   for _, tileNode in pairs(allTileNodes) do
+    print(tileNode:GetID())
     self:RemoveNode(tileNode)
   end
 
@@ -82,7 +91,7 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
   tile:TransformToType(tileTypeDefinition)
 
   -- add new nodes and edges
-  local nodesTypesInstances = {}
+  local nodesTypesInstances = {} -- type => node
   for nodeType, nodeDef in pairs(tileTypeDefinition.nodesDefs) do
     local newNodeName = GetNodeKey(tile:GetID(), nodeType)
     local tags = nodeDef.tags or {}
@@ -101,12 +110,12 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
       local nodesRefereces = {}
       for _, nodeType in pairs(edgeDef.nodes) do
         nodeTypes[#nodeTypes + 1] = nodeType
-        nodesRefereces[nodeType] = nodesTypesInstances[nodeType]
+        nodesRefereces[#nodesRefereces + 1] = nodesTypesInstances[nodeType]
       end
-      local newEdgeName = GetEdgeKey(nodeTypes, edgeDef.tags)
+      local newEdgeName = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
       self.edges[newEdgeName] = Edge.new(
         newEdgeName,
-        nodesRefereces,
+        {tile},
         nodesRefereces,
         edgeDef.edgeType,
         ArrayExt.ConvertToTable(edgeDef.tags)
@@ -115,7 +124,7 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
       nodeTypes[1] = edgeDef.from
       nodeTypes[2] = edgeDef.to
 
-      local newEdgeName = GetEdgeKey(nodeTypes, edgeDef.tags)
+      local newEdgeName = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
       self.edges[newEdgeName] = Edge.new(
         newEdgeName,
         {nodesTypesInstances[edgeDef.from]}, -- 1 item array
@@ -126,11 +135,20 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
     end
   end
 
---[[
-  for k,v in pairs (self.edges) do
-    print(k,v)
+  local allNodes = {} -- array with objects
+  for _, node in pairs(nodesTypesInstances) do
+    allNodes[#allNodes + 1] = node
   end
-  ]]--
+
+  local structuralTags = {"sp"}
+  local newEdgeName = GetEdgeKey(tile:GetID(), {"OwnedByTile"}, structuralTags)
+  self.edges[newEdgeName] = Edge.new(
+    newEdgeName,
+    {tile}, -- tile node
+    allNodes, -- all nodes array
+    "multiedge",
+    ArrayExt.ConvertToTable(structuralTags)
+  )
 end
 
 return Map

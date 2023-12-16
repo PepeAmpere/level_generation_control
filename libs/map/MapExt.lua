@@ -48,8 +48,8 @@ local function GetNodeKey(tileID, nodeName)
   return tileID .. "_" .. nodeName
 end
 
-local function GetEdgeKey(nodesNames, edgeTags)
-  local finalName = ""
+local function GetEdgeKey(uniquePrefix, nodesNames, edgeTags)
+  local finalName = uniquePrefix
   for i = 1, #nodesNames do
     finalName = finalName .. "_" .. nodesNames[i]
   end

@@ -1,8 +1,8 @@
 -- rules of spawning
-local minX = -4
-local minY = -4
-local maxX = 4
-local maxY = 4
+local minX = -1
+local minY = -1
+local maxX = 1
+local maxY = 1
 local tileSiZe = 900
 
 -- functions localization
@@ -17,7 +17,7 @@ local startTile = levelMap:GetTile(GetMapTileKey(Vec3(0,0,0)))
 levelMap:TransformTileToType(startTile, tileTypesDefs["RitualRoom"])
 
 -- experimental conversion
-local randomCrossTile = levelMap:GetTile(
+--[[ local randomCrossTile = levelMap:GetTile(
   GetMapTileKey(
     Vec3(
       math.random(2,3)*900,
@@ -27,5 +27,5 @@ local randomCrossTile = levelMap:GetTile(
   )
 )
 levelMap:TransformTileToType(randomCrossTile, tileTypesDefs["Crossroad"])
-
+ ]]--
 return levelMap

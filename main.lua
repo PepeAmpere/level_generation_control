@@ -30,7 +30,8 @@ levelMap = require ("libs.generator.questBasedGenerator")
 -- ================================================================ --
 -- == UNREAL INTEGRATION WILL NEED ABOVE CODE in the Lua Wrapper == --
 -- saved on this level to avoid saving in Unreal
--- TableExt.SaveToFile("levelMapExported.lua", levelMap)
+local tileKey = MapExt.GetMapTileKey(Vec3(0, 0, 0))
+TableExt.SaveToFile("levelMapExported.lua", levelMap.edges)
 
 -- BELOW JUST LOVE 2D debugging
 Colors = require("libs.drawLove.Colors")
