@@ -75,6 +75,9 @@ function Graph:RemoveNode(node)
   end
 
   for _, edge in pairs(edgesToRemove) do
+    if nodeID == "0_0_WestEntrance" then
+     print(edge:GetID())
+    end
     self:RemoveEdge(edge)
   end
 

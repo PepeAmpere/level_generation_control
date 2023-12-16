@@ -265,6 +265,15 @@ function vectorIndex:Rotate2D(angleOne)
   ) -- copy
 end
 
+function vectorIndex:RotateZFixed(angleOne)
+  local angleInRads = rad(-angleOne) -- inverted Z axis (it increases in "south" direction in Spring map notation
+  return new(
+    self.x * cos(angleInRads) - self.y * sin(angleInRads),
+    self.x * sin(angleInRads) + self.y * cos(angleInRads),
+    self.z
+  ) -- copy
+end
+
 --- Rotates vector around Y axis by given azimuth
 function vectorIndex:RotateByHeading(angleOne)
   return self:Rotate2D(-angleOne) -- just rotation in opoosite direction than mathematic Rotate2D

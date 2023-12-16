@@ -6,13 +6,18 @@ local DIRECTIONS = {
   "south",
   "west"
 }
-local DIR_TO_VEC3 = {
-  north = Vec3(0,1,0),
-  east = Vec3(1,0,0),
-  south = Vec3(0,-1,0),
-  west = Vec3(-1,0,0),
+local DIRECTIONS_TAG_MATCHER = {
+  north = function(node) return node:HasTag("north") end,
+  east = function(node) return node:HasTag("east") end,
+  south = function(node) return node:HasTag("south") end,
+  west = function(node) return node:HasTag("west") end
 }
-local RENDER_FLIP_Y = -1
+local DIR_TO_VEC3 = {
+  north = Vec3(1,0,0),
+  east = Vec3(0,1,0),
+  south = Vec3(-1,0,0),
+  west = Vec3(0,-1,0),
+}
 local OPPOSITION_TABLE = {
   north = "south",
   east = "west",
@@ -29,12 +34,15 @@ local function CopyPath(path)
 end
 
 local function FlipCoords2D(coords)
+  local newCoords = {}
   for i=1, #coords do
-    if i % 2 == 0 then
-      coords[i] = coords[i] * RENDER_FLIP_Y
+    if i % 2 == 1 then
+      newCoords[i] = coords[i+1]
+    else
+      newCoords[i] = -coords[i-1]
     end
   end
-  return coords
+  return newCoords
 end
 local function GetDirections()
   return DIRECTIONS
@@ -85,10 +93,10 @@ end
 
 return {
   DIRECTIONS = DIRECTIONS,
+  DIRECTIONS_TAG_MATCHER = DIRECTIONS_TAG_MATCHER,
   DIR_TO_VEC3 = DIR_TO_VEC3,
   HALF_RECT_SIZE = 150,
   HALF_SIZE = 450,
-  RENDER_FLIP_Y = RENDER_FLIP_Y,
   OPPOSITION_TABLE = OPPOSITION_TABLE,
 
   CopyPath = CopyPath,

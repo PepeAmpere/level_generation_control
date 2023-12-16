@@ -1,6 +1,6 @@
 local nodesDefs = {
   ["Cabinet"] = { relativePosition = Vec3(-220, 420, 0), tags = {"is"} },
-  ["EastEntrance"] = { relativePosition = Vec3(0, 420, 0), tags = {"tc"} },
+  ["EastEntrance"] = { relativePosition = Vec3(0, 420, 0), tags = {"tc", "east"} },
   ["PhotoWall"] = { relativePosition = Vec3(128, 0, 0) },
   ["RitualTable"] = { relativePosition = Vec3(88, 0, 0), tags = {"is"} },
   ["RoomCorner"] = { relativePosition = Vec3(60, -370, 0), tags = {"is"} },
@@ -10,7 +10,7 @@ local nodesDefs = {
   ["RoomNextToRitualTable"] = { relativePosition = Vec3(60, 0, 0) },
   ["RoomSouthDoor"] = { relativePosition = Vec3(-370, 0, 0) },
   ["RoomStartPosition"] = { relativePosition = Vec3(-180, 0, 0), tags = {"sp"} },
-  ["SouthEntrance"] = { relativePosition = Vec3(-420, 0, 0), tags = {"tc"} },
+  ["SouthEntrance"] = { relativePosition = Vec3(-420, 0, 0), tags = {"tc", "south"} },
 }
 
 local edgesDefs = {
@@ -30,10 +30,10 @@ local edgesDefs = {
     nodes = {
       "RoomEastDoor",
       "RoomNextToCabinet",
-      "RoomNextToCorner",
-      "RoomNextToRitualTable",
       "RoomSouthDoor",
       "RoomStartPosition",
+      "RoomNextToCorner",
+      "RoomNextToRitualTable",
     },
   },
 }

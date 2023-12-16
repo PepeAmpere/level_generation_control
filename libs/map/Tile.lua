@@ -37,6 +37,19 @@ function Tile:GetAllNodes()
   return nodes
 end
 
+function Tile:GetNodes(TypeMatcher, TagsMatcher)
+  local selectedNodes = {}
+  TypeMatcher = TypeMatcher or function() return true end
+  TagsMatcher = TagsMatcher or function() return true end
+
+  for _, node in pairs(self:GetAllNodes()) do
+    if TypeMatcher(node) and TagsMatcher(node) then
+      selectedNodes[node:GetID()] = node
+    end
+  end
+  return selectedNodes
+end
+
 function Tile:GetNeighborTileKey(direction)
   return self.neighbors[direction]
 end

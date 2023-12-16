@@ -9,7 +9,6 @@
 -- love 2D specific drawing not related to custom data is in Draw lib
 
 -- constants localization
-local RENDER_FLIP_Y = MapExt.RENDER_FLIP_Y
 local DIR_TO_VEC3 = MapExt.DIR_TO_VEC3
 local RECT_SIZE2 = MapExt.HALF_RECT_SIZE
 local HALF_SIZE2 = MapExt.HALF_SIZE 
@@ -63,8 +62,8 @@ local function DrawTile(tile)
     local stringToWrite = tostring(rectanglePosition)
     if textfields[stringToWrite] then
       love.graphics.draw(
-        textfields[stringToWrite], 
-        rectanglePosition:Y(), 
+        textfields[stringToWrite],
+        rectanglePosition:Y(),
         -rectanglePosition:X()
       )
     else

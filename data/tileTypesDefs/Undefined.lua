@@ -1,8 +1,8 @@
 local nodesDefs = {
-  ["NorthEntrance"] = { tags = {"tc"}, relativePosition = Vec3(420, 0, 0) },
-  ["EastEntrance"] = { tags = {"tc"}, relativePosition = Vec3(0, 420, 0) },
-  ["SouthEntrance"] = { tags = {"tc"}, relativePosition = Vec3(-420, 0, 0) },
-  ["WestEntrance"] = { tags = {"tc"}, relativePosition = Vec3(0, -420, 0) },
+  ["NorthEntrance"] = { tags = {"tc","north"}, relativePosition = Vec3(420, 0, 0) },
+  ["EastEntrance"] = { tags = {"tc", "east"}, relativePosition = Vec3(0, 420, 0) },
+  ["SouthEntrance"] = { tags = {"tc", "south"}, relativePosition = Vec3(-420, 0, 0) },
+  ["WestEntrance"] = { tags = {"tc", "west"}, relativePosition = Vec3(0, -420, 0) },
 }
 
 local edgesDefs = {

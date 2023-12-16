@@ -11,6 +11,10 @@ local GetMapTileKey = MapExt.GetMapTileKey
 local GetNodeKey = MapExt.GetNodeKey
 local GetEdgeKey = MapExt.GetEdgeKey
 
+local DIRECTIONS = MapExt.DIRECTIONS
+local DIRECTIONS_TAG_MATCHER = MapExt.DIRECTIONS_TAG_MATCHER
+local OPPOSITION_TABLE = MapExt.OPPOSITION_TABLE
+
 local Map = {}
 Map.__index = Map
 setmetatable(Map, Graph)
@@ -47,15 +51,36 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
 
   local allTileNodes = TableExt.ShallowCopy(nodes)
   for _, tile in pairs(allTileNodes) do
---[[     if
-      tile:GetPosition():X() == -900 and
-      tile:GetPosition():Y() == 0
-    then
-      i:TransformTileToType(tile, tileTypesDefs["Crossroad"])
-    else
-      i:TransformTileToType(tile, tileTypesDefs["Undefined"])
-    end ]]--
     i:TransformTileToType(tile, tileTypesDefs["Undefined"])
+  end
+
+  for _, tile in pairs(allTileNodes) do
+    for _, direction in ipairs(DIRECTIONS) do
+      local neighborTileKey = tile:GetNeighborTileKey(direction)
+      local neighborTile = nodes[neighborTileKey]
+      if (neighborTile) then
+        local oppositeDirection = OPPOSITION_TABLE[direction]
+        local _, myConnectorNode = next(tile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[direction]))
+        local _, neighborConnectorNode = next(neighborTile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[oppositeDirection]))
+        local tags = {"connector"}
+        local newEdgeKey = GetEdgeKey(
+          tile:GetID(),
+          {
+            myConnectorNode:GetID(),
+            neighborConnectorNode:GetID(),
+          },
+          tags
+        )
+        i.edges[newEdgeKey] = Edge.new(
+          newEdgeKey,
+          {myConnectorNode}, -- 1 item array
+          {neighborConnectorNode}, -- 1 item array
+          "directional",
+          ArrayExt.ConvertToTable(tags)
+        )
+        myConnectorNode:Connect(neighborConnectorNode, i.edges[newEdgeKey])
+      end
+    end
   end
   return i
 end

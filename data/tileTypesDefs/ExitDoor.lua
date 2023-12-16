@@ -1,5 +1,5 @@
 local nodesDefs = {
-  ["EastEntrance"] = { relativePosition = Vec3(0, 420, 0), tags = {"tc"} },
+  ["EastEntrance"] = { relativePosition = Vec3(0, 420, 0), tags = {"tc", "east"} },
   ["InFrontOfExit"] = { relativePosition = Vec3(0, 250, 0) },
   ["Exit"] = { relativePosition = Vec3(0, 50, 0), tags = {"exit"} },
 }

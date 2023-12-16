@@ -37,6 +37,11 @@ local function Line(position1, position2, width, color)
   love.graphics.line(coords)
 end
 
+local function Polygon(vertices, color)
+  love.graphics.setColor(color[1], color[2], color[3], color[4])
+  love.graphics.polygon("fill", FlipCoords2D(vertices))
+end
+
 local function Text(text, position, color)
   love.graphics.setColor(color[1], color[2], color[3], color[4])
   love.graphics.draw(
@@ -47,29 +52,43 @@ local function Text(text, position, color)
 end
 
 local function Edge(edge)
+  
+
   if edge:GetType() == "directional" then
+    local startPosition = edge:GetNodesFrom()[1]:GetPosition()
+    local endPosition = edge:GetNodesTo()[1]:GetPosition()
+    local dirVector = (endPosition - startPosition):Normalize()
+    local arrowVector = dirVector:RotateZFixed(120)
+
+    local color = {0, 127, 255, 255}
+    if edge:HasTag("sp") then
+      color = {192, 192, 192, 64}
+    end
     Line(
-      edge:GetNodesFrom()[1]:GetPosition(),
-      edge:GetNodesTo()[1]:GetPosition(),
-      4,
-      {0, 127, 255, 255}
+      startPosition,
+      endPosition,
+      3,
+      color
+    )
+
+    Line(
+      endPosition,
+      endPosition + arrowVector*10,
+      3,
+      color
     )
   end
 
   if edge:GetType() == "multiedge" then
-    local color = {0, 127, 255, 255}
-    if edge:HasTag("sp") then color = {192, 192, 192, 64} end
-    local centralNode = edge:GetNodesFrom()[1]
     local nodesTo = edge:GetNodesTo()
+    local vertices = {}
     for i=1, #nodesTo do
       local node = nodesTo[i]
-      Line(
-        centralNode:GetPosition(),
-        node:GetPosition(),
-        4,
-        color
-      )
+      vertices[#vertices + 1] = node:GetPosition():X()
+      vertices[#vertices + 1] = node:GetPosition():Y()
     end
+
+    Polygon(vertices, {0, 127, 255, 32})
   end
 end
 
