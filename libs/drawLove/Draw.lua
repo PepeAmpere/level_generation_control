@@ -52,7 +52,6 @@ local function Text(text, position, color)
 end
 
 local function Edge(edge)
-  
 
   if edge:GetType() == "directional" then
     local startPosition = edge:GetNodesFrom()[1]:GetPosition()
@@ -149,6 +148,10 @@ local function Path(path, color, width)
 end
 
 return {
+  Circle = Circle,
+  Line = Line,
+  Polygon = Polygon,
+  Text = Text,
   Edge = Edge,
   Node = Node,
   Path = Path,

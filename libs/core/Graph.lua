@@ -37,8 +37,18 @@ function Graph:GetNode(nodeID)
   return self.nodes[nodeID]
 end
 
-function Graph:GetNodes()
-  return self.nodes -- copy or reference?
+function Graph:GetNodes(TypeMatcher, TagsMatcher)
+  local selectedNodes = {}
+  TypeMatcher = TypeMatcher or function() return true end
+  TagsMatcher = TagsMatcher or function() return true end
+
+  for nodeID, node in pairs(self.nodes) do
+    if TypeMatcher(node) and TagsMatcher(node) then
+      selectedNodes[nodeID] = node
+    end
+  end
+
+  return selectedNodes
 end
 
 function Graph:RemoveNode(node)
@@ -47,8 +57,8 @@ function Graph:RemoveNode(node)
   local allEdges = node:GetAllEdges()
 
   -- remove global references from the edges table
-  for edgeID, edge in pairs(allEdges) do
-  self.edges[edgeID] = nil
+  for edgeID, _ in pairs(allEdges) do
+    self.edges[edgeID] = nil
   end
 
   -- remove in-node refences to the same tables

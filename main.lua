@@ -31,7 +31,7 @@ levelMap = require ("libs.generator.questBasedGenerator")
 -- == UNREAL INTEGRATION WILL NEED ABOVE CODE in the Lua Wrapper == --
 -- saved on this level to avoid saving in Unreal
 local tileKey = MapExt.GetMapTileKey(Vec3(0, 0, 0))
-TableExt.SaveToFile("levelMapExported.lua", levelMap.nodes)
+-- TableExt.SaveToFile("levelMapExported.lua", levelMap.nodes)
 
 -- BELOW JUST LOVE 2D debugging
 -- lovebird = require "libs.lovebird.init
@@ -40,12 +40,15 @@ Draw = require("libs.drawLove.Draw")
 DrawMap = require("libs.drawLove.DrawMap")
 Gamera = require("libs.gamera.gamera")
 
+-- data
+images = require("data.imagesInit")
+
 local DRAW_SIZE = 20000
 local camera = Gamera.new(-DRAW_SIZE,-DRAW_SIZE,DRAW_SIZE,DRAW_SIZE)
 local positionCenterX = 0
 local positionCenterY = 0
 camera:setWorld(-5000,-5000,DRAW_SIZE,DRAW_SIZE)
-camera:setWindow(0,0,1024,768)
+camera:setWindow(0,0,800,600)
 camera:setPosition(positionCenterX, positionCenterY)
 
 local UI_STATES = {
@@ -74,7 +77,7 @@ camera:draw(DrawMap.AllTiles)
 camera:draw(DrawMap.AllNodes)
 camera:draw(DrawMap.AllEdges)
 -- camera:draw(draw.DrawPaths)
--- camera:draw(draw.DrawProhibitedConnections)
+camera:draw(DrawMap.AllTileRestrictions)
 -- camera:draw(draw.DrawPassLevel)
 
 DrawMap.CameraAndCursorPosition(camera)

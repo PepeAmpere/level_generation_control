@@ -12,7 +12,6 @@ local GetNodeKey = MapExt.GetNodeKey
 local GetEdgeKey = MapExt.GetEdgeKey
 
 local DIRECTIONS = MapExt.DIRECTIONS
-local DIRECTIONS_TAG_MATCHER = MapExt.DIRECTIONS_TAG_MATCHER
 local OPPOSITION_TABLE = MapExt.OPPOSITION_TABLE
 
 local Map = {}
@@ -50,10 +49,23 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
   i.edges = {}
 
   local allTileNodes = TableExt.ShallowCopy(nodes)
+
+  -- after nodes created, connect them with proper references instead of IDs
+  for _, tile in pairs(allTileNodes) do
+    for _, direction in ipairs(DIRECTIONS) do
+      local neighborTileKey = tile:GetNeighborTileKey(direction)
+      if i.nodes[neighborTileKey] then
+        tile:SetNeighborReference(direction, i.nodes[neighborTileKey])
+      end
+    end
+  end
+  
+  -- set first tile types
   for _, tile in pairs(allTileNodes) do
     i:PopulateTilePerType(tile, tileTypesDefs["Undefined"])
   end
 
+  -- make first connections
   for _, tile in pairs(allTileNodes) do
     i:ConnectNeighborTiles(tile)
   end
@@ -62,15 +74,11 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
 end
 
 function Map:GetTiles()
-  local nodes = self.nodes
-  local filtered = {}
-  for nodeID, node in pairs(nodes) do
-    if node:HasTag("tile") then
-      filtered[nodeID] = node
-    end
+  local function TagsMatcher(node)
+    return node:HasTag("tile")
   end
 
-  return filtered -- this is table: nodeID => nodeObject
+  return self:GetNodes(nil, TagsMatcher) -- this is table: nodeID => nodeObject
 end
 
 function Map:GetTile(tileID)
@@ -165,19 +173,9 @@ function Map:PopulateTilePerType(tile, tileTypeDefinition)
   end
 end
 
-function Map:TransformTileToType(tile, tileTypeDefinition)
-  print("Transforming tile " .. tile:GetID() .. " to " .. tileTypeDefinition.name)
-  self:CleanTile(tile)
-
-  self:PopulateTilePerType(tile, tileTypeDefinition)
-
-  self:ReconnectTilesAroundTile(tile)
-end
-
 function Map:ReconnectTilesAroundTile(tile)
   for _, direction in ipairs(DIRECTIONS) do
-    local neighborTileKey = tile:GetNeighborTileKey(direction)
-    local neighborTile = self.nodes[neighborTileKey]
+    local neighborTile =  tile:GetNeighborTile(direction)
     if neighborTile then
       self:ConnectNeighborTiles(neighborTile)
     end
@@ -186,13 +184,11 @@ function Map:ReconnectTilesAroundTile(tile)
 end
 
 function Map:ConnectNeighborTiles(tile)
+  local pairsOfConnectors = tile:GetConnectorPairs()
   for _, direction in ipairs(DIRECTIONS) do
-    local neighborTileKey = tile:GetNeighborTileKey(direction)
-    local neighborTile = self.nodes[neighborTileKey]
-    if (neighborTile) then
-      local oppositeDirection = OPPOSITION_TABLE[direction]
-      local _, myConnectorNode = next(tile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[direction]))
-      local _, neighborConnectorNode = next(neighborTile:GetNodes(nil, DIRECTIONS_TAG_MATCHER[oppositeDirection]))
+    local directionPair = pairsOfConnectors[direction]
+    if directionPair then
+      local myConnectorNode, neighborConnectorNode = directionPair[1], directionPair[1]
       if
         myConnectorNode ~= nil and
         neighborConnectorNode ~= nil
@@ -214,6 +210,42 @@ function Map:ConnectNeighborTiles(tile)
           ArrayExt.ConvertToTable(tags)
         )
         myConnectorNode:Connect(neighborConnectorNode, self.edges[newEdgeKey])
+      end
+    end
+  end
+end
+
+function Map:TransformTileToType(tile, tileTypeDefinition)
+  print("Transforming tile " .. tile:GetID() .. " to " .. tileTypeDefinition.name)
+
+  self:CleanTile(tile)
+
+  self:PopulateTilePerType(tile, tileTypeDefinition)
+
+  self:ReconnectTilesAroundTile(tile)
+
+  self:ReestimateTiles()
+end
+
+function Map:ReestimateTiles()
+  local tiles = self:GetTiles() -- tileID => tile
+
+  for _, tile in pairs(tiles) do
+    local pairsOfConnectors = tile:GetConnectorPairs()
+    for _, direction in ipairs(DIRECTIONS) do
+      local directionPair = pairsOfConnectors[direction]
+      if directionPair then
+        local myConnectorNode, neighborConnectorNode = directionPair[1], directionPair[2]
+        if
+          myConnectorNode ~= nil and
+          neighborConnectorNode ~= nil
+        then
+          tile:SetRestriction(direction, 1)
+        else
+          tile:SetRestriction(direction, 0)
+        end
+      else
+        tile:SetRestriction(direction, 0)
       end
     end
   end

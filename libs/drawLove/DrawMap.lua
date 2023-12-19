@@ -10,8 +10,10 @@
 
 -- constants localization
 local DIR_TO_VEC3 = MapExt.DIR_TO_VEC3
+local DIRECTIONS = MapExt.DIRECTIONS
 local RECT_SIZE2 = MapExt.HALF_RECT_SIZE
-local HALF_SIZE2 = MapExt.HALF_SIZE 
+local HALF_SIZE2 = MapExt.HALF_SIZE
+
 -- local constants
 local ZOOM_SCALE_FACTOR = 0.05
 local TILE_KEY_TO_COLOR = {
@@ -26,6 +28,7 @@ local SUBTILES_POSITIONS = {
 
 -- functions localization
 -- local GetMapTileKey = MapExt.GetMapTileKey
+local DrawText = Draw.Text
 
 -- testing data
 local testingNodes = {}
@@ -40,6 +43,7 @@ for i = 1, 5 do
   )
 end
 local testingPath = Path.new(testingNodes)
+
 -- speedup
 local textfields = {}
 
@@ -49,29 +53,29 @@ local function DrawTile(tile)
 
   local drawData = tileTypesDefs[tileType].drawDefs
   for i=1, #drawData do
+
+    -- SECTION TO REFACTOR using Draw START
     local rectanglePosition = tilePosition + SUBTILES_POSITIONS[i]
     local color = TILE_KEY_TO_COLOR[drawData[i]]
     love.graphics.setColor(unpack(color))
     love.graphics.rectangle(
       "fill",
-      (rectanglePosition:Y() - RECT_SIZE2), 
+      (rectanglePosition:Y() - RECT_SIZE2),
       -rectanglePosition:X() - RECT_SIZE2,
       2*RECT_SIZE2, 2*RECT_SIZE2
     )
-    love.graphics.setColor(255,0,255,255)
+    -- SECTION TO REFACTOR END
+
     local stringToWrite = tostring(rectanglePosition)
     if textfields[stringToWrite] then
-      love.graphics.draw(
-        textfields[stringToWrite],
-        rectanglePosition:Y(),
-        -rectanglePosition:X()
-      )
+      DrawText(textfields[stringToWrite], rectanglePosition, {255,0,255,255})
     else
       local text = love.graphics.newText(love.graphics.getFont(), stringToWrite)
       textfields[stringToWrite] = text
     end
   end
 
+  -- SECTION TO REFACTOR using Draw START
   local TILE_SPACING = 10
   love.graphics.setColor(0,0,0,255)
   love.graphics.rectangle(
@@ -80,6 +84,30 @@ local function DrawTile(tile)
     -tilePosition:X() - 3*RECT_SIZE2, 
     6*RECT_SIZE2-TILE_SPACING, 6*RECT_SIZE2-TILE_SPACING
   )
+  -- SECTION TO REFACTOR END
+end
+
+-- restictions debug
+local function DrawTileRestrictions(tile)
+  
+  local tileRestrictions = tile:GetRestrictions()
+  local tilePosition = tile:GetPosition()
+  
+  love.graphics.setColor(255,255,255,64)
+  for _, direction in ipairs(DIRECTIONS) do
+    local sideVector = tilePosition + DIR_TO_VEC3[direction]*2.8*RECT_SIZE2
+
+    local restrictionToImageMap = {
+      [1] = images.check,
+      [0] = images.cross,
+    }
+
+    love.graphics.draw(
+      restrictionToImageMap[tileRestrictions[direction]],
+      sideVector:Y()-32, 
+      -sideVector:X()-32
+    )
+  end
 end
 
 local function AllEdges()
@@ -102,6 +130,13 @@ local function AllTiles()
   local tiles = levelMap:GetTiles()
   for _, tile in pairs(tiles) do
     DrawTile(tile)
+  end
+end
+
+local function AllTileRestrictions()
+  local tiles = levelMap:GetTiles()
+  for _, tile in pairs(tiles) do
+    DrawTileRestrictions(tile)
   end
 end
 
@@ -182,7 +217,7 @@ local function PanMouse(camera, x, y, dx, dy, istouch)
   local mx, my = love.mouse.getPosition()
   local mWx, mWy = camera:toWorld(mx,my)
   local SCALE_FACTOR = 0.05
-  
+
   camera:setPosition(cx - dx, cy - dy)
 --[[   camera:setPosition(
     cx + (mWx - cx)*SCALE_FACTOR,
@@ -195,6 +230,7 @@ return {
   AllNodes = AllNodes,
   AllPaths = AllPaths,
   AllTiles = AllTiles,
+  AllTileRestrictions = AllTileRestrictions,
   CameraAndCursorPosition = CameraAndCursorPosition,
   ControlKeys = ControlKeys,
   DebugControl = DebugControl,

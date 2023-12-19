@@ -6,11 +6,17 @@ local DIRECTIONS = {
   "south",
   "west"
 }
-local DIRECTIONS_TAG_MATCHER = {
+local DIRECTION_TAG_MATCHER = {
   north = function(node) return node:HasTag("north") end,
   east = function(node) return node:HasTag("east") end,
   south = function(node) return node:HasTag("south") end,
   west = function(node) return node:HasTag("west") end
+}
+local DIRECTION_CONNECTOR_TAG_MATCHER = {
+  north = function(node) return node:HasTag("tc") and node:HasTag("north") end,
+  east = function(node) return node:HasTag("tc") and node:HasTag("east") end,
+  south = function(node) return node:HasTag("tc") and node:HasTag("south") end,
+  west = function(node) return node:HasTag("tc") and node:HasTag("west") end
 }
 local DIR_TO_VEC3 = {
   north = Vec3(1,0,0),
@@ -93,7 +99,8 @@ end
 
 return {
   DIRECTIONS = DIRECTIONS,
-  DIRECTIONS_TAG_MATCHER = DIRECTIONS_TAG_MATCHER,
+  DIRECTION_TAG_MATCHER = DIRECTION_TAG_MATCHER,
+  DIRECTION_CONNECTOR_TAG_MATCHER = DIRECTION_CONNECTOR_TAG_MATCHER,
   DIR_TO_VEC3 = DIR_TO_VEC3,
   HALF_RECT_SIZE = 150,
   HALF_SIZE = 450,
