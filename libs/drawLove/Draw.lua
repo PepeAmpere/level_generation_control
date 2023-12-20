@@ -133,7 +133,7 @@ local function Path(path, color, width)
     path.IsValid and
     path:IsValid()
   then
-    love.graphics.setLineWidth(width or 4)
+    love.graphics.setLineWidth(width or 20)
 
     if color ~= nil then
       love.graphics.setColor(unpack(color))

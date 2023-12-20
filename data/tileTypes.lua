@@ -1,8 +1,32 @@
 local tileTypes = {
-  "Crossroad",
-  "ExitDoor",
+  "BP_3x3_base_crossroad",
+  "BP_3x3_exit_door_R_E_M",
+  "BP_3x3_kitchen",
+  "BP_3x3_ritual_room",
+
+  -- ends
+  "BP_3x3_end_W_M",
+  "BP_3x3_end_N_M",
+  "BP_3x3_end_E_M",
+  "BP_3x3_end_S_M",
+  
+  -- corners
+  "BP_3x3_turn_SW_M",
+  "BP_3x3_turn_NW_M",
+  "BP_3x3_turn_NE_M",
+  "BP_3x3_turn_ES_M",
+
+  -- junctions without doors
+  "BP_3x3_junction_t_NES_M",
+  "BP_3x3_junction_t_ESW_M",
+  "BP_3x3_junction_t_NSW_M",
+  "BP_3x3_junction_t_NEW_M",
+
+  -- simple corridors
+  "BP_3x3_corridor_horizontal_M",
+  "BP_3x3_corridor_vertical_M",
+
   "Undefined",
-  "RitualRoom",
 }
 
 local tileTypesDefs = {}

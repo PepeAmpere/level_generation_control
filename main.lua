@@ -30,11 +30,12 @@ levelMap = require ("libs.generator.questBasedGenerator")
 -- ================================================================ --
 -- == UNREAL INTEGRATION WILL NEED ABOVE CODE in the Lua Wrapper == --
 -- saved on this level to avoid saving in Unreal
-local tileKey = MapExt.GetMapTileKey(Vec3(0, 0, 0))
+
+-- local tileKey = MapExt.GetMapTileKey(Vec3(0, 0, 0))
 -- TableExt.SaveToFile("levelMapExported.lua", levelMap.nodes)
 
 -- BELOW JUST LOVE 2D debugging
--- lovebird = require "libs.lovebird.init
+-- lovebird = require("libs.lovebird.init")
 Colors = require("libs.drawLove.Colors")
 Draw = require("libs.drawLove.Draw")
 DrawMap = require("libs.drawLove.DrawMap")
@@ -73,10 +74,9 @@ love.graphics.setBackgroundColor(192, 192, 192)
 --love.graphics.rectangle("fill", 0, 0, 100, 100)
 
 camera:draw(DrawMap.AllTiles)
--- camera:draw(DrawMap.AllPaths)
 camera:draw(DrawMap.AllNodes)
 camera:draw(DrawMap.AllEdges)
--- camera:draw(draw.DrawPaths)
+camera:draw(DrawMap.AllPaths)
 camera:draw(DrawMap.AllTileRestrictions)
 -- camera:draw(draw.DrawPassLevel)
 

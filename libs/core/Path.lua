@@ -12,7 +12,7 @@ setmetatable(Path, Graph)
 -- @return new Path instance
 function Path.new(orderedNodes)
   local i = setmetatable({}, Path) -- make new instance
-  
+
   local nodesOrderedList = {} -- index => node key
   local nodeIDtoIndex = {} -- node key => index
   local nodes = {} -- node key => object reference
@@ -32,9 +32,43 @@ function Path.new(orderedNodes)
   return i
 end
 
+function Path:AppendNode(node)
+  local nodeID = node:GetID()
+  local newIndex = #self.nodesOrderedList+1
+  self.nodesOrderedList[newIndex] = nodeID
+  self.nodeIDtoIndex[nodeID] = newIndex
+  self.nodes[nodeID] = node
+  return self
+end
+
+function Path:FindNode(Matcher) -- implicitly from start
+  for _, nodeID in ipairs(self.nodesOrderedList) do
+    local node = self.nodes[nodeID]
+    if Matcher(node) then return node end
+  end
+  return nil
+end
+
+function Path:FindNodePair(Matcher, distance) -- implicitly from start
+  if #self.nodesOrderedList < distance + 1 then return nil end
+  for i=1, #self.nodesOrderedList-distance do
+    local nodeAID = self.nodesOrderedList[i]
+    local nodeBID = self.nodesOrderedList[i+distance]
+    local nodeA = self.nodes[nodeAID]
+    local nodeB = self.nodes[nodeBID]
+    if Matcher(nodeA, nodeB) then return nodeA, nodeB end
+  end
+  return nil
+end
+
 -- @description Provides array of Path nodes
 function Path:GetNodes()
   return self.nodesOrderedList -- shall it be copy? this is reference and maybe thats actually wanted...
+end
+
+function Path:GetStartNode()
+  local firstNodeID = self.nodesOrderedList[1]
+  return self.nodes[firstNodeID]
 end
 
 function Path:GetNodesCount()

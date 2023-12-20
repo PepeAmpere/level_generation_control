@@ -89,10 +89,10 @@ end
 
 -- restictions debug
 local function DrawTileRestrictions(tile)
-  
+
   local tileRestrictions = tile:GetRestrictions()
   local tilePosition = tile:GetPosition()
-  
+
   love.graphics.setColor(255,255,255,64)
   for _, direction in ipairs(DIRECTIONS) do
     local sideVector = tilePosition + DIR_TO_VEC3[direction]*2.8*RECT_SIZE2
@@ -123,7 +123,9 @@ local function AllNodes()
 end
 
 local function AllPaths()
-  Draw.Path(testingPath)
+  for _, path in pairs(levelMap.paths) do
+    Draw.Path(path)
+  end
 end
 
 local function AllTiles()

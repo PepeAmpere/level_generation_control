@@ -1,4 +1,7 @@
-local builders = {
+local builders = {}
+
+-- obsolete example code
+local oldBuilders = {
   [1] = function(self, map)
     local path = map:FindPathToPositionMatchingTag(
       map:GetPositionInRoomMatchingTag("RitualRoom", "startPosition"),

@@ -1,4 +1,11 @@
--- functions related to map maping which are not methods of the map object
+-- functions and constants related to map maping which are not methods of the map object
+local MIN_X = -3
+local MIN_Y = -3
+local MAX_X = 3
+local MAX_Y = 3
+local TILE_SIZE = 900
+
+local MAIN_QUEST_TAG = "exitQuest"
 
 local DIRECTIONS = {
   "north",
@@ -98,6 +105,14 @@ end
 
 
 return {
+  MIN_X = MIN_X,
+  MIN_Y = MIN_Y,
+  MAX_X = MAX_X,
+  MAX_Y = MAX_Y,
+  TILE_SIZE = TILE_SIZE,
+
+  MAIN_QUEST_TAG = MAIN_QUEST_TAG,
+
   DIRECTIONS = DIRECTIONS,
   DIRECTION_TAG_MATCHER = DIRECTION_TAG_MATCHER,
   DIRECTION_CONNECTOR_TAG_MATCHER = DIRECTION_CONNECTOR_TAG_MATCHER,

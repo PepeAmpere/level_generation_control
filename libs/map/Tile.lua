@@ -55,8 +55,8 @@ function Tile:GetConnectorPairs()
       local oppositeDirection = OPPOSITION_TABLE[direction]
       local myTileMatcher = DIRECTION_CONNECTOR_TAG_MATCHER[direction]
       local neighborTileMatcher = DIRECTION_CONNECTOR_TAG_MATCHER[oppositeDirection]
-      local _, myConnectorNode = next(self:GetNodes(nil,myTileMatcher))
-      local _, neighborConnectorNode = next(neighborTile:GetNodes(nil, neighborTileMatcher))
+      local _, myConnectorNode = next(self:GetNodes(myTileMatcher))
+      local _, neighborConnectorNode = next(neighborTile:GetNodes(neighborTileMatcher))
       if
         myConnectorNode ~= nil and
         neighborConnectorNode ~= nil
@@ -71,13 +71,12 @@ function Tile:GetConnectorPairs()
   return pairsOfConnectors
 end
 
-function Tile:GetNodes(TypeMatcher, TagsMatcher)
+function Tile:GetNodes(Matcher)
   local selectedNodes = {}
-  TypeMatcher = TypeMatcher or function() return true end
-  TagsMatcher = TagsMatcher or function() return true end
+  Matcher = Matcher or function() return true end
 
   for _, node in pairs(self:GetAllNodes()) do
-    if TypeMatcher(node) and TagsMatcher(node) then
+    if Matcher(node) then
       selectedNodes[node:GetID()] = node
     end
   end

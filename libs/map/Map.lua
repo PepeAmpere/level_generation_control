@@ -47,6 +47,7 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
 
   i.nodes = nodes
   i.edges = {}
+  i.paths = {}
 
   local allTileNodes = TableExt.ShallowCopy(nodes)
 
@@ -59,7 +60,7 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
       end
     end
   end
-  
+
   -- set first tile types
   for _, tile in pairs(allTileNodes) do
     i:PopulateTilePerType(tile, tileTypesDefs["Undefined"])
@@ -118,7 +119,8 @@ function Map:PopulateTilePerType(tile, tileTypeDefinition)
 
   for _, edgeDef in pairs(tileTypeDefinition.edgesDefs) do
     local nodeTypes = {}
-    if edgeDef.nodes then
+    local edgeType = edgeDef.edgeType
+    if edgeType == "multiedge" then
       local nodesReferences = {}
       for _, nodeType in pairs(edgeDef.nodes) do
         nodeTypes[#nodeTypes + 1] = nodeType
@@ -127,9 +129,9 @@ function Map:PopulateTilePerType(tile, tileTypeDefinition)
       local newEdgeKey = GetEdgeKey(tile:GetID(), nodeTypes, edgeDef.tags)
       self.edges[newEdgeKey] = Edge.new(
         newEdgeKey,
-        {tile},
         nodesReferences,
-        edgeDef.edgeType,
+        nodesReferences,
+        edgeType,
         ArrayExt.ConvertToTable(edgeDef.tags)
       )
 
@@ -137,7 +139,9 @@ function Map:PopulateTilePerType(tile, tileTypeDefinition)
         node:AddEdgeIn(self.edges[newEdgeKey])
         node:AddEdgeOut(self.edges[newEdgeKey])
       end
-    else
+    end
+
+    if edgeType == "directional" then
       nodeTypes[1] = edgeDef.from
       nodeTypes[2] = edgeDef.to
 
@@ -148,7 +152,7 @@ function Map:PopulateTilePerType(tile, tileTypeDefinition)
         newEdgeKey,
         {nodeA}, -- 1 item array
         {nodeB}, -- 1 item array
-        edgeDef.edgeType,
+        edgeType,
         ArrayExt.ConvertToTable(edgeDef.tags)
       )
 
@@ -175,7 +179,7 @@ end
 
 function Map:ReconnectTilesAroundTile(tile)
   for _, direction in ipairs(DIRECTIONS) do
-    local neighborTile =  tile:GetNeighborTile(direction)
+    local neighborTile = tile:GetNeighborTile(direction)
     if neighborTile then
       self:ConnectNeighborTiles(neighborTile)
     end
@@ -188,7 +192,7 @@ function Map:ConnectNeighborTiles(tile)
   for _, direction in ipairs(DIRECTIONS) do
     local directionPair = pairsOfConnectors[direction]
     if directionPair then
-      local myConnectorNode, neighborConnectorNode = directionPair[1], directionPair[1]
+      local myConnectorNode, neighborConnectorNode = directionPair[1], directionPair[2]
       if
         myConnectorNode ~= nil and
         neighborConnectorNode ~= nil

@@ -52,20 +52,30 @@ function Node:__unm() -- do nothing
   return self
 end
 
-function Node:GetAllEdges(TypeMatcher, TagsMatcher)
+function Node:GetAllEdges(Matcher, inOut)
+  local inOutMode = inOut or "all"
   local selectedEdges = {}
-  TypeMatcher = TypeMatcher or function() return true end
-  TagsMatcher = TagsMatcher or function() return true end
+  Matcher = Matcher or function() return true end
 
-  for _, edge in pairs(self.edgesOut) do
-    if TypeMatcher(edge) and TagsMatcher(edge) then
-      selectedEdges[edge:GetID()] = edge
+  if
+    inOutMode == "all" or
+    inOutMode == "out"
+  then
+    for _, edge in pairs(self.edgesOut) do
+      if Matcher(edge) then
+        selectedEdges[edge:GetID()] = edge
+      end
     end
   end
 
-  for _, edge in pairs(self.edgesIn) do
-    if TypeMatcher(edge) and TagsMatcher(edge) then
-      selectedEdges[edge:GetID()] = edge
+  if
+    inOutMode == "all" or
+    inOutMode == "in"
+  then
+    for _, edge in pairs(self.edgesIn) do
+      if Matcher(edge) then
+        selectedEdges[edge:GetID()] = edge
+      end
     end
   end
 
@@ -80,8 +90,16 @@ function Node:GetType()
   return self.nodeType
 end
 
+function Node:IsTypeOf(nodeType)
+  return self.nodeType == nodeType
+end
+
 function Node:HasTag(tag)
   return self.tags[tag]
+end
+
+function Node:AddTag(tag)
+  self.tags[tag] = true
 end
 
 function Node:AddEdgeIn(edge)
@@ -102,6 +120,92 @@ function Node:RemoveAllEdges()
   local allEdges = self:GetAllEdges()
   for _, edge in pairs(allEdges) do
     edge:DisconnectFromNodes()
+  end
+end
+
+function Node:TagRDFSLook(
+    NodeMatcher, NodeUpdater,
+    EdgeMatcher, EdgeUpdater, edgesInOut,
+    EndMatcher
+  )
+  NodeUpdater(self)
+  if EndMatcher(self) then
+    return Path.new({self})
+  end
+
+  local nodesToTry = {}
+  local edgesByNode = {}
+
+  local edges = self:GetAllEdges(EdgeMatcher, edgesInOut)
+  for _, edge in pairs(edges) do
+    local newNodes
+    if edgesInOut == "out" then
+      newNodes = edge:GetNodesTo()
+    else
+      newNodes = edge:GetNodesFrom()
+    end
+    for _, node in pairs(newNodes) do
+      nodesToTry[#nodesToTry + 1] = node
+      edgesByNode[node:GetID()] = edge
+    end
+  end
+
+  local function TryNode(
+    node, edge,
+    NodeMatcher, NodeUpdater,
+    EdgeMatcher, EdgeUpdater, edgesInOut,
+    EndMatcher
+  )
+    if NodeMatcher(node) then
+      EdgeUpdater(edge)
+      return node:TagRDFSLook(
+        NodeMatcher, NodeUpdater,
+        EdgeMatcher, EdgeUpdater, edgesInOut,
+        EndMatcher
+      )
+    end
+  end
+
+  -- first three random
+  local passed = false
+  local lastResult
+  if #nodesToTry > 0 then
+    for i=1, math.min(3, #nodesToTry) do
+      local nodeIndex = math.random(#nodesToTry)
+      local selectedNode = nodesToTry[nodeIndex]
+      local selectedEdge = edgesByNode[selectedNode:GetID()]
+      -- print(self:GetID(), "=> Random try " .. selectedNode:GetID(), nodeIndex, "of", #nodesToTry)
+      lastResult = TryNode(
+        selectedNode, selectedEdge,
+        NodeMatcher, NodeUpdater,
+        EdgeMatcher, EdgeUpdater, edgesInOut,
+        EndMatcher
+      )
+      if lastResult then
+        passed = true
+        break
+      end
+    end
+
+    if not passed then
+      for i=1,#nodesToTry do
+        -- print(self:GetID(), " => Ordered try " .. nodesToTry[i]:GetID(), i, "from", #nodesToTry)
+        lastResult = TryNode(
+          nodesToTry[i], edgesByNode[nodesToTry[i]:GetID()],
+          NodeMatcher, NodeUpdater,
+          EdgeMatcher, EdgeUpdater, edgesInOut,
+          EndMatcher
+        )
+        if lastResult then
+          passed = true
+          break
+        end
+      end
+    end
+  end
+
+  if lastResult then
+    return lastResult:AppendNode(self) -- path expected
   end
 end
 
