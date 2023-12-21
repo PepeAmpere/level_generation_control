@@ -14,10 +14,6 @@ function Edge.new(id, nodesFrom, nodesTo, edgeType, tags)
   return i
 end
 
-function Edge:AddTag(tag)
-  self.tags[tag] = true
-end
-
 function Edge:DisconnectFromNodes()
   for _, node in ipairs(self.nodesTo) do
     node:RemoveEdge(self)
@@ -53,6 +49,10 @@ end
 
 function Edge:IsTypeOf(edgeType)
   return self.edgeType == edgeType
+end
+
+function Edge:RemoveTag(tag)
+  self.tags[tag] = nil
 end
 
 function Edge:SetTag(tag)

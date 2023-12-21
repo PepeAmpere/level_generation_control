@@ -9,13 +9,21 @@ local edgesDefs = {
 }
 
 local drawDefs = {
-    "x", "w", "x",
-    "x", "w", "x",
-    "x", "x", "x",
+  "x", "w", "x",
+  "x", "w", "x",
+  "x", "x", "x",
+}
+
+local restrictions = {
+  north = 2,
+  east = 0,
+  south = 0,
+  west = 0,
 }
 
 return {
   nodesDefs = nodesDefs,
   edgesDefs = edgesDefs,
   drawDefs = drawDefs,
+  restrictions = restrictions,
 }

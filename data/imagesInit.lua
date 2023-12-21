@@ -1,6 +1,7 @@
 local imagesList = {
   {name = "cross", ext = "png"},
   {name = "check", ext = "png"},
+  {name = "plus", ext = "png"},
 }
 
 local images = {}

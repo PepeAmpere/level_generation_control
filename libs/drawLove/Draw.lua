@@ -5,7 +5,7 @@ local ASSERT_PREFIX = "[" .. MODULE_NAME .. "] "
 local RENDER_FLIP_Y = MapExt.RENDER_FLIP_Y
 local DIR_TO_VEC3 = MapExt.DIR_TO_VEC3
 local RECT_SIZE2 = MapExt.HALF_RECT_SIZE
-local HALF_SIZE2 = MapExt.HALF_SIZE 
+local HALF_SIZE2 = MapExt.HALF_SIZE
 
 -- functions localization
 local FlipCoords2D = MapExt.FlipCoords2D
@@ -87,7 +87,11 @@ local function Edge(edge)
       vertices[#vertices + 1] = node:GetPosition():Y()
     end
 
-    Polygon(vertices, {0, 127, 255, 32})
+    if #vertices > 4 then
+      Polygon(vertices, {0, 127, 255, 32})
+    else
+      -- no draw anything now
+    end
   end
 end
 

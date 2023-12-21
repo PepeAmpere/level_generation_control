@@ -36,7 +36,7 @@ local OPPOSITION_TABLE = {
   east = "west",
   south = "north",
   west = "east"
-} 
+}
 
 local function CopyPath(path)
   local newPath = {}
@@ -117,9 +117,10 @@ return {
   DIRECTION_TAG_MATCHER = DIRECTION_TAG_MATCHER,
   DIRECTION_CONNECTOR_TAG_MATCHER = DIRECTION_CONNECTOR_TAG_MATCHER,
   DIR_TO_VEC3 = DIR_TO_VEC3,
+  OPPOSITION_TABLE = OPPOSITION_TABLE,
+
   HALF_RECT_SIZE = 150,
   HALF_SIZE = 450,
-  OPPOSITION_TABLE = OPPOSITION_TABLE,
 
   CopyPath = CopyPath,
   FlipCoords2D = FlipCoords2D,

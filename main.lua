@@ -21,9 +21,12 @@ Map = require("libs.map.Map")
 
 -- data
 tileTypesDefs = require("data.tileTypes")
-questTypesDefs = require("data.questTypes")
+local qResult = require("data.questTypes")
+questTypes = qResult[1]
+questTypesDefs = qResult[2]
 
 -- run the levele generation
+math.randomseed( os.time() )
 levelMap = require ("libs.generator.questBasedGenerator")
 
 -- ================================================================ --

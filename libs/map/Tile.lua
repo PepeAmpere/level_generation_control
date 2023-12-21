@@ -95,6 +95,50 @@ function Tile:GetRestrictions()
   return self.restrictions
 end
 
+function Tile:IsMatchingTransformation(tileTypeDef)
+  local restrictions = self:GetRestrictions()
+
+  for _, direction in ipairs(DIRECTIONS) do
+    local dirRestriction = restrictions[direction]
+    local tileDefRestriction = tileTypeDef.restrictions[direction]
+
+    -- check if the tile is not providing exit in restricted direction
+    if (dirRestriction == 0) and
+      tileDefRestriction ~= 0
+    then
+      return false
+    end
+
+    -- check if the tile is providing exit in the mandatory direction
+    if (dirRestriction == 2) and
+      tileDefRestriction ~= 2
+    then
+      return false
+    end
+
+    -- now temporarly check if it is not tile def of a unique room
+    -- later probably replace by dedicated flag
+    if
+      tileTypeDef.name == "BP_3x3_exit_door_R_E_M" or
+      tileTypeDef.name == "BP_3x3_kitchen" or
+      tileTypeDef.name == "BP_3x3_ritual_room"
+    then
+      return false
+    end
+  end
+
+--[[
+  print(restrictions["north"], restrictions["east"], restrictions["south"], restrictions["west"])
+  print(
+    tileTypeDef.restrictions["north"],
+    tileTypeDef.restrictions["east"],
+    tileTypeDef.restrictions["south"],
+    tileTypeDef.restrictions["west"]
+  )
+]]--
+  return true
+end
+
 function Tile:SetNeighborReference(direction, neighborTile)
   self.neighbors[direction] = neighborTile
 end

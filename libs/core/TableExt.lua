@@ -52,8 +52,17 @@ local function ShallowCopy(tbl)
   return tblCopy
 end
 
+local function ValuesToArray(tbl)
+  local newArray = {}
+  for k,v in pairs(tbl) do
+    newArray[#newArray + 1] = v
+  end
+  return newArray
+end
+
 return {
   SaveToFile = SaveToFile,
   ShallowCopy = ShallowCopy,
+  ValuesToArray = ValuesToArray,
   WriteUsingFunction = WriteUsingFunction,
 }

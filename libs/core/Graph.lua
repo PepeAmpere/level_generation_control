@@ -37,13 +37,12 @@ function Graph:GetNode(nodeID)
   return self.nodes[nodeID]
 end
 
-function Graph:GetNodes(TypeMatcher, TagsMatcher)
+function Graph:GetNodes(Matcher)
   local selectedNodes = {}
-  TypeMatcher = TypeMatcher or function() return true end
-  TagsMatcher = TagsMatcher or function() return true end
+  Matcher = Matcher or function() return true end
 
   for nodeID, node in pairs(self.nodes) do
-    if TypeMatcher(node) and TagsMatcher(node) then
+    if Matcher(node) then
       selectedNodes[nodeID] = node
     end
   end

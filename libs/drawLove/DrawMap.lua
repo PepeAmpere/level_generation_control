@@ -98,6 +98,7 @@ local function DrawTileRestrictions(tile)
     local sideVector = tilePosition + DIR_TO_VEC3[direction]*2.8*RECT_SIZE2
 
     local restrictionToImageMap = {
+      [2] = images.plus,
       [1] = images.check,
       [0] = images.cross,
     }
@@ -154,8 +155,8 @@ local function CameraAndCursorPosition(camera)
   love.graphics.print("cw: " .. math.floor(cw) .. " ch: " .. math.floor(ch), 10, 20)
   love.graphics.print("mx: " .. math.floor(mx) .. " my: " .. math.floor(my), 10, 30)
   love.graphics.print("mw: " .. math.floor(mw) .. " mh: " .. math.floor(mh), 10, 40)
-  love.graphics.print("mWx: " .. math.floor(mWx) .. " mWy: " .. math.floor(mWy), 10, 50)
-  love.graphics.print("visbleCornerX: " .. math.floor(visbleCornerX) .. " visibleCornerY: " .. math.floor(visibleCornerY), 10, 60)
+  love.graphics.print("mapX: " .. math.floor(-mWy) .. " mapY: " .. math.floor(mWx), 10, 50)
+  love.graphics.print("visbleCornerX: " .. math.floor(-visibleCornerY) .. " visibleCornerY: " .. math.floor(visbleCornerX), 10, 60)
   love.graphics.print("scale: " .. tostring(camera:getScale()), 10, 70)
 end
 

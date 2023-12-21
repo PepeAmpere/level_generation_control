@@ -74,18 +74,6 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
   return i
 end
 
-function Map:GetTiles()
-  local function TagsMatcher(node)
-    return node:HasTag("tile")
-  end
-
-  return self:GetNodes(nil, TagsMatcher) -- this is table: nodeID => nodeObject
-end
-
-function Map:GetTile(tileID)
-  return self:GetNode(tileID)
-end
-
 function Map:CleanTile(tile)
   -- remove all nodes and edges
   local allTileNodes = tile:GetAllNodes()
@@ -97,6 +85,35 @@ function Map:CleanTile(tile)
   end 
   -- remove structural edges on tile node
   tile:RemoveAllEdges()
+end
+
+function Map:Cleanup(NodeCleaner, EdgeCleaner)
+  for _, node in pairs(self.nodes) do
+    NodeCleaner(node)
+  end
+  for _, edge in pairs(self.edges) do
+    EdgeCleaner(edge)
+  end
+end
+
+function Map:GetTile(tileID)
+  return self:GetNode(tileID)
+end
+
+function Map:GetTiles()
+  local function Matcher(node)
+    return node:HasTag("tile")
+  end
+
+  return self:GetNodes(Matcher) -- this is table: nodeID => nodeObject
+end
+
+function Map:GetUndefinedTiles()
+  local function Matcher(node)
+    return node:HasTag("tile") and node:IsTypeOf("Undefined")
+  end
+
+  return self:GetNodes(Matcher) -- this is table: nodeID => nodeObject
 end
 
 function Map:PopulateTilePerType(tile, tileTypeDefinition)
@@ -187,6 +204,42 @@ function Map:ReconnectTilesAroundTile(tile)
   self:ConnectNeighborTiles(tile)
 end
 
+-- central tile is ruling, others mirror the restrictions
+function Map:RestrictTilesAroundTile(tile)
+--[[
+  local neighborDebug = {}
+  local neighborID = {}
+]]--
+
+  for _, direction in ipairs(DIRECTIONS) do
+    local tileDef = tileTypesDefs[tile:GetType()]
+    local restrictionToSet = tileDef.restrictions[direction]
+
+    -- set it first on yourself
+    tile:SetRestriction(direction, restrictionToSet)
+
+    -- if there is relevant neighbor, set it on it as well
+    local neighborTile = tile:GetNeighborTile(direction)
+    if neighborTile then
+      local oppositeDirection = OPPOSITION_TABLE[direction]
+      neighborTile:SetRestriction(oppositeDirection, restrictionToSet)
+      --[[
+      local neighborTileRestrictions = neighborTile:GetRestrictions()
+      neighborDebug[direction] = neighborTileRestrictions[oppositeDirection]
+      neighborID[direction] = neighborTile:GetID() 
+      ]]--
+    end
+  end
+
+--[[
+  local restrictions = tile:GetRestrictions()
+  print("update of " .. tile:GetID() .. " of type " .. tile:GetType())
+  print(restrictions.north, restrictions.east, restrictions.south, restrictions.west)
+  print(neighborDebug.north, neighborDebug.east, neighborDebug.south, neighborDebug.west)
+  print(neighborID.north, neighborID.east, neighborID.south, neighborID.west) 
+  ]]--
+end
+
 function Map:ConnectNeighborTiles(tile)
   local pairsOfConnectors = tile:GetConnectorPairs()
   for _, direction in ipairs(DIRECTIONS) do
@@ -228,30 +281,67 @@ function Map:TransformTileToType(tile, tileTypeDefinition)
 
   self:ReconnectTilesAroundTile(tile)
 
-  self:ReestimateTiles()
+  self:ReestimateTile(tile)
 end
 
-function Map:ReestimateTiles()
-  local tiles = self:GetTiles() -- tileID => tile
+function Map:ReestimateTile(tile)
+  -- get nodes in all map paths
+  local allNodesOnMapPaths = {}
+  for _, path in pairs(self.paths) do
+    for nodeID, node in pairs(path:GetNodes()) do
+      allNodesOnMapPaths[nodeID] = node
+    end
+  end
 
-  for _, tile in pairs(tiles) do
+  -- for Undefined tiles, we run this process
+  if tile:IsTypeOf("Undefined") then
     local pairsOfConnectors = tile:GetConnectorPairs()
     for _, direction in ipairs(DIRECTIONS) do
       local directionPair = pairsOfConnectors[direction]
-      if directionPair then
-        local myConnectorNode, neighborConnectorNode = directionPair[1], directionPair[2]
-        if
-          myConnectorNode ~= nil and
-          neighborConnectorNode ~= nil
-        then
-          tile:SetRestriction(direction, 1)
+      local neighborTile = tile:GetNeighborTile(direction)
+
+      -- check - maybe neighbor is defining it for us already
+      if neighborTile == nil or neighborTile:IsTypeOf("Undefined") then
+        -- if not, run this process
+        if directionPair then
+          local myConnectorNode, neighborConnectorNode = directionPair[1], directionPair[2]
+          if
+            myConnectorNode ~= nil and
+            neighborConnectorNode ~= nil
+          then
+            local myConID = myConnectorNode:GetID()
+            local neighborConID = neighborConnectorNode:GetID()
+            if allNodesOnMapPaths[myConID]
+              and allNodesOnMapPaths[neighborConID]
+            then
+              tile:SetRestriction(direction, 2) -- = must connect
+            else
+              tile:SetRestriction(direction, 1) -- = may connect
+            end
+          else
+            tile:SetRestriction(direction, 0) -- = cannot connect
+          end
         else
           tile:SetRestriction(direction, 0)
         end
+      -- just mirror already decided neighbor setting
       else
-        tile:SetRestriction(direction, 0)
+        local neighborRestrictions = neighborTile:GetRestrictions()
+        tile:SetRestriction(direction, neighborRestrictions[OPPOSITION_TABLE[direction]])
       end
     end
+
+  -- for all other tiles we set it based on tiles defs
+  else
+    Map:RestrictTilesAroundTile(tile)
+  end
+end
+
+function Map:ReestimateTiles()
+  -- now update all tiles
+  local tiles = self:GetTiles() -- tileID => tile
+  for _, tile in pairs(tiles) do
+    self:ReestimateTile(tile)
   end
 end
 

@@ -26,4 +26,12 @@ return {
     end
     return newArray
   end,
+
+  Shuffle = function(array)
+    for i = #array, 2, -1 do
+      local j = math.random(i)
+      array[i], array[j] = array[j], array[i]
+    end
+    return array
+  end
 }

@@ -14,7 +14,8 @@ levelMap = Map.new(minX, maxX, minY, maxY, tileSize)
 
 -- generate quests
 local quests = {}
-for questID, questDef in pairs(questTypesDefs) do
+for _, questID in ipairs(questTypes) do
+  local questDef = questTypesDefs[questID]
   quests[questID] = {}
   quests[questID].questDef = questDef
   if questDef.builders then

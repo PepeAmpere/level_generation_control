@@ -52,6 +52,34 @@ function Node:__unm() -- do nothing
   return self
 end
 
+function Node:AddEdgeIn(edge)
+  self.edgesIn[edge:GetID()] = edge
+end
+
+function Node:AddEdgeOut(edge)
+  self.edgesOut[edge:GetID()] = edge
+end
+
+function Node:Connect(nodeB, edge)
+  return Connect(self, nodeB, edge)
+end
+
+function Node:ConnectInverted(nodeB, edge)
+  return ConnectInverted(self, nodeB, edge)
+end
+
+function Node:ConectBothDirections(nodeB, edgeA, edgeB)
+  return ConnectBothDirections(self, nodeB, edgeA, edgeB)
+end
+
+function Node:Disconnect(edgeB)
+  return Disconnect(self, edgeB)
+end
+
+function Node:DisconnectAll(nodes)
+  return DisconnectAll(self, nodes)
+end
+
 function Node:GetAllEdges(Matcher, inOut)
   local inOutMode = inOut or "all"
   local selectedEdges = {}
@@ -98,16 +126,12 @@ function Node:HasTag(tag)
   return self.tags[tag]
 end
 
-function Node:AddTag(tag)
-  self.tags[tag] = true
-end
-
-function Node:AddEdgeIn(edge)
-  self.edgesIn[edge:GetID()] = edge
-end
-
-function Node:AddEdgeOut(edge)
-  self.edgesOut[edge:GetID()] = edge
+function Node:RemoveAllEdges()
+  -- need to kill edge references on other nodes
+  local allEdges = self:GetAllEdges()
+  for _, edge in pairs(allEdges) do
+    edge:DisconnectFromNodes()
+  end
 end
 
 function Node:RemoveEdge(edge)
@@ -115,12 +139,8 @@ function Node:RemoveEdge(edge)
   self.edgesIn[edge:GetID()] = nil
 end
 
-function Node:RemoveAllEdges()
-  -- need to kill edge references on other nodes
-  local allEdges = self:GetAllEdges()
-  for _, edge in pairs(allEdges) do
-    edge:DisconnectFromNodes()
-  end
+function Node:RemoveTag(tag)
+  self.tags[tag] = nil
 end
 
 function Node:TagRDFSLook(
@@ -215,26 +235,6 @@ end
 
 function Node:SetType(nodeType)
   self.nodeType = nodeType
-end
-
-function Node:Connect(nodeB, edge)
-  return Connect(self, nodeB, edge)
-end
-
-function Node:ConnectInverted(nodeB, edge)
-  return ConnectInverted(self, nodeB, edge)
-end
-
-function Node:ConectBothDirections(nodeB, edgeA, edgeB)
-  return ConnectBothDirections(self, nodeB, edgeA, edgeB)
-end
-
-function Node:Disconnect(edgeB)
-  return Disconnect(self, edgeB)
-end
-
-function Node:DisconnectAll(nodes)
-  return DisconnectAll(self, nodes)
 end
 
 function Node:__lt(nodeB) -- a < b = has b outgoing edge conntecting a?

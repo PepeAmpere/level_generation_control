@@ -61,9 +61,9 @@ function Path:FindNodePair(Matcher, distance) -- implicitly from start
   return nil
 end
 
--- @description Provides array of Path nodes
+-- @description Provides nodeKey => node object table
 function Path:GetNodes()
-  return self.nodesOrderedList -- shall it be copy? this is reference and maybe thats actually wanted...
+  return self.nodes
 end
 
 function Path:GetStartNode()
