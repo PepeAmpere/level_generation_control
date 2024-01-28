@@ -1,3 +1,20 @@
+local function Export(tbl)
+    local newTable = {}
+    for key, value in pairs(tbl) do
+      if type(value) ~= "table" then
+        newTable[key] = value
+      else
+        local ExportMethod = value.Export
+        if ExportMethod then
+          newTable[key] = value:Export(value)
+        else
+          newTable[key] = Export(value)
+        end
+      end
+    end
+    return newTable
+end
+
 local function WriteUsingFunction(tbl, WriteFunction, indent)
   indent = indent or 0
   local writeIndent = string.rep("  ", indent)
@@ -15,9 +32,9 @@ local function WriteUsingFunction(tbl, WriteFunction, indent)
     else
       WriteFunction(writeIndent .. "  [" .. tostring(key) .. "] = ")
     end
-    if 
+    if
       type(value) == "table" and
-      indent <= 3 -- preventing infinite recursion
+      indent <= 5 -- preventing infinite recursion
     then
       WriteUsingFunction(value, WriteFunction, indent + 1)
     elseif type(value) == "string" then
@@ -54,13 +71,14 @@ end
 
 local function ValuesToArray(tbl)
   local newArray = {}
-  for k,v in pairs(tbl) do
+  for _,v in pairs(tbl) do
     newArray[#newArray + 1] = v
   end
   return newArray
 end
 
 return {
+  Export = Export,
   SaveToFile = SaveToFile,
   ShallowCopy = ShallowCopy,
   ValuesToArray = ValuesToArray,

@@ -1,4 +1,4 @@
--- dependency on 
+-- dependency on
 -- * Vec3
 -- * Node
 -- which is loaded externally to reduce environment specific code
@@ -39,6 +39,24 @@ function Path:AppendNode(node)
   self.nodeIDtoIndex[nodeID] = newIndex
   self.nodes[nodeID] = node
   return self
+end
+
+function Path:Export()
+  local exportedObject = {}
+
+  -- export all keys automatically unless specifically handled
+  for k,v in pairs(self) do
+    if k == "nodes" then
+      exportedObject[k] = {}
+      for nodeID, _ in pairs(v) do
+        exportedObject[k][nodeID] = true
+      end
+    else
+      exportedObject[k] = v
+    end
+  end
+
+  return exportedObject
 end
 
 function Path:FindNode(Matcher) -- implicitly from start

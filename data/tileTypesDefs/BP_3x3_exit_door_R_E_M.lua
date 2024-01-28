@@ -7,7 +7,8 @@ local nodesDefs = {
 local edgesDefs = {
   { edgeType = "directional", tags = {"pp"}, from = "EastEntrance", to = "InFrontOfExit" },
   { edgeType = "directional", tags = {"pp"}, from = "InFrontOfExit", to = "EastEntrance" },
-  { edgeType = "directional", tags = {"pp"}, from = "InFrontOfExit", to = "Exit" },
+  { edgeType = "directional", tags = {"pp", "d"}, from = "InFrontOfExit", to = "Exit" },
+  { edgeType = "directional", tags = {"pp", "d"}, from = "Exit", to = "InFrontOfExit" },
 }
 
 local drawDefs = {

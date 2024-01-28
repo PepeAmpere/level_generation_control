@@ -15,6 +15,9 @@ MapExt = require("libs.map.MapExt") -- needed for Map & Tile to work
 Tile = require("libs.map.Tile")
 Map = require("libs.map.Map")
 
+UnrealEvent = require("libs.unreal.UnrealEvent")
+JSON = require("libs.json.json")
+
 -- data
 tileTypesDefs = require("data.tileTypes")
 local qResult = require("data.questTypes")
@@ -40,7 +43,14 @@ if love then print(love.getVersion()) end
 ]]--
 
 -- local tileKey = MapExt.GetMapTileKey(Vec3(0, 0, 0))
--- TableExt.SaveToFile("levelMapExported.lua", levelMap.nodes)
+
+-- simplified export
+--[[
+local exportTable = UnrealEvent.SaveMap()
+local jsonString = JSON.encode(exportTable)
+TableExt.SaveToFile("levelMapExported.lua", {json = jsonString})
+TableExt.SaveToFile("levelMapExported.lua", exportTable)
+]]--
 
 -- BELOW JUST LOVE 2D debugging
 -- lovebird = require("libs.lovebird.init")

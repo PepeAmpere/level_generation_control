@@ -23,6 +23,24 @@ function Edge:DisconnectFromNodes()
   end
 end
 
+function Edge:Export()
+  local exportedObject = {}
+
+  -- export all keys automatically unless specifically handled
+  for k,v in pairs(self) do
+    if k == "nodesFrom" or k == "nodesTo" then
+      exportedObject[k] = {}
+      for nodeID, node in ipairs(v) do
+        exportedObject[k][nodeID] = node:GetID()
+      end
+    else
+      --exportedObject[k] = v
+    end
+  end
+
+  return exportedObject
+end
+
 function Edge:GetID()
   return self.id
 end

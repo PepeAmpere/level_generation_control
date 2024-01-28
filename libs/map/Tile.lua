@@ -38,6 +38,26 @@ function Tile.newFromNode(node, tileSize)
   return i
 end
 
+function Node:Export()
+  local exportedObject = {}
+
+  -- export all keys automatically unless specifically handled
+  for k,v in pairs(self) do
+    if k == "edgesIn" or k == "edgesOut" then
+      exportedObject[k] = {}
+      for edgeID, _ in pairs(v) do
+        exportedObject[k][edgeID] = true
+      end
+    elseif k == "neighbors" then
+      exportedObject[k] = "Determinstic replication"
+    else
+      exportedObject[k] = v
+    end
+  end
+
+  return exportedObject
+end
+
 function Tile:GetAllNodes()
   local nodes = {}
   for _, edge in pairs(self.edgesOut) do

@@ -75,14 +75,20 @@ function Map.new(minX, maxX, minY, maxY, tileSize)
 end
 
 function Map:CleanTile(tile)
-  -- remove all nodes and edges
+  -- find all nodes on tile
   local allTileNodes = tile:GetAllNodes()
 
-  -- removing nodes tables
+  -- ? remove all nodes from all graph-like structures attached to map
+  -- = paths
+  -- = trees
+  -- TBD?
+
+  -- removing nodes tables (last existing instances)
   for _, tileNode in pairs(allTileNodes) do
     print("    Removing node: " .. tileNode:GetID())
     self:RemoveNode(tileNode)
-  end 
+  end
+
   -- remove structural edges on tile node
   tile:RemoveAllEdges()
 end

@@ -80,6 +80,24 @@ function Node:DisconnectAll(nodes)
   return DisconnectAll(self, nodes)
 end
 
+function Node:Export()
+  local exportedObject = {}
+
+  -- export all keys automatically unless specifically handled
+  for k,v in pairs(self) do
+    if k == "edgesIn" or k == "edgesOut" then
+      exportedObject[k] = {}
+      for edgeID, _ in pairs(v) do
+        exportedObject[k][edgeID] = true
+      end
+    else
+      exportedObject[k] = v
+    end
+  end
+
+  return exportedObject
+end
+
 function Node:GetAllEdges(Matcher, inOut)
   local inOutMode = inOut or "all"
   local selectedEdges = {}
@@ -147,7 +165,7 @@ function Node:TagRDFSLook(
     NodeMatcher, NodeUpdater,
     EdgeMatcher, EdgeUpdater, edgesInOut,
     EndMatcher
-  )
+)
   NodeUpdater(self)
   if EndMatcher(self) then
     return Path.new({self})

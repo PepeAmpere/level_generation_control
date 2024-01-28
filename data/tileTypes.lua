@@ -40,14 +40,13 @@ return tileTypesDefs
 -- NEW TILE TEMPLATE
 
 --[[
--- default nodes connecting with neighbor tiles
-
--- TAGS
+-- NODE TAGS
 -- tc = tiles connector
 -- is = item placement spot
 -- sp = start position
 -- exit = end game spot
 
+-- default nodes connecting with neighbor tiles
 local nodesData = {
   ["NorthEntrance"] = { relativePosition = Vec3(400, 0, 0) },
   ["EastEntrance"] = { relativePosition = Vec3(0, 400, 0) },
@@ -55,16 +54,18 @@ local nodesData = {
   ["WestEntrance"] = { relativePosition = Vec3(0, -400, 0) },
 }
 
--- trivial connection of all nodes to each other via one multiedge
-
--- TAGS
+-- EDGE TAGS
 -- pp = physical proximity
 -- sp = structural proximity
+-- d = door
+-- k_<N> = key of number N is needed to unlock given doors, e.g. k_198751
+-- k_<c> = key of color c is needed to unlock given doors, e.g. k_red
 
 -- TYPES
 -- directional - simple edge type going from node to another in defined direction
 -- multiedge - edge type connecting 2+ nodes in both directions
 
+-- trivial connection of all nodes to each other via one multiedge
 local edgesData = {
   {
     edgeType = "multiedge", tags = {"pp"},
@@ -80,16 +81,29 @@ local edgesData = {
 -- data defining the color classes
 -- colors mapping: in Colors.lua
 
-local drawData = {
-    "x", "w", "x",
-    "w", "w", "w",
-    "x", "w", "x",
+local drawDefs = {
+  "w", "x", "x",
+  "x", "w", "w",
+  "w", "x", "x",
+}
+
+-- restrictions
+-- 0 -- must not passable
+-- 1 -- undefined
+-- 2 -- must passable
+
+local restrictions = {
+  north = 0,
+  east = 2,
+  south = 0,
+  west = 0,
 }
 
 return {
-  nodesData = nodesData,
-  edgesData = edgesData,
-  drawData = drawData,
-} 
+  nodesDefs = nodesDefs,
+  edgesDefs = edgesDefs,
+  drawDefs = drawDefs,
+  restrictions = restrictions,
+}
 
 ]]--
