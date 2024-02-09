@@ -1,8 +1,18 @@
 local tileTypes = {
   "BP_3x3_base_crossroad",
+
+  -- rooms
   "BP_3x3_exit_door_R_E_M",
   "BP_3x3_kitchen",
   "BP_3x3_ritual_room",
+  "BP_3x3_office",
+  "BP_3x3_restroom_female",
+  "BP_3x3_restroom_male",
+  "BP_3x3_restroom_male_alt",
+
+  -- special rooms
+  "BP_3x3_diner_entrance",
+  "BP_3x3_diner_table_area",
 
   -- ends
   "BP_3x3_end_W_M",
@@ -26,13 +36,56 @@ local tileTypes = {
   "BP_3x3_corridor_horizontal_M",
   "BP_3x3_corridor_vertical_M",
 
+  -- variables for generation
+  "Undefined",
+  "Virtual",
+}
+
+local variables = {
+  "BP_3x3_exit_door_R_E_M",
+  "BP_3x3_kitchen",
+  "BP_3x3_ritual_room",
+  "BP_3x3_office",
+  "BP_3x3_restroom_female",
+  "BP_3x3_restroom_male",
+}
+
+local variablesToColor = {
+  "Virtual",
   "Undefined",
 }
 
+local colorsForVariables = {
+  "yellow",
+  "blue",
+  "red",
+  "green"
+}
+
 local tileTypesDefs = {}
-for i, tileTypeName in ipairs(tileTypes) do
+for _, tileTypeName in ipairs(tileTypes) do
   tileTypesDefs[tileTypeName] = require("data.tileTypesDefs." .. tileTypeName)
   tileTypesDefs[tileTypeName].name = tileTypeName
+end
+
+for _, variableName in ipairs(variables) do
+  local fullName = variableName .. "_variable"
+  tileTypesDefs[fullName] = TableExt.ShallowCopy(tileTypesDefs[variableName])
+  tileTypesDefs[fullName].name = fullName
+end
+
+for _, variableName in ipairs(variablesToColor) do
+  for _, colorName in ipairs(colorsForVariables) do
+    local fullName = variableName .. "_" .. colorName
+    tileTypesDefs[fullName] = TableExt.DeepCopy(tileTypesDefs[variableName])
+    tileTypesDefs[fullName].name = fullName
+    local drawDefs = tileTypesDefs[fullName].drawDefs
+    for i = 1, #drawDefs do
+      if drawDefs[i] == "w" then
+        tileTypesDefs[fullName].drawDefs[i] = colorName
+      end
+    end
+  end
 end
 
 return tileTypesDefs

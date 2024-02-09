@@ -2,6 +2,6 @@
   deps = [
       pkgs.lua5_4
       pkgs.sumneko-lua-language-server
-      pkgs.love
+      pkgs.love_0_10
   ];
 }

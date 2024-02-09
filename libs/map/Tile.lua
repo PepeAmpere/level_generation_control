@@ -22,11 +22,11 @@ function Tile.newFromNode(node, tileSize)
   for k,v in pairs(node) do
     i[k] = v
   end
-  i.neighborsIDs = {
-    north = GetMapTileKey(i.position + DIR_TO_VEC3.north * tileSize),
-    east = GetMapTileKey(i.position + DIR_TO_VEC3.east * tileSize),
-    south = GetMapTileKey(i.position + DIR_TO_VEC3.south * tileSize),
-    west = GetMapTileKey(i.position + DIR_TO_VEC3.west * tileSize),
+  i.neighborsPositions = {
+    north = i.position + DIR_TO_VEC3.north * tileSize,
+    east = i.position + DIR_TO_VEC3.east * tileSize,
+    south = i.position + DIR_TO_VEC3.south * tileSize,
+    west = i.position + DIR_TO_VEC3.west * tileSize,
   }
   i.neighbors = {}
   i.restrictions = {
@@ -91,6 +91,14 @@ function Tile:GetConnectorPairs()
   return pairsOfConnectors
 end
 
+function Tile:GetDirectionOf(neighborTile)
+  for direction, neighborPos in pairs(self.neighborsPositions) do
+    if GetMapTileKey(neighborPos) == neighborTile:GetID() then
+      return direction
+    end
+  end
+end
+
 function Tile:GetNodes(Matcher)
   local selectedNodes = {}
   Matcher = Matcher or function() return true end
@@ -107,8 +115,17 @@ function Tile:GetNeighborTile(direction)
   return self.neighbors[direction]
 end
 
-function Tile:GetNeighborTileKey(direction)
-  return self.neighborsIDs[direction]
+function Tile:GetNeighborTileID(direction)
+  local tilePosition = self.neighborsPositions[direction]
+  return GetMapTileKey(tilePosition)
+end
+
+function Tile:GetNeighborTilePosition(direction)
+  return self.neighborsPositions[direction]
+end
+
+function Tile:GetRestriction(direction)
+  return self.restrictions[direction]
 end
 
 function Tile:GetRestrictions()
@@ -164,6 +181,7 @@ function Tile:SetNeighborReference(direction, neighborTile)
 end
 
 function Tile:SetRestriction(key, value)
+  if key == nil then assert(false, "Tile:SetRestriction, direction is nil") end
   self.restrictions[key] = value
 end
 function Tile:TransformToType(typeTypeDefinition)

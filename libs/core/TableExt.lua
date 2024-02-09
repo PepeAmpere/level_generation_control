@@ -69,6 +69,20 @@ local function ShallowCopy(tbl)
   return tblCopy
 end
 
+local function DeepCopy(tbl, seen)
+  if (type(tbl) ~= "table") then return tbl end
+  if (seen and seen[tbl]) then return seen[tbl] end
+
+  local newSeen = seen or {}
+  local newTable = setmetatable({}, getmetatable(tbl))
+
+  newSeen[tbl] = newTable
+  for k, v in pairs(tbl) do 
+    newTable[DeepCopy(k, newSeen)] = DeepCopy(v, newSeen)
+  end
+  return newTable
+end
+
 local function ValuesToArray(tbl)
   local newArray = {}
   for _,v in pairs(tbl) do
@@ -81,6 +95,7 @@ return {
   Export = Export,
   SaveToFile = SaveToFile,
   ShallowCopy = ShallowCopy,
+  DeepCopy = DeepCopy,
   ValuesToArray = ValuesToArray,
   WriteUsingFunction = WriteUsingFunction,
 }

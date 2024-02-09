@@ -10,10 +10,12 @@ Edge = require("libs.core.Edge")
 Node = require("libs.core.Node")
 Graph = require("libs.core.Graph")
 Path = require("libs.core.Path")
+Tree = require("libs.core.Tree")
 
 MapExt = require("libs.map.MapExt") -- needed for Map & Tile to work
 Tile = require("libs.map.Tile")
 Map = require("libs.map.Map")
+TTE = require("libs.map.TTE")
 
 UnrealEvent = require("libs.unreal.UnrealEvent")
 JSON = require("libs.json.json")
@@ -23,6 +25,9 @@ tileTypesDefs = require("data.tileTypes")
 local qResult = require("data.questTypes")
 questTypes = qResult[1]
 questTypesDefs = qResult[2]
+local pResult = require("data.productionRules")
+productionRulesTypes = pResult[1]
+productionRulesDefs = pResult[2]
 
 -- prepare the level generation
 math.randomseed( os.time() )
@@ -58,17 +63,18 @@ Colors = require("libs.drawLove.Colors")
 Draw = require("libs.drawLove.Draw")
 DrawMap = require("libs.drawLove.DrawMap")
 Gamera = require("libs.gamera.gamera")
+Turtle = require("libs.turtle.turtle")
 
 -- data
 images = require("data.imagesInit")
 
-local DRAW_SIZE = 20000
+local DRAW_SIZE = 40000
 local camera = Gamera.new(-DRAW_SIZE,-DRAW_SIZE,DRAW_SIZE,DRAW_SIZE)
 camera:setScale(0.1)
 
 local positionCenterX = 0
 local positionCenterY = 0
-camera:setWorld(-5000,-5000,DRAW_SIZE,DRAW_SIZE)
+camera:setWorld(-10000,-10000,DRAW_SIZE,DRAW_SIZE)
 camera:setWindow(0,0,800,600)
 camera:setPosition(positionCenterX, positionCenterY)
 
@@ -76,8 +82,18 @@ local UI_STATES = {
   pan = false,
 }
 
-function love.load()
+triangle = Turtle(300,0)
+levelToDraw = Turtle()
+TurtleBuilder = require("libs.turtle.TurtleBuilder")
 
+function love.load()
+  triangle:pensize(10):forward(100):left(120):forward(100):left(120):forward(100)
+  levelString = "1111[11[1[0]0]1[0]0]11[1[0]0]1[0]0"
+  levelToDraw = TurtleBuilder.Encode(levelToDraw, levelString)
+end
+function DrawStuff()
+  triangle:draw()
+  levelToDraw:draw()
 end
 
 function love.update(dt)
@@ -94,7 +110,11 @@ function love.draw()
   --love.graphics.setColor(0, 255, 0)
   --love.graphics.rectangle("fill", 0, 0, 100, 100)
 
-  camera:draw(DrawMap.AllTiles)
+  --camera:draw(DrawStuff)
+
+  --camera:draw(DrawMap.AllTiles)
+  camera:draw(DrawMap.AllTreeTiles)
+  camera:draw(DrawMap.AllTreeLines)
   camera:draw(DrawMap.AllNodes)
   camera:draw(DrawMap.AllEdges)
   camera:draw(DrawMap.AllPaths)
@@ -124,6 +144,6 @@ function love.wheelmoved(x, y)
   DrawMap.WheelZoom(camera, x, y)
 end
 
-function love.keyreleased(key, scancode) 
+function love.keyreleased(key, scancode)
   DrawMap.ControlKeys(camera, key, scancode)
 end

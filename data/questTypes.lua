@@ -1,10 +1,10 @@
 local questTypes = {
-  "Escape",
-  "FinalPopulator"
+  "Escape", -- Path based, depricate
+  "FinalPopulator", -- Path based, depricate
 }
 
 local questTypesDefs = {}
-for i, questTypeName in ipairs(questTypes) do
+for _, questTypeName in ipairs(questTypes) do
   questTypesDefs[questTypeName] = require("data.questTypesDefs." .. questTypeName)
 end
 

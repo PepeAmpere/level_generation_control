@@ -7,3 +7,6 @@ pattern = "**/*.lua"
 
 [languages.lua.languageServer]
 start = ["lua-language-server"]
+
+[nix]
+channel = "stable-23_11"

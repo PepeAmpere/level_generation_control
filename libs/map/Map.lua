@@ -18,59 +18,56 @@ local Map = {}
 Map.__index = Map
 setmetatable(Map, Graph)
 
-function Map.new(minX, maxX, minY, maxY, tileSize)
+function Map.new(rootPostionVec3, tileSize)
   local i = setmetatable({}, Map) -- make new instance
-  minX = minX or -1
-  maxX = maxX or 1
-  minY = minY or -1
-  maxY = maxY or 1
   tileSize = tileSize or 1
+  i.tileSize = tileSize
 
-  local nodes = {}
-  for x = minX*tileSize, maxX*tileSize, tileSize do
-    for y = minY*tileSize, maxY*tileSize, tileSize do
-      local tileKey = GetMapTileKey(Vec3(x, y, 0))
-      local newTile = Tile.newFromNode(
-        Node.new(
-          tileKey,
-          Vec3(x, y, 0),
-          nil,
-          {
-            tile = true
-          }
-        ),
-        tileSize
-      )
-      nodes[tileKey] = newTile
-    end
-  end
+  i.nodes = {}
 
-  i.nodes = nodes
+  local rootTileID = GetMapTileKey(rootPostionVec3)
+  local rootNodeTile = Tile.newFromNode(
+    Node.new(
+      rootTileID,
+      rootPostionVec3,
+      nil,
+      {
+        tile = true
+      }
+    ),
+    tileSize
+  )
+  i.nodes[rootTileID] = rootNodeTile
+
+  i.constructorTree = Tree.new(rootNodeTile)
+  i.constructorScores = {
+    rulesMatchesCounter = {},
+  }
   i.edges = {}
   i.paths = {}
 
-  local allTileNodes = TableExt.ShallowCopy(nodes)
+  -- test
+  i:PopulateTilePerType(rootNodeTile, tileTypesDefs["Undefined"])
+  i:ConnectNeighborTiles(rootNodeTile)
 
-  -- after nodes created, connect them with proper references instead of IDs
-  for _, tile in pairs(allTileNodes) do
-    for _, direction in ipairs(DIRECTIONS) do
-      local neighborTileKey = tile:GetNeighborTileKey(direction)
-      if i.nodes[neighborTileKey] then
-        tile:SetNeighborReference(direction, i.nodes[neighborTileKey])
-      end
-    end
-  end
+  i:ConstructionInitVirtualTiles()
 
+  --[[
+  tile:GetNeighborTileID(direction)
+  tile:SetNeighborReference(direction, i.nodes[neighborTileKey])
+  Node.new(
+    tileKey,
+    Vec3(x, y, 0),
+    nil,
+    {
+      tile = true
+    }
+  )
   -- set first tile types
-  for _, tile in pairs(allTileNodes) do
-    i:PopulateTilePerType(tile, tileTypesDefs["Undefined"])
-  end
-
+  i:PopulateTilePerType(tile, tileTypesDefs["Undefined"])
   -- make first connections
-  for _, tile in pairs(allTileNodes) do
-    i:ConnectNeighborTiles(tile)
-  end
-
+  i:ConnectNeighborTiles(tile)
+  ]] --
   return i
 end
 
@@ -100,6 +97,89 @@ function Map:Cleanup(NodeCleaner, EdgeCleaner)
   for _, edge in pairs(self.edges) do
     EdgeCleaner(edge)
   end
+end
+
+function Map:ConstructionGetMaxDepth()
+  local constructorTree = self:GetConstructorTree()
+  return constructorTree:GetMaxDepth()
+end
+
+function Map:ConstructionGetParentTileDirection(tile)
+  local constructorTree = self:GetConstructorTree()
+  local rootNode = constructorTree:GetRootNode()
+  if not rootNode:IsEqual(tile) then
+    local parentTile = constructorTree:GetParentOf(tile)
+    return parentTile:GetDirectionOf(tile)
+  end
+end
+
+function Map:ConstructionGetScoresCopy()
+  local scores = {}
+  for k,v in pairs(self.constructorScores) do
+    scores[k] = v
+  end
+  return scores
+end
+
+function Map:ConstructionGetTilesCoutPerType()
+  local constructorTree = self:GetConstructorTree()
+  local countPerType = {}
+  for typeName, _ in pairs(tileTypesDefs) do
+    countPerType[typeName] = 0
+  end
+
+  local treeCountPerType = constructorTree:GetNodesCountPerType()
+  for typeName, count in pairs(treeCountPerType) do
+    countPerType[typeName] = count
+  end
+
+  return countPerType
+end
+
+function Map:ConstructionIncrementMatchCounter(ruleName)
+  if self.constructorScores.rulesMatchesCounter[ruleName] == nil then
+    self.constructorScores.rulesMatchesCounter[ruleName] = 1
+  else
+    self.constructorScores.rulesMatchesCounter[ruleName] = self.constructorScores.rulesMatchesCounter[ruleName] + 1
+  end
+end
+
+function Map:ConstructionInitVirtualTiles()
+  local constructorTree = self:GetConstructorTree()
+  local rootNode = constructorTree:GetRootNode()
+
+  for _, direction in ipairs(DIRECTIONS) do
+    if direction == "east" then -- start only east from the initial tile
+      local neighborVirtualTilePosition = rootNode:GetNeighborTilePosition(direction)
+      local neighborVirtualTileID = GetMapTileKey(neighborVirtualTilePosition)
+      local neighborVirtualTile = Tile.newFromNode(
+        Node.new(
+          neighborVirtualTileID,
+          neighborVirtualTilePosition,
+          "Virtual_yellow",
+          {
+            tile = true
+          }
+        ),
+        self.tileSize
+      )
+      constructorTree:AddNode(neighborVirtualTile, rootNode)
+    end
+  end
+end
+
+function Map:ConstructionUpdateScoreByRule(ruleFn)
+  self = ruleFn(self)
+end
+
+function Map:ConstructionUpdateScores(newScores)
+  for k,v in pairs(newScores) do
+      self.constructorScores[k] = v
+  end
+end
+
+function Map:GetConstructorTree()
+  return self.constructorTree
 end
 
 function Map:GetTile(tileID)

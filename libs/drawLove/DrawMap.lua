@@ -15,10 +15,14 @@ local RECT_SIZE2 = MapExt.HALF_RECT_SIZE
 local HALF_SIZE2 = MapExt.HALF_SIZE
 
 -- local constants
-local ZOOM_SCALE_FACTOR = 0.05
+local ZOOM_SCALE_FACTOR = 0.03
 local TILE_KEY_TO_COLOR = {
   w = {234, 234, 234, 255},
   x = {168, 168, 168, 255},
+  yellow = {168, 168, 0, 128},
+  blue = {0, 0, 255, 128},
+  red = {255, 0, 0, 128},
+  green = {0, 255, 0, 128},
 }
 local SUBTILES_POSITIONS = {
   Vec3(2*RECT_SIZE2, -2*RECT_SIZE2, 0),  Vec3(2*RECT_SIZE2, 0, 0), Vec3(2*RECT_SIZE2, 2*RECT_SIZE2, 0),
@@ -87,6 +91,30 @@ local function DrawTile(tile)
   -- SECTION TO REFACTOR END
 end
 
+local tagsTextfields = {}
+
+local function DrawTileTags(tile)
+  local tags = tile:GetTags()
+  local index = 0
+  for tag, _ in pairs(tags) do
+    if tagsTextfields[tag] then
+      -- DrawText(tagsTextfields[tag], tile:GetPosition(), {255,0,255,255})
+      local drawPosition = tile:GetPosition() + Vec3(index*-100,0,0)
+      love.graphics.printf( 
+        tag, 
+        drawPosition:Y(),
+        -drawPosition:X(),
+        1000, "left", 0, 10, 10)
+
+      index = index + 1
+    else
+      local font = love.graphics.getFont()
+      local text = love.graphics.newText(font, tag)
+      tagsTextfields[tag] = text
+    end
+  end
+end
+
 -- restictions debug
 local function DrawTileRestrictions(tile)
 
@@ -140,6 +168,36 @@ local function AllTileRestrictions()
   local tiles = levelMap:GetTiles()
   for _, tile in pairs(tiles) do
     DrawTileRestrictions(tile)
+  end
+end
+
+local function AllTreeLines()
+  local constructorTree = levelMap:GetConstructorTree()
+  local rootNode = constructorTree:GetRootNode()
+  local rootNodeID = rootNode:GetID()
+
+  local function RecLookup(tree, nodeID)
+    local childrenOfNode = tree:GetNodeChildren(nodeID) or {}
+    for i=1, #childrenOfNode do
+      Draw.Line(
+        tree:GetNode(nodeID):GetPosition(),
+        tree:GetNode(childrenOfNode[i]):GetPosition(),
+        10,
+        {0,128,0,128}
+      )
+      RecLookup(tree, childrenOfNode[i])
+    end
+  end
+
+  RecLookup(constructorTree, rootNodeID)
+end
+
+local function AllTreeTiles()
+  local constructorTree = levelMap:GetConstructorTree()
+  local tiles = constructorTree:GetNodes()
+  for _, tile in pairs(tiles) do
+    DrawTile(tile)
+    DrawTileTags(tile)
   end
 end
 
@@ -234,6 +292,8 @@ return {
   AllPaths = AllPaths,
   AllTiles = AllTiles,
   AllTileRestrictions = AllTileRestrictions,
+  AllTreeLines = AllTreeLines,
+  AllTreeTiles = AllTreeTiles,
   CameraAndCursorPosition = CameraAndCursorPosition,
   ControlKeys = ControlKeys,
   DebugControl = DebugControl,

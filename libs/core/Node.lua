@@ -45,7 +45,7 @@ local function Disconnect(nodeA, nodeB, edge)
 end
 
 function Node:__eq(nodeB)
-  return self.ID == nodeB.ID
+  return self:GetID() == nodeB:GetID()
 end
 
 function Node:__unm() -- do nothing
@@ -140,8 +140,12 @@ function Node:IsTypeOf(nodeType)
   return self.nodeType == nodeType
 end
 
+function Node:IsEqual(nodeB)
+  return self:GetID() == nodeB:GetID()
+end
+
 function Node:HasTag(tag)
-  return self.tags[tag]
+  return self.tags[tag] ~= nil
 end
 
 function Node:RemoveAllEdges()
