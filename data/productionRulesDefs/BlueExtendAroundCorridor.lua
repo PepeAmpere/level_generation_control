@@ -2,24 +2,21 @@
 local DIRECTIONS = MapExt.DIRECTIONS
 
 local productionFormulas = {
-  "W(MVY,TUY)F(ME,TUY)LF(ME,TUY)RF(ME,TVY)",
-  "W(MVY,TUY)F(ME,TUY)F(ME,TVY)",
-  "W(MVY,TUY)F(ME,TUY)RF(ME,TUY)F(ME,TUY)RF(ME,TVY)",
-  "W(MVY,TUY)F(ME,TUY)RF(ME,TUY)F(ME,TUY)LF(ME,TVY)",
-  "W(MVY,TUY)F(ME,TUY)RF(ME,TUY)LF(ME,TUY)LF(ME,TVY)",
-  "W(MVY,TUY)F(ME,TUY)LF(ME,TUY)LF(ME,TUY)RF(ME,TUY)RF(ME,TUY)F(ME,TVY)",
-  "W(MVY,TUY)F(ME,TUY)LF(ME,TUY)F(ME,TVY)",
+  "W(MVB,TUB)F(ME,TUB)LF(ME,TVB)",
+  "W(MVB,TUB)F(ME,TUB)RF(ME,TUB)LF(ME,TUB)LF(ME,TUB)F(ME,TVB)",
+  "W(MUB,TZ)F(ME,TUB)RF(ME,TVB)",
+  "W(MHN,TZ)W(MUB,TZ)F(ME,TRRM)",
+  "W(MHS,TZ)W(MUB,TZ)F(ME,TRDE)LF(ME,TRDT)RFRFFRF",
 }
 
 local function SearchAndTransform(Matcher, Transformer, levelMap)
   local constructorTree = levelMap:GetConstructorTree()
   local _, deepestTile = constructorTree:GetMaxDepth()
-  local parentTile = constructorTree:GetParentOf(deepestTile)
-  local parentDirection = parentTile:GetDirectionOf(deepestTile)
   local formula = ArrayExt.Shuffle(productionFormulas)[1]
+  local randomDirection = ArrayExt.Shuffle(ArrayExt.ShallowCopy(DIRECTIONS))[1]
 
-  if Matcher(constructorTree, deepestTile, levelMap, parentDirection, formula) then
-    Transformer(constructorTree, deepestTile, levelMap, parentDirection, formula)
+  if Matcher(constructorTree, deepestTile, levelMap, randomDirection, formula) then
+    Transformer(constructorTree, deepestTile, levelMap, randomDirection, formula)
   else
     for _, direction in ipairs(DIRECTIONS) do
       if Matcher(constructorTree, deepestTile, levelMap, direction, formula) then

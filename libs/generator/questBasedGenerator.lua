@@ -1,6 +1,6 @@
 local globalConditions = {
   -- just the initial tile setup
-  [1] = function(levelMap)
+  function(levelMap)
     local tilesCounts = levelMap:ConstructionGetTilesCoutPerType()
 
     -- condition
@@ -17,53 +17,23 @@ local globalConditions = {
   -- get closer to the anticipated blue part
   -- keep few grow opportunities along the lines
   -- but go agresivelly towards to wanted position, no breadth if possible
-  [2] = function(levelMap)
+  function(levelMap)
     local constructorScores = levelMap:ConstructionGetScoresCopy()
     local tilesCounts = levelMap:ConstructionGetTilesCoutPerType()
 
     -- condition
-    local result = tilesCounts["Undefined_yellow"] > 10 and
-                  tilesCounts["Virtual_yellow"] > 5
+    local result = tilesCounts["Undefined_yellow"] > 8
 
     -- list of applicable rules if condition is not met
-    local productionRulesNames = {
-      "YellowLeafMaxJunction",
-    }
-
-    return result, productionRulesNames
-  end,
-
-  [3] = function(levelMap)
-    local constructorScores = levelMap:ConstructionGetScoresCopy()
-    local tilesCounts = levelMap:ConstructionGetTilesCoutPerType()
-
-    -- condition
-    local result = tilesCounts["Undefined_yellow"] > 40 and
-                  tilesCounts["Virtual_yellow"] > 10
-
-    -- list of applicable rules if condition is not met
-    local productionRulesNames
-    if constructorScores.iterations % 2 == 0 then
-      productionRulesNames = {
-        --"YellowLeafLongDirectCorridor",
-        "YellowLeafLongCustomCorridor",
-      }
-    else
-      productionRulesNames = {
-        "YellowLeafMaxJunction",
-      }
-    end
-    productionRulesNames = ArrayExt.Shuffle(productionRulesNames)
-
     productionRulesNames = {
-      --"YellowLeafLongDirectCorridor",
       "YellowLeafLongCustomCorridor",
     }
 
     return result, productionRulesNames
   end,
 
-  [4] = function(levelMap)
+  -- add ritual room to any reasonable tile
+  function(levelMap)
     local constructorScores = levelMap:ConstructionGetScoresCopy()
     local tilesCounts = levelMap:ConstructionGetTilesCoutPerType()
 
@@ -72,13 +42,14 @@ local globalConditions = {
 
     -- list of applicable rules if condition is not met
     local productionRulesNames = {
-      "AddRitualRoom",
+      "YellowToBlue",
     }
 
     return result, productionRulesNames
   end,
 
-  [5] = function(levelMap)
+  -- grow blue part and maybe make some rooms as part of it
+  function(levelMap)
     local constructorScores = levelMap:ConstructionGetScoresCopy()
     local tilesCounts = levelMap:ConstructionGetTilesCoutPerType()
 
@@ -87,12 +58,28 @@ local globalConditions = {
 
     -- list of applicable rules if condition is not met
     local productionRulesNames = {
-      "BasicExtendBlue",
+      "BlueExtendAroundCorridor",
     }
 
     return result, productionRulesNames
   end,
-  }
+
+  -- grow blue part and maybe make some rooms as part of it
+  function(levelMap)
+    local constructorScores = levelMap:ConstructionGetScoresCopy()
+    local tilesCounts = levelMap:ConstructionGetTilesCoutPerType()
+
+    -- condition
+    local result = tilesCounts["Undefined_blue"] >= 25
+
+    -- list of applicable rules if condition is not met
+    local productionRulesNames = {
+      "BlueExtend",
+    }
+
+    return result, productionRulesNames
+  end,
+}
 
 local function QuestBasedGenerator()
 

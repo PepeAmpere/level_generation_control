@@ -1,11 +1,11 @@
 local productionRulesTypes = {
-  --"BasicExtend",
-  "BasicExtendBlue",
+  "BlueExtend",
+  "BlueExtendAroundCorridor",
   "InitialExit",
-  "AddRitualRoom",
   "YellowLeafLongCustomCorridor",
   "YellowLeafLongDirectCorridor",
   "YellowLeafMaxJunction",
+  "YellowToBlue"
 }
 
 local productionRulesDefs = {}

@@ -27,7 +27,7 @@ end
 -- LOCAL NOT EXPOSED FUNCTIONS
 local function DecodeFormula(formula)
   local steps = {}
-  local defaultMatcher = "MA"
+  local defaultMatcher = "ME"
   local defaultTransformer = "TZ"
 
   local matchFormulaFull = "%a%(%a+,%a+%)"
@@ -41,12 +41,17 @@ local function DecodeFormula(formula)
     local defWithoutFull = string.gsub(remainingString, matchFormulaFull, "_")
     local fullIndex = string.find(remainingString, matchFormulaFull)
     local letterIndex = string.find(defWithoutFull, matchSingleLetters)
+
+    -- print(fullIndex,letterIndex, remainingString)
     if
       (
         fullIndex ~= nil and
         letterIndex == nil
       ) or
-      fullIndex < letterIndex
+      (
+        fullIndex ~= nil and
+        fullIndex < letterIndex
+      )
     then
       _, eI, moveType, matcherType, transformerType = string.find(
         remainingString,
@@ -84,22 +89,6 @@ function TTE:F()
   return self:Move(1)
 end
 
---[[ function TTE:ExploreEmpty(levelMap)
-  local path = self.formula
-  local result = true
-
-  for i=1, string.len(path) do
-    self:OneStep()
-    local tileID = GetMapTileKey(self.position)
-    local constructorTree = levelMap:GetConstructorTree()
-    if constructorTree:HasNodeID(tileID) then
-      result = false
-      break
-    end
-  end
-  return result
-end ]]--
-
 function TTE:L()
   if self.direction == "north" then
     self.direction = "west"
@@ -122,6 +111,8 @@ function TTE:Match(levelMap)
     TTE[step.MovementType](self)
 
     local match = TTE[step.Matcher](self, levelMap, self.position, self.direction)
+
+    print(s, step.Matcher, match, self.position, self.direction)
     if not match then
       result = false
       break
@@ -184,9 +175,27 @@ end
 -- EXAMPLE BUILT-IN MATCHERS
 -- all methods can be later added in the "new" method via custom param "customMethods"
 -- now hard-defining here to keep it simple
--- Match Auto
+
+-- generic type-matching function
+local function MatchType(levelMap, position, direction, tileType)
+  local tileID = GetMapTileKey(position)
+  local constructorTree = levelMap:GetConstructorTree()
+  if constructorTree:HasNodeID(tileID) then
+    local tile = constructorTree:GetNode(tileID)
+    return tile:IsTypeOf(tileType)
+  end
+  return false
+end
+
+-- Match Always
 function TTE:MA()
   return true
+end
+
+-- Match any yellow
+function TTE:MAY(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Undefined_yellow") or
+        MatchType(levelMap, position, direction, "Virtual_yellow")
 end
 
 -- Match Empty
@@ -196,26 +205,58 @@ function TTE:ME(levelMap, position, direction)
   return not constructorTree:HasNodeID(tileID)
 end
 
--- Match Undefined_yellow
-function TTE:MUY(levelMap, position, direction)
-  local tileID = GetMapTileKey(position)
-  local constructorTree = levelMap:GetConstructorTree()
-  if constructorTree:HasNodeID(tileID) then
-    local tile = constructorTree:GetNode(tileID)
-    return tile:IsTypeOf("Undefined_yellow")
-  end
-  return false
+-- Match heading east
+function TTE:MHE(levelMap, position, direction)
+  return direction == "east"
 end
 
+-- Match heading north
+function TTE:MHN(levelMap, position, direction)
+  return direction == "north"
+end
+
+-- Match heading south
+function TTE:MHS(levelMap, position, direction)
+  return direction == "south"
+end
+
+-- Match heading west
+function TTE:MHW(levelMap, position, direction)
+  return direction == "west"
+end
+
+-- Match Undefined_blue
+function TTE:MUB(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Undefined_blue")
+end
+-- Match Undefined_green
+function TTE:MUG(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Undefined_green")
+end
+-- Match Undefined_red
+function TTE:MUR(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Undefined_red")
+end
+-- Match Undefined_yellow
+function TTE:MUY(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Undefined_yellow")
+end
+
+-- Match Virtual_blue
+function TTE:MVB(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Virtual_blue")
+end
+-- Match Virtual_green
+function TTE:MVG(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Virtual_green")
+end
+-- Match Virtual_red
+function TTE:MVR(levelMap, position, direction)
+  return MatchType(levelMap, position, direction, "Virtual_red")
+end
 -- Match Virtual_yellow
 function TTE:MVY(levelMap, position, direction)
-  local tileID = GetMapTileKey(position)
-  local constructorTree = levelMap:GetConstructorTree()
-  if constructorTree:HasNodeID(tileID) then
-    local tile = constructorTree:GetNode(tileID)
-    return tile:IsTypeOf("Virtual_yellow")
-  end
-  return false
+  return MatchType(levelMap, position, direction, "Virtual_yellow")
 end
 
 -- Generic transformation function
@@ -264,26 +305,86 @@ local function GenericTransform(levelMap, position, direction, parentTile, tileT
   return tile
 end
 
--- Transform to Undefined_yellow
-function TTE:TUY(levelMap, position, direction, parentTile)
-  return GenericTransform(
-    levelMap,
-    position,
-    direction,
-    parentTile,
-    "Undefined_yellow"
-  )
+-- Transform to corners and corridors
+function TTE:TCCV(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_corridor_vertical_M")
+end
+function TTE:TCturn_ES(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_turn_ES_M")
+end
+function TTE:TCturn_NW(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_turn_NW_M")
+end
+function TTE:TCturn_NE(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_turn_NE_M")
 end
 
+-- Transform to BP_3x3_kitchen
+function TTE:TRK(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_kitchen")
+end
+
+-- Transform to BP_3x3_office
+function TTE:TRO(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_office")
+end
+
+-- Transform to BP_3x3_diner_entrance
+function TTE:TRDE(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_diner_entrance")
+end
+-- Transform to BP_3x3_diner_table_area
+function TTE:TRDT(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_diner_table_area")
+end
+
+-- Transform to BP_3x3_ritual_room
+function TTE:TRR(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_ritual_room")
+end
+
+-- Transform to BP_3x3_restroom_female
+function TTE:TRRF(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_restroom_female")
+end
+
+-- Transform to BP_3x3_restroom_male
+function TTE:TRRM(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_restroom_male")
+end
+
+-- Transform to Undefined_blue
+function TTE:TUB(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Undefined_blue")
+end
+-- Transform to Undefined_green
+function TTE:TUG(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Undefined_green")
+end
+-- Transform to Undefined_red
+function TTE:TUR(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Undefined_red")
+end
+-- Transform to Undefined_yellow
+function TTE:TUY(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Undefined_yellow")
+end
+
+-- Transform to Virtual_blue
+function TTE:TVB(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Virtual_blue")
+end
+-- Transform to Virtual_green
+function TTE:TVG(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Virtual_green")
+end
+-- Transform to Virtual_red
+function TTE:TVR(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "Virtual_red")
+end
 -- Transform to Virtual_yellow
 function TTE:TVY(levelMap, position, direction, parentTile)
-  return GenericTransform(
-    levelMap,
-    position,
-    direction,
-    parentTile,
-    "Virtual_yellow"
-  )
+  return GenericTransform(levelMap, position, direction, parentTile, "Virtual_yellow")
 end
 
 -- Transform Zero = no transformation

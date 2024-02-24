@@ -65,18 +65,21 @@ function Tree:GetMaxDepth()
   local function RecLookup(tree, nodeID, depth)
     local childrenOfNode = tree:GetNodeChildren(nodeID) or {}
     local currentMaxDepth = depth
+    local deepestNodeID = nodeID
 
     for i=1, #childrenOfNode do
-      local lastMaxDepth = RecLookup(tree, childrenOfNode[i], depth + 1)
+      local lastMaxDepth, deepNodeID = RecLookup(tree, childrenOfNode[i], depth + 1)
       if lastMaxDepth > currentMaxDepth then
         currentMaxDepth = lastMaxDepth
+        deepestNodeID = deepNodeID
       end
     end
 
-    return currentMaxDepth
+    return currentMaxDepth, deepestNodeID
   end
 
-  return RecLookup(self, rootNodeID, 0)
+  local depth, nodeID = RecLookup(self, rootNodeID, 0)
+  return depth, self.nodes[nodeID]
 end
 
 function Tree:GetNode(nodeID)
@@ -112,6 +115,13 @@ end
 function Tree:GetParentOf(node)
   local parents = self.parents
   local parentID = parents[node:GetID()]
+
+  return self.nodes[parentID]
+end
+
+function Tree:GetParentOfID(nodeID)
+  local parents = self.parents
+  local parentID = parents[nodeID]
 
   return self.nodes[parentID]
 end

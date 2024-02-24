@@ -70,7 +70,7 @@ images = require("data.imagesInit")
 
 local DRAW_SIZE = 40000
 local camera = Gamera.new(-DRAW_SIZE,-DRAW_SIZE,DRAW_SIZE,DRAW_SIZE)
-camera:setScale(0.1)
+camera:setScale(0.02)
 
 local positionCenterX = 0
 local positionCenterY = 0
