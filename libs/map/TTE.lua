@@ -590,7 +590,7 @@ function TTE:TRDT(levelMap, position, direction, parentTile)
 end
 
 function TTE:TRR(levelMap, position, direction, parentTile)
-  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_ritual_room", {"blue"})
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_ritual_room", {"blue", "sp"})
 end
 
 function TTE:TRRF(levelMap, position, direction, parentTile)
