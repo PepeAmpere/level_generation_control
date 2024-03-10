@@ -37,6 +37,64 @@ local OPPOSITION_TABLE = {
   south = "north",
   west = "east"
 }
+local ROTATION_LEFT = {
+  north = "west",
+  east = "north",
+  south = "east",
+  west = "south",
+}
+local ROTATION_RIGHT = {
+  north = "east",
+  east = "south",
+  south = "west",
+  west = "north",
+}
+local DIRECTIONS_TO_TILES_STRICT = {
+  NESW = "BP_3x3_base_crossroad",
+
+  NES = "BP_3x3_junction_t_NES_M",
+  ESW = "BP_3x3_junction_t_ESW_M",
+  NSW = "BP_3x3_junction_t_NSW_M",
+  NEW = "BP_3x3_junction_t_NEW_M",
+
+  NS = "BP_3x3_corridor_vertical_M",
+  EW = "BP_3x3_corridor_horizontal_M",
+  NW = "BP_3x3_turn_NW_M",
+  NE = "BP_3x3_turn_NE_M",
+  SW = "BP_3x3_turn_SW_M",
+  ES = "BP_3x3_turn_ES_M",
+
+  N = "BP_3x3_end_N_M",
+  E = "BP_3x3_end_E_M",
+  S = "BP_3x3_end_S_M",
+  W = "BP_3x3_end_W_M",
+}
+local DIRECTION_TO_SIDES = {
+  north = {
+    N = "MrelF", 
+    E = "MrelR",
+    S = "MrelB",
+    W = "MrelL"
+  },
+  east = {
+    N = "MrelL", 
+    E = "MrelF",
+    S = "MrelR",
+    W = "MrelB",
+  },
+  south = {
+    N = "MrelB", 
+    E = "MrelL",
+    S = "MrelF",
+    W = "MrelR",
+  },
+  west = {
+    N = "MrelR", 
+    E = "MrelB",
+    S = "MrelL",
+    W = "MrelF",
+  }
+}
 
 local function CopyPath(path)
   local newPath = {}
@@ -121,6 +179,12 @@ return {
 
   HALF_RECT_SIZE = 150,
   HALF_SIZE = 450,
+
+  ROTATION_LEFT = ROTATION_LEFT,
+  ROTATION_RIGHT = ROTATION_RIGHT,
+
+  DIRECTION_TO_SIDES = DIRECTION_TO_SIDES,
+  DIRECTIONS_TO_TILES_STRICT = DIRECTIONS_TO_TILES_STRICT,
 
   CopyPath = CopyPath,
   FlipCoords2D = FlipCoords2D,

@@ -41,7 +41,9 @@ function Map.new(rootPostionVec3, tileSize)
 
   i.constructorTree = Tree.new(rootNodeTile)
   i.constructorScores = {
-    rulesMatchesCounter = {},
+    rules = {},
+    forumulas = {},
+    transformers = {},
   }
   i.edges = {}
   i.paths = {}
@@ -52,22 +54,6 @@ function Map.new(rootPostionVec3, tileSize)
 
   i:ConstructionInitVirtualTiles()
 
-  --[[
-  tile:GetNeighborTileID(direction)
-  tile:SetNeighborReference(direction, i.nodes[neighborTileKey])
-  Node.new(
-    tileKey,
-    Vec3(x, y, 0),
-    nil,
-    {
-      tile = true
-    }
-  )
-  -- set first tile types
-  i:PopulateTilePerType(tile, tileTypesDefs["Undefined"])
-  -- make first connections
-  i:ConnectNeighborTiles(tile)
-  ]] --
   return i
 end
 
@@ -99,6 +85,34 @@ function Map:Cleanup(NodeCleaner, EdgeCleaner)
   end
 end
 
+-- ========================
+-- = CONSTRUCTION methods =
+-- ========================
+
+function Map:ConstructionDebugCounters()
+  local function PrintCounters(counter)
+    for rule, count in pairs(counter) do
+      print(rule .. ": " .. count)
+    end
+  end
+
+  PrintCounters(self.constructorScores.rules)
+  PrintCounters(self.constructorScores.transformers)
+  PrintCounters(self.constructorScores.forumulas)
+end
+
+function Map:ConstructionGetFormulaCount(formulaName)
+  return self.constructorScores.forumulas[formulaName] or 0
+end
+
+function Map:ConstructionGetRuleCount(ruleName)
+  return self.constructorScores.rules[ruleName] or 0
+end
+
+function Map:ConstructionGetTransformerCount(transformerName)
+  return self.constructorScores.transformers[transformerName] or 0
+end
+
 function Map:ConstructionGetMaxDepth()
   local constructorTree = self:GetConstructorTree()
   return constructorTree:GetMaxDepth()
@@ -121,7 +135,35 @@ function Map:ConstructionGetScoresCopy()
   return scores
 end
 
-function Map:ConstructionGetTilesCoutPerType()
+function Map:ConstructionGetTilesCountPerTurtleMatch(formula)
+  local constructorTree = self:GetConstructorTree()
+  local function Matcher(constructorTree, tile, levelMap, direction, formula)
+    local newTurtle = TTE.new(
+      tile:GetPosition(),
+      direction,
+      levelMap.tileSize,
+      formula
+    )
+    local matchResult = newTurtle:Match(levelMap)
+    return matchResult
+  end
+
+  local counter = 0
+
+  for nodeID, node in pairs(constructorTree:GetNodes()) do
+    local parentTile = constructorTree:GetParentOfID(nodeID)
+    if parentTile then
+      local parentDirection = parentTile:GetDirectionOf(node)
+      if Matcher(constructorTree, node, self, parentDirection, formula) then
+        counter = counter + 1
+      end
+    end
+  end
+
+  return counter
+end
+
+function Map:ConstructionGetTilesCountPerType()
   local constructorTree = self:GetConstructorTree()
   local countPerType = {}
   for typeName, _ in pairs(tileTypesDefs) do
@@ -136,12 +178,19 @@ function Map:ConstructionGetTilesCoutPerType()
   return countPerType
 end
 
-function Map:ConstructionIncrementMatchCounter(ruleName)
-  if self.constructorScores.rulesMatchesCounter[ruleName] == nil then
-    self.constructorScores.rulesMatchesCounter[ruleName] = 1
-  else
-    self.constructorScores.rulesMatchesCounter[ruleName] = self.constructorScores.rulesMatchesCounter[ruleName] + 1
-  end
+function Map:ConstructionIncrementFormulaMatchCounter(formulaName)
+  local currentCounter = self.constructorScores.forumulas[formulaName]
+  self.constructorScores.forumulas[formulaName] = (currentCounter or 0) + 1
+end
+
+function Map:ConstructionIncrementRuleMatchCounter(ruleName)
+  local currentCounter = self.constructorScores.rules[ruleName]
+  self.constructorScores.rules[ruleName] = (currentCounter or 0) + 1
+end
+
+function Map:ConstructionIncrementTransformerCounter(transformerName)
+  local currentCounter = self.constructorScores.transformers[transformerName]
+  self.constructorScores.transformers[transformerName] = (currentCounter or 0) + 1
 end
 
 function Map:ConstructionInitVirtualTiles()
@@ -156,9 +205,10 @@ function Map:ConstructionInitVirtualTiles()
         Node.new(
           neighborVirtualTileID,
           neighborVirtualTilePosition,
-          "Virtual_yellow",
+          "Virtual",
           {
-            tile = true
+            tile = true,
+            yellow = true,
           }
         ),
         self.tileSize
@@ -181,6 +231,10 @@ end
 function Map:GetConstructorTree()
   return self.constructorTree
 end
+
+-- =====================
+-- = other map methods =
+-- =====================
 
 function Map:GetTile(tileID)
   return self:GetNode(tileID)

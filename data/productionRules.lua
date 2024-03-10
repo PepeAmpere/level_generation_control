@@ -1,10 +1,12 @@
 local productionRulesTypes = {
+  "BlueAddPuzzleRooms",
+  "BlueCandleRoom",
   "BlueExtend",
   "BlueExtendAroundCorridor",
   "InitialExit",
+  "UndefinedToCorridors",
   "YellowLeafLongCustomCorridor",
   "YellowLeafLongDirectCorridor",
-  "YellowLeafMaxJunction",
   "YellowToBlue"
 }
 

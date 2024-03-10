@@ -21,20 +21,25 @@ UnrealEvent = require("libs.unreal.UnrealEvent")
 JSON = require("libs.json.json")
 
 -- data
+-- tile types defs tags and vectors are updated in Unreal on load of level from actual blueprints
 tileTypesDefs = require("data.tileTypes")
-local qResult = require("data.questTypes")
-questTypes = qResult[1]
-questTypesDefs = qResult[2]
+
+-- layout types in data.layoutTypes are testing ones in Love2D, in unreal use defs in Unreal repo
+local qResult = require("data.layoutTypes")
+layoutTypes = qResult[1]
+layoutTypesDefs = qResult[2]
+
+-- unchanged, used by Love2D and Unreal without any difference
 local pResult = require("data.productionRules")
 productionRulesTypes = pResult[1]
 productionRulesDefs = pResult[2]
 
 -- prepare the level generation
 math.randomseed( os.time() )
-local MapMakingFunction = require ("libs.generator.questBasedGenerator")
+local MapMakingFunction = require ("libs.generator.layoutBasedGenerator")
 
 -- run the level generation once
-levelMap = MapMakingFunction()
+levelMap = MapMakingFunction(layoutTypesDefs.FullHouse)
 
 -- ================================================================ --
 -- ================================================================ --

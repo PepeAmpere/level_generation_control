@@ -18,9 +18,9 @@ local edgesDefs = {
 }
 
 local drawDefs = {
-  "w", "w", "w",
-  "w", "w", "w",
-  "w", "w", "w",
+  "x", "a", "x",
+  "a", "a", "a",
+  "x", "a", "x",
 }
 
 local restrictions = {

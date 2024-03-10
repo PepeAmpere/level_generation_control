@@ -9,6 +9,7 @@ local tileTypes = {
   "BP_3x3_restroom_female",
   "BP_3x3_restroom_male",
   "BP_3x3_restroom_male_alt",
+  "BP_3x3_candleRoom",
 
   -- special rooms
   "BP_3x3_diner_entrance",
@@ -19,7 +20,7 @@ local tileTypes = {
   "BP_3x3_end_N_M",
   "BP_3x3_end_E_M",
   "BP_3x3_end_S_M",
-  
+
   -- corners
   "BP_3x3_turn_SW_M",
   "BP_3x3_turn_NW_M",
@@ -50,18 +51,6 @@ local variables = {
   "BP_3x3_restroom_male",
 }
 
-local variablesToColor = {
-  "Virtual",
-  "Undefined",
-}
-
-local colorsForVariables = {
-  "yellow",
-  "blue",
-  "red",
-  "green"
-}
-
 local tileTypesDefs = {}
 for _, tileTypeName in ipairs(tileTypes) do
   tileTypesDefs[tileTypeName] = require("data.tileTypesDefs." .. tileTypeName)
@@ -72,20 +61,6 @@ for _, variableName in ipairs(variables) do
   local fullName = variableName .. "_variable"
   tileTypesDefs[fullName] = TableExt.ShallowCopy(tileTypesDefs[variableName])
   tileTypesDefs[fullName].name = fullName
-end
-
-for _, variableName in ipairs(variablesToColor) do
-  for _, colorName in ipairs(colorsForVariables) do
-    local fullName = variableName .. "_" .. colorName
-    tileTypesDefs[fullName] = TableExt.DeepCopy(tileTypesDefs[variableName])
-    tileTypesDefs[fullName].name = fullName
-    local drawDefs = tileTypesDefs[fullName].drawDefs
-    for i = 1, #drawDefs do
-      if drawDefs[i] == "w" then
-        tileTypesDefs[fullName].drawDefs[i] = colorName
-      end
-    end
-  end
 end
 
 return tileTypesDefs

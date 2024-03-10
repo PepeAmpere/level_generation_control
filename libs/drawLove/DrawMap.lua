@@ -17,6 +17,7 @@ local HALF_SIZE2 = MapExt.HALF_SIZE
 -- local constants
 local ZOOM_SCALE_FACTOR = 0.03
 local TILE_KEY_TO_COLOR = {
+  a = {200, 234, 200, 255},
   w = {234, 234, 234, 255},
   x = {168, 168, 168, 255},
   yellow = {168, 168, 0, 128},
@@ -56,11 +57,24 @@ local function DrawTile(tile)
   local tilePosition = tile:GetPosition()
 
   local drawData = tileTypesDefs[tileType].drawDefs
+
+  -- color override per tags
+  local replacementColor
+  local specialColors = {"blue", "green", "red", "yellow"}
+  for _, color in pairs(specialColors) do
+    if tile:HasTag(color) then
+      replacementColor = TILE_KEY_TO_COLOR[color]
+    end
+  end
+
   for i=1, #drawData do
 
     -- SECTION TO REFACTOR using Draw START
     local rectanglePosition = tilePosition + SUBTILES_POSITIONS[i]
-    local color = TILE_KEY_TO_COLOR[drawData[i]]
+    local symbol = drawData[i]
+    local color = TILE_KEY_TO_COLOR[symbol]
+    if symbol == "x" then color = replacementColor or TILE_KEY_TO_COLOR[symbol]  end
+
     love.graphics.setColor(unpack(color))
     love.graphics.rectangle(
       "fill",

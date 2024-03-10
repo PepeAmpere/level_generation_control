@@ -59,31 +59,51 @@ function Tree:GetLeafNodes()
   return leafNodes -- nodeID => node object reference
 end
 
-function Tree:GetMaxDepth()
-  local rootNodeID = self.rootNodeID
+local function RecursiveDepthSearch(tree, nodeID, depth, Matcher)
+  local childrenOfNode = tree:GetNodeChildren(nodeID) or {}
+  local currentMaxDepth = depth
+  local deepestNodeID = nodeID
+  local match = Matcher(tree, nodeID)
 
-  local function RecLookup(tree, nodeID, depth)
-    local childrenOfNode = tree:GetNodeChildren(nodeID) or {}
-    local currentMaxDepth = depth
-    local deepestNodeID = nodeID
-
-    for i=1, #childrenOfNode do
-      local lastMaxDepth, deepNodeID = RecLookup(tree, childrenOfNode[i], depth + 1)
-      if lastMaxDepth > currentMaxDepth then
-        currentMaxDepth = lastMaxDepth
-        deepestNodeID = deepNodeID
-      end
+  for i=1, #childrenOfNode do
+    local lastMaxDepth, deepNodeID, deepMatch = RecursiveDepthSearch(
+      tree,
+      childrenOfNode[i],
+      depth + 1,
+      Matcher
+    )
+    if
+      lastMaxDepth > currentMaxDepth and
+      deepMatch
+    then
+      currentMaxDepth = lastMaxDepth
+      deepestNodeID = deepNodeID
+      match = deepMatch
     end
-
-    return currentMaxDepth, deepestNodeID
   end
 
-  local depth, nodeID = RecLookup(self, rootNodeID, 0)
+  return currentMaxDepth, deepestNodeID, match
+end
+
+function Tree:GetMaxDepth(Matcher)
+  local rootNodeID = self.rootNodeID
+  return self:GetMaxDepthFromNode(rootNodeID, Matcher)
+end
+
+function Tree:GetMaxDepthFromNode(startNodeID, Matcher)
+  if Matcher == nil then
+    Matcher = function(tree, nodeID) return true end
+  end
+  local depth, nodeID = RecursiveDepthSearch(self, startNodeID, 0, Matcher)
   return depth, self.nodes[nodeID]
 end
 
 function Tree:GetNode(nodeID)
   return self.nodes[nodeID]
+end
+
+function Tree:GetNodeIDChildren(nodeID)
+  return self.children[nodeID] or {}
 end
 
 function Tree:GetNodes()
@@ -139,6 +159,17 @@ end
 
 function Tree:HasNodeID(nodeID)
   return self.nodes[nodeID] ~= nil
+end
+
+function Tree:HasNodeIDChildID(nodeID, childID)
+  local childrenOfNode = self.children[nodeID] or {}
+
+  for i=1, #childrenOfNode do
+    if childrenOfNode[i] == childID then
+      return true
+    end
+  end
+  return false
 end
 
 function Tree:RemoveNode(node)

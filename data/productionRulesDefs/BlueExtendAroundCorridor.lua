@@ -11,7 +11,11 @@ local productionFormulas = {
 
 local function SearchAndTransform(Matcher, Transformer, levelMap)
   local constructorTree = levelMap:GetConstructorTree()
-  local _, deepestTile = constructorTree:GetMaxDepth()
+  local function BlueMatcher(tree, tileID)
+    local tile = tree:GetNode(tileID)
+    return tile:HasTag("blue")
+  end
+  local _, deepestTile = constructorTree:GetMaxDepth(BlueMatcher)
   local formula = ArrayExt.Shuffle(productionFormulas)[1]
   local randomDirection = ArrayExt.Shuffle(ArrayExt.ShallowCopy(DIRECTIONS))[1]
 
