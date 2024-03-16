@@ -1,5 +1,6 @@
 local nodesDefs = {
-  ["SouthEntrance"] = { relativePosition = Vec3(-420, 0, 0), tags = {"tc", "south"} }
+  ["SouthEntrance"] = { relativePosition = Vec3(-420, 0, 0), tags = {"tc", "south"} },
+  ["KeyLocation"] = { relativePosition = Vec3(190, 320, 60), tags = {"tc"}}
 }
 
 local edgesDefs = {

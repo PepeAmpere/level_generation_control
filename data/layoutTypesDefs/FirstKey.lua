@@ -15,17 +15,17 @@ function(levelMap)
   return result, productionRulesNames
 end,
 
--- make short yellow corridor
+-- very short yellow corridor
 function(levelMap)
   local constructorScores = levelMap:ConstructionGetScoresCopy()
   local count = levelMap:ConstructionGetTilesCountPerTurtleMatch("W(MAY,TZ)")
 
   -- condition
-  local result = count > 4
+  local result = count > 1
 
   -- list of applicable rules if condition is not met
   productionRulesNames = {
-    "YellowLeafLongCustomCorridor",
+    "YellowShort",
   }
 
   return result, productionRulesNames
@@ -53,7 +53,7 @@ function(levelMap)
     local count = levelMap:ConstructionGetTilesCountPerTurtleMatch("W(MUB,TZ)")
 
   -- condition
-  local result = count >= 4
+  local result = count > 0
 
   -- list of applicable rules if condition is not met
   local productionRulesNames = {

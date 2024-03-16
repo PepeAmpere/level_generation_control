@@ -15,9 +15,7 @@ return {
     return result, productionRulesNames
   end,
 
-  -- get closer to the anticipated blue part
-  -- keep few grow opportunities along the lines
-  -- but go agresivelly towards to wanted position, no breadth if possible
+  -- very short yellow corridor
   function(levelMap)
     local constructorScores = levelMap:ConstructionGetScoresCopy()
     local count = levelMap:ConstructionGetTilesCountPerTurtleMatch("W(MAY,TZ)")
