@@ -39,7 +39,7 @@ math.randomseed( os.time() )
 local MapMakingFunction = require ("libs.generator.layoutBasedGenerator")
 
 -- run the level generation once
-levelMap = MapMakingFunction(layoutTypesDefs.FullHouse)
+levelMap = MapMakingFunction(layoutTypesDefs.FirstEscape)
 
 -- ================================================================ --
 -- ================================================================ --

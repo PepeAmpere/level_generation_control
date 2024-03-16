@@ -4,10 +4,11 @@ local productionRulesTypes = {
   "BlueExtend",
   "BlueExtendAroundCorridor",
   "InitialExit",
+  "RitualRoomLoopZero",
   "UndefinedToCorridors",
   "YellowLeafLongCustomCorridor",
-  "YellowLeafLongDirectCorridor",
-  "YellowToBlue"
+  "YellowShort",
+  "YellowToBlue",
 }
 
 local productionRulesDefs = {}

@@ -5,6 +5,7 @@ local tileTypes = {
   "BP_3x3_exit_door_R_E_M",
   "BP_3x3_kitchen",
   "BP_3x3_ritual_room",
+  "BP_3x3_ritual_room_Loop0",
   "BP_3x3_office",
   "BP_3x3_restroom_female",
   "BP_3x3_restroom_male",
@@ -134,4 +135,5 @@ return {
   restrictions = restrictions,
 }
 
-]]--
+]]
+   --
