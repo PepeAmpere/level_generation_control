@@ -252,9 +252,11 @@ function TTE:MA()
   return true
 end
 
--- Match any yellow
 function TTE:MAY(levelMap, position, direction)
   return MatchTagsAll(levelMap, position, {"yellow"})
+end
+function TTE:MAB(levelMap, position, direction)
+  return MatchTagsAll(levelMap, position, {"blue"})
 end
 
 -- Match Empty
@@ -545,6 +547,10 @@ function TTE:TCCH(levelMap, position, direction, parentTile)
   return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_corridor_horizontal_M")
 end
 
+function TTE:TCCHB(levelMap, position, direction, parentTile)
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_corridor_horizontal_M_boxes")
+end
+
 function TTE:TCEN(levelMap, position, direction, parentTile)
   return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_end_N_M")
 end
@@ -566,7 +572,7 @@ function TTE:TCturnNE(levelMap, position, direction, parentTile)
 end
 
 function TTE:TRC(levelMap, position, direction, parentTile)
-  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_candleRoom", {"candleSpawn"})
+  return GenericTransform(levelMap, position, direction, parentTile, "BP_3x3_candleRoom", {"blue","candleSpawn"})
 end
 
 function TTE:TRE(levelMap, position, direction, parentTile)

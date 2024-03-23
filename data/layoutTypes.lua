@@ -1,4 +1,5 @@
 local layoutTypes = {
+  "BlockedPath",
   "FirstEscape",
   "FirstKey",
   "FullHouse",

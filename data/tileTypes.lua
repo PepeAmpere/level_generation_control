@@ -37,6 +37,7 @@ local tileTypes = {
   -- simple corridors
   "BP_3x3_corridor_horizontal_M",
   "BP_3x3_corridor_vertical_M",
+  "BP_3x3_corridor_horizontal_M_boxes",
 
   -- variables for generation
   "Undefined",

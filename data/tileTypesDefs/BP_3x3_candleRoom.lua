@@ -7,7 +7,7 @@ local edgesDefs = {
 }
 
 local drawDefs = {
-  "w", "w", "w",
+  "w", "w", "x",
   "w", "w", "w",
   "w", "w", "w",
 }

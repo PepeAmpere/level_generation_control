@@ -1,5 +1,6 @@
 local productionRulesTypes = {
   "BlueAddPuzzleRooms",
+  "BlueBlocked",
   "BlueCandleRoom",
   "BlueExtend",
   "BlueExtendAroundCorridor",
@@ -16,7 +17,7 @@ for _, prdouctionRuleName in ipairs(productionRulesTypes) do
   productionRulesDefs[prdouctionRuleName] = require("data.productionRulesDefs." .. prdouctionRuleName)
 end
 
-return {productionRulesTypes, productionRulesDefs}
+return { productionRulesTypes, productionRulesDefs }
 
 --[[
 -- NEW RULE TEMPLATE --
@@ -35,4 +36,5 @@ return {
   Matcher = Matcher,
   Transformer = Transformer,
 }
-]]--
+]]
+   --
