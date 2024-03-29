@@ -1,10 +1,10 @@
-local productionFormula = "W(MAY,TZ)W(MHN,TZ)F(ME,TRRLZ)"
+local productionFormula = "W(MAY,TZ)W(MHN,TUY)F(ME,TRRB)RF(ME,TVB)RFLFLFFLF"
 
 local function Matcher(constructorTree, tile, levelMap)
   local tilesCounts = levelMap:ConstructionGetTilesCountPerType()
 
   -- condition
-  local notGeneratedYet = tilesCounts["BP_3x3_ritual_room_firstEscape"] < 1
+  local notGeneratedYet = tilesCounts["BP_3x3_ritual_room"] < 1
 
   if notGeneratedYet then
     local newTurtle = TTE.new(

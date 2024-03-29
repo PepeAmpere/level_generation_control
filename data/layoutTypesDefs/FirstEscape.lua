@@ -37,7 +37,7 @@ return {
     local tilesCounts = levelMap:ConstructionGetTilesCountPerType()
 
     -- condition
-    local result = tilesCounts["BP_3x3_ritual_room_Loop0"] >= 1
+    local result = tilesCounts["BP_3x3_ritual_room_firstEscape"] >= 1
 
     -- list of applicable rules if condition is not met
     local productionRulesNames = {

@@ -4,7 +4,7 @@ local function Matcher(constructorTree, tile, levelMap)
   local tilesCounts = levelMap:ConstructionGetTilesCountPerType()
 
   -- condition
-  local notGeneratedYet = tilesCounts["BP_3x3_ritual_room"] < 1
+  local notGeneratedYet = tilesCounts["BP_3x3_ritual_room_blocked"] < 1
 
   if notGeneratedYet then
     local newTurtle = TTE.new(

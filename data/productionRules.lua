@@ -10,6 +10,7 @@ local productionRulesTypes = {
   "YellowLeafLongCustomCorridor",
   "YellowShort",
   "YellowToBlue",
+  "YellowToBlueBlocked",
 }
 
 local productionRulesDefs = {}
@@ -37,4 +38,4 @@ return {
   Transformer = Transformer,
 }
 ]]
-   --
+--
