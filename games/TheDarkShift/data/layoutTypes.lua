@@ -7,7 +7,7 @@ local layoutTypes = {
 
 local layoutTypesDefs = {}
 for _, layoutTypeName in ipairs(layoutTypes) do
-  layoutTypesDefs[layoutTypeName] = require("data.layoutTypesDefs." .. layoutTypeName)
+  layoutTypesDefs[layoutTypeName] = require(GAME_PATH .. "data.layoutTypesDefs." .. layoutTypeName)
 end
 
 return {layoutTypes, layoutTypesDefs}

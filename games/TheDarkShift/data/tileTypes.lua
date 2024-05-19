@@ -56,7 +56,7 @@ local variables = {
 
 local tileTypesDefs = {}
 for _, tileTypeName in ipairs(tileTypes) do
-  tileTypesDefs[tileTypeName] = require("data.tileTypesDefs." .. tileTypeName)
+  tileTypesDefs[tileTypeName] = require(GAME_PATH .. "data.tileTypesDefs." .. tileTypeName)
   tileTypesDefs[tileTypeName].name = tileTypeName
 end
 

@@ -15,7 +15,7 @@ local productionRulesTypes = {
 
 local productionRulesDefs = {}
 for _, prdouctionRuleName in ipairs(productionRulesTypes) do
-  productionRulesDefs[prdouctionRuleName] = require("data.productionRulesDefs." .. prdouctionRuleName)
+  productionRulesDefs[prdouctionRuleName] = require(GAME_PATH .. "data.productionRulesDefs." .. prdouctionRuleName)
 end
 
 return { productionRulesTypes, productionRulesDefs }
