@@ -1,8 +1,29 @@
 FPS_SIM = 10 -- frames per second for simulation
 
-Entity = require("libs.core.Entity")
-Simulation = require("libs.core.Simulation")
+Components = require("libs.sim.Components")
+Entity = require("libs.sim.Entity")
+
+Systems = require("libs.sim.Systems")
+Simulation = require("libs.sim.Simulation")
+
 OneSim = Simulation.New(0, love.timer.getTime())
+
+local newEntity = OneSim:AddEntity()
+newEntity:AddComponent(
+  "Position",
+  {
+    position = Vec3(0,0,0),
+  }
+)
+
+local secondEntity = OneSim:AddEntity()
+secondEntity:AddComponent(
+  "AI",
+  {}
+)
+
+OneSim:AddSystem("AIEval",{})
+OneSim:AddSystem("StatusReport",{})
 
 -- BELOW JUST LOVE 2D debugging
 -- lovebird = require("libs.lovebird.init")
@@ -35,6 +56,7 @@ function love.update(dt)
 
   OneSim:Update(dt)
   OneSim:UpdateTime(love.timer.getTime())
+  OneSim:RunSystems()
   -- lovebird.update()
 end
 

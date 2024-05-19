@@ -36,8 +36,8 @@ TableExt.SaveToFile("levelMapExported.lua", exportTable)
 
 FPS_SIM = 10 -- frames per second for simulation
 
-Entity = require("libs.core.Entity")
-Simulation = require("libs.core.Simulation")
+Entity = require("libs.sim.Entity")
+Simulation = require("libs.sim.Simulation")
 OneSim = Simulation.New(0, love.timer.getTime())
 
 -- BELOW JUST LOVE 2D debugging
