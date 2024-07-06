@@ -8,14 +8,13 @@ end
 
 function AIEval:IsEntityValid(entity)
   if entity.components.AI then
-    return true
+    return entity
   end
-  return false
 end
 
 function AIEval:Run(entities)
   for _, entity in pairs(entities) do
-    print("AIEval: " .. entity:GetID())
+    -- print("AIEval: " .. entity:GetID())
   end
 end
 

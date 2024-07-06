@@ -2,28 +2,62 @@ FPS_SIM = 10 -- frames per second for simulation
 
 Components = require("libs.sim.Components")
 Entity = require("libs.sim.Entity")
+EntityTypes = require(GAME_PATH .. "data.entityTypes")
 
 Systems = require("libs.sim.Systems")
 Simulation = require("libs.sim.Simulation")
 
-OneSim = Simulation.New(0, love.timer.getTime())
+-- HARD GLOBAL VAR INTEGRATION WITH GENERIC EVENT FUNCTIONS
+-- not support multiple ones until we are clear we need that
+ONE_SIMULATION = nil
+OneSim = nil
 
-local newEntity = OneSim:AddEntity()
-newEntity:AddComponent(
-  "Position",
-  {
-    position = Vec3(0,0,0),
-  }
-)
+-- THIS PART WILL BE LATER SERIALIZED
+-- OneSim = Simulation.New(0, love.timer.getTime())
+OneSim = Simulation.New(0, 0)
 
-local secondEntity = OneSim:AddEntity()
-secondEntity:AddComponent(
-  "AI",
-  {}
-)
+local playerEntity = OneSim:AddEntityOfType(EntityTypes.Player)
 
+local crew = {}
+for i = 1, 10 do
+  local randomPositon = Vec3(0, math.random(-2000,2000), 0)
+  local newEntity = OneSim:AddEntityOfType(EntityTypes.Developer)
+  local posComponent = newEntity:GetComponent("Position")
+  posComponent:Set(randomPositon)
+  crew[i] = newEntity
+end
+
+local kryssarEntity = OneSim:AddEntityOfType(EntityTypes.Kryssar)
+
+local rats = {}
+for i = 1, 5 do
+  local randomPositon = Vec3(0, math.random(-800,800), 0)
+  local newEntity = OneSim:AddEntityOfType(EntityTypes.Rat)
+  local posComponent = newEntity:GetComponent("Position")
+  posComponent:Set(randomPositon)
+  rats[i] = newEntity
+end
+
+-- BELOW JUST LOVE speicifc stuff
+--[[
 OneSim:AddSystem("AIEval",{})
-OneSim:AddSystem("StatusReport",{})
+OneSim:AddSystem("Detection",{})
+OneSim:AddSystem("InputHandler",{})
+-- OneSim:AddSystem("StatusReport",{})
+
+function love.load()
+end
+
+function love.update(dt)
+  if dt < 1/FPS_SIM then
+    love.timer.sleep(1/FPS_SIM - dt)
+  end
+
+  OneSim:Update(dt)
+  OneSim:UpdateTime(love.timer.getTime())
+  OneSim:RunSystems()
+  -- lovebird.update()
+end
 
 -- BELOW JUST LOVE 2D debugging
 -- lovebird = require("libs.lovebird.init")
@@ -46,20 +80,6 @@ local UI_STATES = {
   pan = false,
 }
 
-function love.load()
-end
-
-function love.update(dt)
-  if dt < 1/FPS_SIM then
-    love.timer.sleep(1/FPS_SIM - dt)
-  end
-
-  OneSim:Update(dt)
-  OneSim:UpdateTime(love.timer.getTime())
-  OneSim:RunSystems()
-  -- lovebird.update()
-end
-
 function love.draw()
   love.graphics.setBackgroundColor(192, 192, 192)
 
@@ -69,6 +89,25 @@ function love.draw()
     love.graphics.print("Simtime " .. OneSim.t, 400, 260)
   end
   DebugStep()
+
+  local function DrawAllCrew()
+    local allEntities = OneSim:GetEntities()
+    for entityID, entity in pairs(allEntities) do
+      local posComponent = entity:GetComponent("Position")
+      if posComponent then
+        --print(entityID, posComponent, posComponent:Get())
+        Draw.Circle(
+          "fill",
+          posComponent:Get(),
+          4,
+          100,
+          {255, 255, 255, 255}
+        )
+      end
+    end
+  end
+
+  camera:draw(DrawAllCrew)
 end
 
 function love.mousepressed(x, y, button) 
@@ -94,3 +133,8 @@ end
 function love.keyreleased(key, scancode)
   DrawMap.ControlKeys(camera, key, scancode)
 end
+]]--
+
+return {
+  math.random()
+}

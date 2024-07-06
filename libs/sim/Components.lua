@@ -1,6 +1,11 @@
 local componentTypes = {
   "AI",
+  "Controller",
+  "CtrlGoalMove",
+  "CtrlTask",
   "Position",
+  "Visible",
+  "Vision",
 }
 
 local componentTypesDefs = {}

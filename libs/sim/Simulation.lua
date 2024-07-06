@@ -24,18 +24,43 @@ end
 function Simulation:AddEntity(params)
   params = params or {}
 
-  local newIDindex =  self.lastEntityIndex + 1
+  local newIDindex = self.lastEntityIndex + 1
   local newID = "e" .. newIDindex
-  params.ID = newID
+
+  if params.ID == nil then
+    self.lastEntityIndex = newIDindex
+    params.ID = newID
+  end
 
   self.entities[newID] = Entity.New(params)
-  self.lastEntityIndex = newIDindex
 
   return self.entities[newID]
 end
 
+function Simulation:AddEntityOfType(entityTypeDef)
+  local params = {}
+  for k,v in pairs(entityTypeDef) do
+    params[k] = TableExt.DeepCopy(v)
+  end
+
+  local entity = self:AddEntity(params)
+  local entityComponents = entityTypeDef.components
+
+  if entityComponents then
+    for _, componentData in pairs(entityComponents) do
+      entity:AddComponent(componentData.name, componentData)
+    end
+  end
+
+  return entity
+end
+
 function Simulation:AddSystem(systemName, params)
   self.systems[systemName] = Systems[systemName].New(params)
+end
+
+function Simulation:GetEntities()
+  return self.entities
 end
 
 function Simulation:GetSystemNames()
@@ -50,11 +75,15 @@ function Simulation:GetSystemEntities(system)
   local entities = self.entities
   local validEntities = {}
   for entityID, entity in pairs(entities) do
-    if system:IsEntityValid(entity) then
-      validEntities[entityID] = entity
+    local checkResult = system:IsEntityValid(entity)
+    if checkResult then
+      validEntities[entityID] = checkResult
     end
   end
   return validEntities
+end
+
+function Simulation:RunOneSystem()
 end
 
 function Simulation:RunSystems()

@@ -1,5 +1,7 @@
 local systemTypes = {
   "AIEval",
+  "Detection",
+  "InputHandler",
   "StatusReport",
 }
 

@@ -1,0 +1,3 @@
+local Event = {}
+
+return Event

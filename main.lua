@@ -19,12 +19,19 @@ Tile = require("libs.map.Tile")
 Map = require("libs.map.Map")
 TTE = require("libs.map.TTE")
 
-UnrealEvent = require("libs.unreal.UnrealEvent")
+-- ENGINE SELECTION
+ENGINE = "unreal"
+ENGINE_PATH = "engines." .. ENGINE .. "."
 
+EngineInit = require(ENGINE_PATH .. "Init")
+EngineControl = require(ENGINE_PATH .. "Control")
+EngineEvent = require(ENGINE_PATH ..  "Event")
+EngineRead = require(ENGINE_PATH .. "Read")
+
+-- GAME SELECTION
 GAME = "TheDarkShift"
 GAME_PATH = "games." .. GAME .. "."
-
-require(GAME_PATH .. "main") -- main.lua of the game
+Game = require(GAME_PATH .. "main") -- main.lua of the game
 
 -- ================================================================ --
 -- ================================================================ --
@@ -35,5 +42,4 @@ require(GAME_PATH .. "main") -- main.lua of the game
 print(_VERSION)
 if math.type then print(math.type(3)) end
 if love then print(love.getVersion()) end
-]]
-   --
+]]--

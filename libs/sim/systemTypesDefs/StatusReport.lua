@@ -8,9 +8,8 @@ end
 
 function StatusReport:IsEntityValid(entity)
   if entity.components then
-    return true
+    return entity
   end
-  return false
 end
 
 function StatusReport:Run(entities)
