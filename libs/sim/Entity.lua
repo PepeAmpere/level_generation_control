@@ -12,7 +12,9 @@ function Entity.New(params)
 end
 
 function Entity:AddComponent(componentName, params)
-  self.components[componentName] = Components[componentName].New(params)
+  if self.components[componentName] == nil then
+    self.components[componentName] = Components[componentName].New(params)
+  end
 end
 
 function Entity:GetComponent(componentName) -- reference

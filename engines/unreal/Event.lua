@@ -1,4 +1,4 @@
--- to speedup and simplify, just one sim referenced via global ONE_SIMULATION
+-- to speedup and simplify, just one sim referenced via global OneSim
 
 local Event = {}
 

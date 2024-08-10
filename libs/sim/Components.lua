@@ -1,8 +1,11 @@
 local componentTypes = {
   "AI",
+  "Children",
+  "ChildrenOrders",
   "Controller",
   "CtrlGoalMove",
   "CtrlTask",
+  "Parent",
   "Position",
   "Visible",
   "Vision",

@@ -6,7 +6,7 @@ for packageName,_ in pairs(package.loaded) do
     string.find(packageName, "engines") or
     string.find(packageName, "main")
   then
-    print(packageName)
+    print("Unloading " .. packageName)
     package.loaded[packageName] = nil
   end
 end

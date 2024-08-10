@@ -1,4 +1,4 @@
-FPS_SIM = 10 -- frames per second for simulation
+FPS_SIM = 5 -- frames per second for simulation
 
 Components = require("libs.sim.Components")
 Entity = require("libs.sim.Entity")
@@ -9,21 +9,36 @@ Simulation = require("libs.sim.Simulation")
 
 -- HARD GLOBAL VAR INTEGRATION WITH GENERIC EVENT FUNCTIONS
 -- not support multiple ones until we are clear we need that
-ONE_SIMULATION = nil
 OneSim = nil
 
 -- THIS PART WILL BE LATER SERIALIZED
 -- OneSim = Simulation.New(0, love.timer.getTime())
 OneSim = Simulation.New(0, 0)
 
+local STEP = 1200
+for i=-10, 10 do
+  if i~=0 then
+    local newEntity = OneSim:AddEntityOfType(EntityTypes.Tile, {IDprefix = "tile"})
+    local posComponent = newEntity:GetComponent("Position")
+    posComponent:Set(Vec3(0,i * STEP,0))
+  end
+end
+
+local team = OneSim:AddEntityOfType(EntityTypes.Team, {IDprefix = "team"})
+local teamID = team:GetID()
+
 local playerEntity = OneSim:AddEntityOfType(EntityTypes.Player)
 
 local crew = {}
-for i = 1, 10 do
+for i = 1, 5 do
   local randomPositon = Vec3(0, math.random(-2000,2000), 0)
   local newEntity = OneSim:AddEntityOfType(EntityTypes.Developer)
+
   local posComponent = newEntity:GetComponent("Position")
   posComponent:Set(randomPositon)
+
+  OneSim:SetParent(newEntity:GetID(), teamID)
+
   crew[i] = newEntity
 end
 
@@ -33,8 +48,10 @@ local rats = {}
 for i = 1, 5 do
   local randomPositon = Vec3(0, math.random(-800,800), 0)
   local newEntity = OneSim:AddEntityOfType(EntityTypes.Rat)
+
   local posComponent = newEntity:GetComponent("Position")
   posComponent:Set(randomPositon)
+
   rats[i] = newEntity
 end
 

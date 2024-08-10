@@ -3,6 +3,8 @@ local entityTypes = {
   "Kryssar",
   "Player",
   "Rat",
+  "Team",
+  "Tile",
 }
 
 local entityTypesDefs = {}
