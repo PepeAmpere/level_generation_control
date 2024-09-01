@@ -5,6 +5,7 @@ local componentTypes = {
   "Controller",
   "CtrlGoalMove",
   "CtrlTask",
+  "PatternMemoryLast",
   "Parent",
   "Position",
   "Visible",
