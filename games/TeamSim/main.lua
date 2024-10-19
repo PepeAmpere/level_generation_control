@@ -16,8 +16,8 @@ OneSim = nil
 OneSim = Simulation.New(0, 0)
 
 local STEP = 1200
-for i=-10, 10 do
-  if i~=0 then
+for i=-10, 20 do
+  if i<0 or i>11 then
     local newEntity = OneSim:AddEntityOfType(EntityTypes.Tile, {IDprefix = "tile"})
     local posComponent = newEntity:GetComponent("Position")
     posComponent:Set(Vec3(0,i * STEP,0))
@@ -31,7 +31,7 @@ local playerEntity = OneSim:AddEntityOfType(EntityTypes.Player)
 
 local crew = {}
 for i = 1, 5 do
-  local randomPositon = Vec3(0, math.random(-2000,2000), 0)
+  local randomPositon = Vec3(0, math.random(11200,12500), math.random(-10,10))
   local newEntity = OneSim:AddEntityOfType(EntityTypes.Developer)
 
   local posComponent = newEntity:GetComponent("Position")
@@ -43,10 +43,13 @@ for i = 1, 5 do
 end
 
 local kryssarEntity = OneSim:AddEntityOfType(EntityTypes.Kryssar)
+local kryssarPosition = Vec3(0,12600,0)
+local kryssarPositionCoponent = kryssarEntity:GetComponent("Position")
+kryssarPositionCoponent:Set(kryssarPosition)
 
 local rats = {}
-for i = 1, 5 do
-  local randomPositon = Vec3(0, math.random(-800,800), 0)
+for i = 1, 10 do
+  local randomPositon = kryssarPosition + Vec3(0, math.random(-600,400), math.random(-10,10))
   local newEntity = OneSim:AddEntityOfType(EntityTypes.Rat)
 
   local posComponent = newEntity:GetComponent("Position")
