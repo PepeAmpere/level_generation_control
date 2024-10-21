@@ -39,7 +39,7 @@ function PatternMemoryLast:GetCounts()
   local countsTable = {}
   local initCount = 1
   local uniquePatterns = 0
-  local allCount = 0
+  local membersCount = 0
   local patternKey = self.patternKey
   for i=1, #self.lastPatterns do
     local patternOccurenceData = self.lastPatterns[i]
@@ -51,10 +51,10 @@ function PatternMemoryLast:GetCounts()
         countsTable[pattern] = initCount
         uniquePatterns = uniquePatterns + 1
       end
-      allCount = allCount + 1
+      membersCount = membersCount + 1
     end
   end
-  return countsTable, allCount, uniquePatterns
+  return countsTable, membersCount, uniquePatterns
 end
 
 return PatternMemoryLast

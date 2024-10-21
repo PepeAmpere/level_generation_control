@@ -45,10 +45,10 @@ print("Mem2: ", memComponent:Get()[2].c, memComponent:Get()[2].t)
 print("Mem3: ", memComponent:Get()[3].c, memComponent:Get()[3].t)
 ]]--
 
-local countsTable, allCount, uniquePatterns = memComponent:GetCounts()
+local countsTable, membersCount, uniquePatterns = memComponent:GetCounts()
 print("SAMPLE SIZE: " .. SAMPLE_SIZE .. " MEMORY SIZE: " .. MEMORY_SIZE)
 print("uniquePatterns: ", uniquePatterns)
-print("allCount: ", allCount)
+print("membersCount: ", membersCount)
 for pattern, count in pairs(countsTable) do
-  print(pattern .. " " .. count .. " " .. 100* count / allCount .. "%")
+  print(pattern .. " " .. count .. " " .. 100* count / membersCount .. "%")
 end

@@ -1,6 +1,8 @@
 -- globalize the libs (to integrate both in replit, love 2D and also Unreal)
 -- libs
 
+LuaExt = require("libs.core.LuaExt")
+
 ArrayExt = require("libs.core.ArrayExt")
 TableExt = require("libs.core.TableExt")
 
@@ -19,8 +21,13 @@ Tile = require("libs.map.Tile")
 Map = require("libs.map.Map")
 TTE = require("libs.map.TTE")
 
+-- GAME SELECTION
+GAME = "TheDarkShift"
+GAME_PATH = "games." .. GAME .. "."
+Game = require(GAME_PATH .. "main") -- main.lua of the game
+
 -- ENGINE SELECTION
-ENGINE = "unreal"
+ENGINE = "love"
 ENGINE_PATH = "engines." .. ENGINE .. "."
 
 EngineInit = require(ENGINE_PATH .. "Init")
@@ -28,10 +35,10 @@ EngineControl = require(ENGINE_PATH .. "Control")
 EngineEvent = require(ENGINE_PATH ..  "Event")
 EngineRead = require(ENGINE_PATH .. "Read")
 
--- GAME SELECTION
-GAME = "TheDarkShift"
-GAME_PATH = "games." .. GAME .. "."
-Game = require(GAME_PATH .. "main") -- main.lua of the game
+-- GAME SPECIFIC ENGINE INIT (if exists)
+GAME_ENGINE_PATH = GAME_PATH .. ENGINE_PATH .. "Init"
+
+GameEngineInit = LuaExt.TryRequire(GAME_ENGINE_PATH)
 
 -- ================================================================ --
 -- ================================================================ --
