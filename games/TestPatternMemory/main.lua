@@ -1,4 +1,3 @@
-
 Components = require("libs.sim.Components")
 Entity = require("libs.sim.Entity")
 EntityTypes = require(GAME_PATH .. "data.entityTypes")

@@ -22,7 +22,7 @@ Map = require("libs.map.Map")
 TTE = require("libs.map.TTE")
 
 -- GAME SELECTION
-GAME = "TheDarkShift"
+GAME = "LightLock"
 GAME_PATH = "games." .. GAME .. "."
 Game = require(GAME_PATH .. "main") -- main.lua of the game
 
@@ -30,10 +30,10 @@ Game = require(GAME_PATH .. "main") -- main.lua of the game
 ENGINE = "love"
 ENGINE_PATH = "engines." .. ENGINE .. "."
 
-EngineInit = require(ENGINE_PATH .. "Init")
-EngineControl = require(ENGINE_PATH .. "Control")
-EngineEvent = require(ENGINE_PATH ..  "Event")
-EngineRead = require(ENGINE_PATH .. "Read")
+EngineInit = LuaExt.TryRequire(ENGINE_PATH .. "Init")
+EngineControl = LuaExt.TryRequire(ENGINE_PATH .. "Control")
+EngineEvent = LuaExt.TryRequire(ENGINE_PATH ..  "Event")
+EngineRead = LuaExt.TryRequire(ENGINE_PATH .. "Read")
 
 -- GAME SPECIFIC ENGINE INIT (if exists)
 GAME_ENGINE_PATH = GAME_PATH .. ENGINE_PATH .. "Init"
