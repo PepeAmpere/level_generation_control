@@ -59,9 +59,9 @@ local function Edge(edge)
     local dirVector = (endPosition - startPosition):Normalize()
     local arrowVector = dirVector:RotateZFixed(120)
 
-    local color = {0, 127, 255, 255}
+    local color = {0, 0.5, 1, 1}
     if edge:HasTag("sp") then
-      color = {192, 192, 192, 64}
+      color = {0.75, 0.75, 0.75, 0.25}
     end
     Line(
       startPosition,
@@ -88,7 +88,7 @@ local function Edge(edge)
     end
 
     if #vertices > 4 then
-      Polygon(vertices, {0, 127, 255, 32})
+      Polygon(vertices, {0, 0.5, 1, 0.125})
     else
       -- no draw anything now
     end
@@ -96,7 +96,7 @@ local function Edge(edge)
 end
 
 local function Node(node)
-  local latestColor = {255, 255, 255, 255}
+  local latestColor = {1, 1, 1, 1}
   Circle(
     "fill",
     node:GetPosition(),
@@ -105,10 +105,10 @@ local function Node(node)
     latestColor
   )
 
-  latestColor = {0, 0, 255, 255}
-  if node:HasTag("tc") then latestColor = {0, 127, 255, 255} end
-  if node:HasTag("is") then latestColor = {127, 0, 255, 255}  end
-  if node:HasTag("tile") then latestColor = {127, 127, 127, 255} end
+  latestColor = {0, 0, 1, 1}
+  if node:HasTag("tc") then latestColor = {0, 0.5, 1, 1} end
+  if node:HasTag("is") then latestColor = {1, 0, 1, 1}  end
+  if node:HasTag("tile") then latestColor = {0.5, 0.5, 0.5, 1} end
   Circle(
     "line",
     node:GetPosition(),

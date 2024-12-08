@@ -17,13 +17,13 @@ local HALF_SIZE2 = MapExt.HALF_SIZE
 -- local constants
 local ZOOM_SCALE_FACTOR = 0.03
 local TILE_KEY_TO_COLOR = {
-  a = {200, 234, 200, 255},
-  w = {234, 234, 234, 255},
-  x = {168, 168, 168, 255},
-  yellow = {168, 168, 0, 128},
-  blue = {0, 0, 255, 128},
-  red = {255, 0, 0, 128},
-  green = {0, 255, 0, 128},
+  a = {0.8, 0.9, 0.8, 1},
+  w = {0.9, 0.9, 0.9, 1},
+  x = {0.625, 0.625, 0.625, 1},
+  yellow = {0.625, 0.625, 0, 0.5},
+  blue = {0, 0, 1, 0.5},
+  red = {1, 0, 0, 0.5},
+  green = {0, 1, 0, 0.5},
 }
 local SUBTILES_POSITIONS = {
   Vec3(2*RECT_SIZE2, -2*RECT_SIZE2, 0),  Vec3(2*RECT_SIZE2, 0, 0), Vec3(2*RECT_SIZE2, 2*RECT_SIZE2, 0),
@@ -86,7 +86,7 @@ local function DrawTile(tile)
 
     local stringToWrite = tostring(rectanglePosition)
     if textfields[stringToWrite] then
-      DrawText(textfields[stringToWrite], rectanglePosition, {255,0,255,255})
+      DrawText(textfields[stringToWrite], rectanglePosition, {1,0,1,1})
     else
       local text = love.graphics.newText(love.graphics.getFont(), stringToWrite)
       textfields[stringToWrite] = text
@@ -95,7 +95,7 @@ local function DrawTile(tile)
 
   -- SECTION TO REFACTOR using Draw START
   local TILE_SPACING = 10
-  love.graphics.setColor(0,0,0,255)
+  love.graphics.setColor(0,0,0,1)
   love.graphics.rectangle(
     "line",
     (tilePosition:Y() - 3*RECT_SIZE2),
@@ -135,7 +135,7 @@ local function DrawTileRestrictions(tile)
   local tileRestrictions = tile:GetRestrictions()
   local tilePosition = tile:GetPosition()
 
-  love.graphics.setColor(255,255,255,64)
+  love.graphics.setColor(1,1,1,0.25)
   for _, direction in ipairs(DIRECTIONS) do
     local sideVector = tilePosition + DIR_TO_VEC3[direction]*2.8*RECT_SIZE2
 
@@ -197,7 +197,7 @@ local function AllTreeLines()
         tree:GetNode(nodeID):GetPosition(),
         tree:GetNode(childrenOfNode[i]):GetPosition(),
         10,
-        {0,128,0,128}
+        {0,0.5,0,0.5}
       )
       RecLookup(tree, childrenOfNode[i])
     end
@@ -222,7 +222,7 @@ local function CameraAndCursorPosition(camera)
   local mw, mh, flags = love.window.getMode()
   local mWx, mWy = camera:toWorld(mx,my)
   local visbleCornerX, visibleCornerY = camera:getVisibleCorners()
-  love.graphics.setColor(255,0,255,255)
+  love.graphics.setColor(1,0,1,1)
   love.graphics.print("cx: " .. math.floor(cx) .. " cy: " .. math.floor(cy), 10, 10)
   love.graphics.print("cw: " .. math.floor(cw) .. " ch: " .. math.floor(ch), 10, 20)
   love.graphics.print("mx: " .. math.floor(mx) .. " my: " .. math.floor(my), 10, 30)
@@ -233,7 +233,7 @@ local function CameraAndCursorPosition(camera)
 end
 
 local function DebugControl(camera)
-  love.graphics.setColor(255,0,255,255)
+  love.graphics.setColor(1,0,1,1)
   love.graphics.print("Move around:", 10, 440) love.graphics.print("[Up] [Down] [Left] [Right]", 100, 440)
   love.graphics.print("Zoom:", 10, 450) love.graphics.print("[Num+] [Num-]", 100, 450)
   love.graphics.print("Reset to [0,0]:", 10, 460) love.graphics.print("[Space]", 100, 460)
