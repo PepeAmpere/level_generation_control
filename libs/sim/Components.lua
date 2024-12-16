@@ -1,10 +1,12 @@
 local componentTypes = {
   "AI",
+  "BB",
   "Children",
   "ChildrenOrders",
   "Controller",
   "CtrlGoalMove",
   "CtrlTask",
+  "DebugScreen",
   "PatternMemoryLast",
   "Parent",
   "Position",
