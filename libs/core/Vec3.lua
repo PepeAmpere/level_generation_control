@@ -108,6 +108,7 @@ function vectorMeta:__tostring()
 end
 
 function vectorMeta:__concat()
+  print(self)
   return "Vec3(" .. self.x .. "," .. self.y .. "," .. self.z .. ")"
 end
 
