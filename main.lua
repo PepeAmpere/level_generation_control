@@ -22,7 +22,7 @@ Map = require("libs.map.Map")
 TTE = require("libs.map.TTE")
 
 -- GAME SELECTION
-GAME = "TestScreen"
+GAME = "TestHexMap"
 GAME_PATH = "games." .. GAME .. "."
 Game = require(GAME_PATH .. "main") -- main.lua of the game
 
