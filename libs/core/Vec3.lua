@@ -25,15 +25,15 @@ local function new(x, y, z)
   return setmetatable(
     {
       x = x or 0,
-      y = y or 0, 
+      y = y or 0,
       z = z or 0
     },
     vectorMeta
-  ) 
+  )
 end
 
 local function is3DVector(vectorOne)
-  return 	type(vectorOne) == "table" and
+  return type(vectorOne) == "table" and
       type(vectorOne.x) == "number" and
       type(vectorOne.y) == "number" and
       type(vectorOne.z) == "number"
@@ -42,12 +42,11 @@ end
 local Vec3 = new
 
 -- operators
-
 function vectorMeta:__add(vectorOne)
-  return new( 
+  return new(
     self.x + vectorOne.x,
     self.y + vectorOne.y,
-    self.z + vectorOne.z 
+    self.z + vectorOne.z
   )
 end
 
@@ -55,7 +54,7 @@ function vectorMeta:__sub(vectorOne)
   return new(
     self.x - vectorOne.x,
     self.y - vectorOne.y,
-    self.z - vectorOne.z 
+    self.z - vectorOne.z
   )
 end
 
@@ -70,7 +69,7 @@ function vectorMeta:__mul(vectorOne)
     return new(
       self.x * vectorOne.x,
       self.y * vectorOne.y,
-      self.z * vectorOne.z 
+      self.z * vectorOne.z
     )
   end
 end
@@ -86,7 +85,7 @@ function vectorMeta:__div(vectorOne)
     return new(
       self.x / vectorOne.x,
       self.y / vectorOne.y,
-      self.z / vectorOne.z 
+      self.z / vectorOne.z
     )
   end
 end
@@ -108,7 +107,6 @@ function vectorMeta:__tostring()
 end
 
 function vectorMeta:__concat()
-  print(self)
   return "Vec3(" .. self.x .. "," .. self.y .. "," .. self.z .. ")"
 end
 
@@ -209,7 +207,7 @@ function vectorIndex:Normalize()
   return self:Mul(1 / length) -- in place
 end
 
-function vectorIndex:DotProduct(angleOne)
+function vectorIndex:DotProduct(vectorOne)
   return (self.x * vectorOne.x) + (self.y * vectorOne.y) + (self.z * vectorOne.z)
 end
 
@@ -289,8 +287,8 @@ end
 -- Convert to array with three items, no string keys, as Spring API likes it
 function vectorIndex:AsSpringVector()
   return {
-    self.x, 
-    self.y, 
+    self.x,
+    self.y,
     self.z
   }
 end

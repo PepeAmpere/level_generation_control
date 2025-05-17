@@ -28,22 +28,15 @@ function DrawStuff()
   for _, node in pairs(levelMap.nodes) do
     -- Draw.Polygon(node:GetPosition(), {0, 0, 1, 0.5})
     local hexCoords = node:GetPosition()
-    local q = hexCoords:X()
-    local r = hexCoords:Y()
-    --local s = hexCoords:Z()
     local scale = 100
-    local vertical = 1.5 * scale
-    local horizontal = math.sqrt(3) * scale
-    local qUnit = Vec3(0,horizontal,0)
-    local rUnit = Vec3(vertical,0.5*horizontal,0)
-    --local sUnit = Vec3(vertical,-0.5*horizontal,0)
-    local drawCoords = qUnit * q + rUnit * r
+
+    local x,y = hexCoords:ToPixel(scale)
+    local drawCoords = Vec3(x,y,0)
+    local vertices = hexCoords:ToCorners(scale, scale*0.8)
+
     local latestColor = {0.5, 1, 0.5, 0.5}
-    Draw.Circle(
-      "fill",
-      drawCoords + correctionPoints[node:GetID()]*(scale/2.5),
-      4,
-      24,
+    Draw.Polygon(
+      vertices,
       latestColor
     )
     local stringToWrite = tostring(hexCoords)
@@ -87,7 +80,7 @@ function love.draw()
   DebugStep()
 end
 
-function love.mousepressed(x, y, button) 
+function love.mousepressed(x, y, button)
   if button == 2 then -- right mouse button
     UI_STATES.pan = true
   end

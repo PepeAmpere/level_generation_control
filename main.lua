@@ -7,6 +7,7 @@ ArrayExt = require("libs.core.ArrayExt")
 TableExt = require("libs.core.TableExt")
 
 Vec3 = require("libs.core.Vec3")
+Hex3 = require("libs.core.Hex3")
 
 Edge = require("libs.core.Edge")
 Node = require("libs.core.Node")

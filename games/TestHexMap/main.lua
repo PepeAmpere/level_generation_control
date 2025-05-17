@@ -6,7 +6,6 @@ Entity = require("libs.sim.Entity")
 Simulation = require("libs.sim.Simulation")
 OneSim = Simulation.New(0, love.timer.getTime())
 
-correctionPoints = {}
 levelMap = {}
 levelMap.nodes = {}
 
@@ -19,16 +18,11 @@ for q = -SIZE, SIZE do
         local nodeID = q .. "|" .. r .. "|" .. s
         levelMap.nodes[nodeID] = Node.new(
           nodeID,
-          Vec3(q, r, s),
+          Hex3(q, r, s),
           "Hex",
           {
             hex = true,
           }
-        )
-        correctionPoints[nodeID] = Vec3(
-          math.random()*2 - 1,
-          math.random()*2 - 1,
-          0
         )
       end
     end
