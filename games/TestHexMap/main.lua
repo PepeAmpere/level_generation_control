@@ -9,7 +9,7 @@ OneSim = Simulation.New(0, love.timer.getTime())
 levelMap = {}
 levelMap.nodes = {}
 
-local SIZE = 3
+local SIZE = 5
 
 for q = -SIZE, SIZE do
   for r = -SIZE, SIZE do

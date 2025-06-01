@@ -16,6 +16,7 @@ local HALF_SIZE2 = MapExt.HALF_SIZE
 
 -- local constants
 local ZOOM_SCALE_FACTOR = 0.03
+local ROTATE_SCALE_FACTOR = 0.05
 local TILE_KEY_TO_COLOR = {
   a = {0.8, 0.9, 0.8, 1},
   w = {0.9, 0.9, 0.9, 1},
@@ -255,11 +256,19 @@ local function WheelZoom(camera, x, y)
   )
 end
 
+local function PadRotate(camera, x, y)
+  camera:setAngle(camera:getAngle() + x * ROTATE_SCALE_FACTOR)
+end
+
+local function PadZoom(camera, x, y)
+  camera:setScale(camera:getScale() + y * ZOOM_SCALE_FACTOR)
+end
+
 local function ControlKeys(camera, key, scancode)
   local cx, cy = camera:getPosition()
   local scale = camera:getScale()
   local scaleInverted = 1/scale
-  local delta = RECT_SIZE2 * scaleInverted
+  local delta = RECT_SIZE2/10 * scaleInverted
   local y = 0
 
   if key == "left" then cx = cx - delta end
@@ -311,6 +320,8 @@ return {
   CameraAndCursorPosition = CameraAndCursorPosition,
   ControlKeys = ControlKeys,
   DebugControl = DebugControl,
+  PadRotate = PadRotate,
+  PadZoom = PadZoom,
   PanMouse = PanMouse,
   WheelZoom = WheelZoom,
 }
