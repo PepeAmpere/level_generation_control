@@ -17,6 +17,7 @@ Tree = require("libs.core.Tree")
 
 JSON = require("libs.json.json")
 
+-- becomes game specfic, going to be removed
 MapExt = require("libs.map.MapExt") -- needed for Map & Tile to work
 Tile = require("libs.map.Tile")
 Map = require("libs.map.Map")

@@ -13,8 +13,16 @@ function Simulation.New(step, startTime)
   return i
 end
 
+function Simulation:GetStep()
+  return self.step
+end
+
 function Simulation:Update(dSteps)
   self.step = self.step + dSteps
+end
+
+function Simulation:GetTime()
+  return self.t
 end
 
 function Simulation:UpdateTime(t)
@@ -54,7 +62,10 @@ function Simulation:AddEntityOfType(entityTypeDef, paramsOverride)
 
   if entityComponents then
     for _, componentData in pairs(entityComponents) do
-      entity:AddComponent(componentData.name, componentData)
+      for k,v in pairs(componentData) do
+        params[k] = TableExt.DeepCopy(v)
+      end
+      entity:AddComponent(componentData.name, params)
     end
   end
 

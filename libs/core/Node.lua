@@ -132,6 +132,12 @@ function Node:GetTags()
   return self.tags
 end
 
+function Node:GetTagValue(tag)
+  if self:HasTag(tag) then
+    return self.tags[tag]
+  end
+end
+
 function Node:GetType()
   return self.nodeType
 end

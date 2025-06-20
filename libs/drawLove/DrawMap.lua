@@ -297,12 +297,17 @@ local function ControlKeys(camera, key, scancode)
 end
 
 local function PanMouse(camera, x, y, dx, dy, istouch)
+  local angle = camera:getAngle()
+  local angleSin, angleCos = math.sin(angle), math.cos(angle)
   local cx, cy = camera:getPosition()
   local mx, my = love.mouse.getPosition()
   local mWx, mWy = camera:toWorld(mx,my)
   local SCALE_FACTOR = 0.05
 
-  camera:setPosition(cx - dx, cy - dy)
+  camera:setPosition(
+    cx - (dx * angleCos - dy * angleSin),
+    cy - (dx * angleSin + dy * angleCos)
+  )
 --[[   camera:setPosition(
     cx + (mWx - cx)*SCALE_FACTOR,
     cy + (mWy - cy)*SCALE_FACTOR

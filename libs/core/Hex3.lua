@@ -99,6 +99,11 @@ function hexMeta:__concat()
   return "Hex3(" .. self.q .. "," .. self.r.. "," .. self.s .. ")"
 end
 
+function hexIndex:ToKey(separator)
+  if separator == nil then separator = "_" end
+  return self.q .. separator .. self.r .. separator .. self.s
+end
+
 function hexIndex:Add(hex)
   self = self + hex
   return self -- copy
