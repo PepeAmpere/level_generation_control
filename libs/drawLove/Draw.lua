@@ -37,9 +37,10 @@ local function Line(position1, position2, width, color)
   love.graphics.line(coords)
 end
 
-local function Polygon(vertices, color)
+local function Polygon(vertices, color, mode)
+  if mode == nil then mode = "fill" end
   love.graphics.setColor(color[1], color[2], color[3], color[4])
-  love.graphics.polygon("fill", FlipCoords2D(vertices))
+  love.graphics.polygon(mode, FlipCoords2D(vertices))
 end
 
 local function Text(text, position, color)

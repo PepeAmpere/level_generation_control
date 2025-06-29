@@ -219,18 +219,40 @@ end
 local function CameraAndCursorPosition(camera)
   local cx, cy = camera:getPosition()
   local mx, my = love.mouse.getPosition()
-  local _, _, cw, ch = camera:getVisible()
+  local ltcx, ltcy, cw, ch = camera:getVisible()
+  local w, h = love.graphics.getDimensions()
   local mw, mh, flags = love.window.getMode()
   local mWx, mWy = camera:toWorld(mx,my)
-  local visbleCornerX, visibleCornerY = camera:getVisibleCorners()
-  love.graphics.setColor(1,0,1,1)
-  love.graphics.print("cx: " .. math.floor(cx) .. " cy: " .. math.floor(cy), 10, 10)
-  love.graphics.print("cw: " .. math.floor(cw) .. " ch: " .. math.floor(ch), 10, 20)
-  love.graphics.print("mx: " .. math.floor(mx) .. " my: " .. math.floor(my), 10, 30)
-  love.graphics.print("mw: " .. math.floor(mw) .. " mh: " .. math.floor(mh), 10, 40)
-  love.graphics.print("mapX: " .. math.floor(-mWy) .. " mapY: " .. math.floor(mWx), 10, 50)
-  love.graphics.print("visbleCornerX: " .. math.floor(-visibleCornerY) .. " visibleCornerY: " .. math.floor(visbleCornerX), 10, 60)
-  love.graphics.print("scale: " .. tostring(camera:getScale()), 10, 70)
+  local angle = camera:getAngle()
+
+  -- top left corner
+  love.graphics.setColor(1, 1, 1, 0.7)
+  love.graphics.rectangle("fill", 0, 0, 150, 65)
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.print("mapX: " .. math.floor(-ltcy) .. " mapY: " .. math.floor(ltcx), 0, 0)
+  love.graphics.print("scrX: 0 scrY: 0", 0, 10)
+  love.graphics.print("mapW: " .. math.floor(cw) .. " mapH: " .. math.floor(ch), 0, 20)
+  love.graphics.print("scrH: " .. math.floor(w) .. " scrW: " .. math.floor(h), 0, 30)
+  love.graphics.print("scale: " .. tostring(camera:getScale()), 0, 40)
+  love.graphics.print("angle: " .. math.floor(angle * 180 / math.pi), 0, 50)
+
+  -- middle
+  local centerX = w/2
+  local centerY = h/2
+  love.graphics.setColor(1, 1, 1, 0.7)
+  love.graphics.rectangle("fill", centerX-80, centerY-15, 160, 45)
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.print("screen center", centerX-60, centerY-10)
+  love.graphics.print("mapX: " .. math.floor(-cy) .. " mapY: " .. math.floor(cx), centerX-60, centerY)
+  love.graphics.print("scrX: " .. centerX .. " scrY: " .. centerY, centerX-60, centerY+10)
+
+  -- mouse
+  love.graphics.setColor(1, 1, 1, 0.7)
+  love.graphics.rectangle("fill", mx-80, my, 150, 25)
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.print("MmapX: " .. math.floor(-mWy) .. " MmapY: " .. math.floor(mWx), mx-80, my)
+  love.graphics.print("MscrX: " .. math.floor(mx) .. " MscrY: " .. math.floor(my), mx-80, my+10)
+
 end
 
 local function DebugControl(camera)

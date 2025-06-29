@@ -9,6 +9,15 @@ local axisKeys = {
   "a6" -- right trigger
 }
 
+local axisNames = {
+  a1 = "Lstick <>",
+  a2 = "Lstick ^v",
+  a3 = "Rstick <>",
+  a4 = "Rstick ^v",
+  a5 = "Ltrigger",
+  a6 = "Rtrigger",
+}
+
 local gamepadIndex = {}
 local gamepadMeta = {}
 gamepadMeta.__index = gamepadIndex
@@ -28,12 +37,23 @@ local Gamepad = new
 
 function gamepadIndex:DrawDebug()
   if (self:IsConnected()) then
+    local w, h = love.graphics.getDimensions()
+    love.graphics.setColor(1, 1, 1, 0.7)
+    love.graphics.rectangle("fill", 0, h-120, 180, 70)
+    love.graphics.setColor(0, 0, 0, 1)
+    local line = 0
+    for _, axisKey in ipairs (axisKeys) do
+      if self.axis[axisKey] then
+        love.graphics.print(axisNames[axisKey] .. ": " .. self.axis[axisKey], 0, h-120+line*10)
+      end
+      line = line + 1
+    end
     love.graphics.setColor(1,1,1)
     love.graphics.draw(
-      gamepadDebug.image, 
-      0, 0, -- x, z
+      gamepadDebug.image,
+      10, h-50, -- x, y
       0, -- orientation (radians)
-      0.2, 0.2 -- x, z scale
+      0.2, 0.2 -- x, y scale
     )
   end
 end
@@ -65,7 +85,22 @@ function gamepadIndex:GetRightStickXY()
   return 0, 0
 end
 
-function gamepadIndex:InputAxis(index, value)
+function gamepadIndex:GetLeftTrigger()
+  if self.axis.a5 then
+    return self.axis.a5
+  end
+  return 0
+end
+
+function gamepadIndex:GetRightTrigger()
+  if self.axis.a6 then
+    return self.axis.a6
+  end
+  return 0
+end
+
+function gamepadIndex:InputAxis(camera, index, value)
+  if math.abs(value) <= 0.06 then value = 0 end -- deadzone fix
   local axisKey = axisKeys[index]
   if self:IsConnected() then
     self.axis[axisKey] = value
@@ -84,7 +119,7 @@ function gamepadIndex:IsPressed(key)
   local pad = self:GetObject()
   local now = pad:isGamepadDown({key})
   local state = self.states[key]
-  
+
   if state then
     local last = state.last
     state.now = now
@@ -102,7 +137,7 @@ function gamepadIndex:IsReleased(key)
   local pad = self:GetObject()
   local now = pad:isGamepadDown({key})
   local state = self.states[key]
-  
+
   if state then
     local last = state.last
     state.now = now

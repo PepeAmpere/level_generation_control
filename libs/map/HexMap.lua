@@ -168,4 +168,15 @@ function HexMap:GetConstructorTree()
   return self.constructorTree
 end
 
+function HexMap:GetAnyHexPosition(selectedHexKey, separator)
+  local selectedHex = self:GetNode(selectedHexKey)
+  local selectedHexPosition
+  if selectedHex then
+    selectedHexPosition = selectedHex:GetPosition()
+  else
+    selectedHexPosition = HexBase.KeyToHex3(UI_STATES.selectedHexKey, separator)
+  end
+  return selectedHexPosition
+end
+
 return HexMap

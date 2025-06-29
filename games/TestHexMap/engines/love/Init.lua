@@ -27,10 +27,12 @@ camera:setWindow(0, 0, 800, 600)
 camera:setPosition(positionCenterX, positionCenterY)
 
 UI_STATES = {
+  debugOn = true,
   pan = false,
   textfields = {},
   sensorName = "Eye",
-  scale = SCALE,
+  scale = HEX_SIZE,
+  selectedHexKey = nil,
 }
 
 GamepadOne = Gamepad(1)
@@ -44,8 +46,27 @@ function DrawStuff()
   for _, node in pairs(levelMap.nodes) do
     DrawPrimitives.NodeShape(node, scale)
 
+    if UI_STATES.selectedHexKey == nil then UI_STATES.selectedHexKey = node:GetID() end
+    DrawPrimitives.NodeSelected(UI_STATES.selectedHexKey, scale)
+
+    local selectedHex = levelMap:GetNode(UI_STATES.selectedHexKey)
+    if selectedHex then
+      local rt = GamepadOne:GetRightTrigger()
+      if rt > 0.5 then
+        local direction = selectedHex:GetTagValue("randomDirection")
+        selectedHex:SetTagValue("randomDirection", ((direction + 1 ) % 6) + 1 )
+      end
+      local lt = GamepadOne:GetLeftTrigger()
+      if lt > 0.5 then
+        local direction = selectedHex:GetTagValue("randomDirection")
+        selectedHex:SetTagValue("randomDirection", ((direction - 1 ) % 6) + 1 )
+      end
+    end
+
     simPosition = node:GetPosition()
-    DrawPrimitives.Coordinates(simPosition, scale)
+    if UI_STATES.debugOn then
+      DrawPrimitives.Coordinates(simPosition, scale)
+    end
   end
 
   local step = OneSim:GetStep()
@@ -76,9 +97,6 @@ function love.draw()
 
   camera:draw(DrawStuff)
 
-  DrawMap.CameraAndCursorPosition(camera)
-  DrawMap.DebugControl(camera)
-
   local x, y = GamepadOne:GetRightStickXY()
   --print("pan", x, y)
   DrawMap.PanMouse(camera, nil, nil, -x * 50, -y * 50, false)
@@ -87,15 +105,19 @@ function love.draw()
   DrawMap.PadZoom(camera, 0, -y)
   DrawMap.PadRotate(camera, -x, 0)
 
-  GamepadOne:DrawDebug()
+  if UI_STATES.debugOn then
+    DrawMap.CameraAndCursorPosition(camera)
+    DrawMap.DebugControl(camera)
+    DrawPrimitives.DebugUIStates()
+    GamepadOne:DrawDebug()
 
-  local function DebugStep()
-    love.graphics.setColor(0, 0, 0, 255)
-    love.graphics.print("Simstep: " .. OneSim:GetStep(), 600, 240)
-    love.graphics.print("Simtime: " .. OneSim:GetTime(), 600, 260)
-    love.graphics.print("SensorName: " .. UI_STATES.sensorName, 600, 280)
+    local function DebugStep()
+      love.graphics.setColor(0, 0, 0, 255)
+      love.graphics.print("Simstep: " .. OneSim:GetStep(), 600, 240)
+      love.graphics.print("Simtime: " .. OneSim:GetTime(), 600, 260)
+    end
+    DebugStep()
   end
-  DebugStep()
 end
 
 function love.mousepressed(x, y, button)
@@ -122,6 +144,7 @@ end
 
 function love.keypressed(key, scancode)
   DrawMap.ControlKeys(camera, key, scancode)
+  Controls.KeyboardButton(camera, key)
 end
 
 --[[
@@ -142,27 +165,15 @@ function love.keyreleased(key, scancode)
 end
 
 function love.gamepadaxis(gamepad, axis, value)
-  LASTKEY = axis .. " " .. value
-  if axis == "triggerleft" and value == 1 then
-    ADMIN = true
-  else
-    ADMIN = false
-  end
   local inputtype, inputindex, hatdirection = gamepad:getGamepadMapping(axis)
   -- print(inputtype, inputindex, hatdirection, value)
 
-  GamepadOne:InputAxis(inputindex, value)
-  -- if inputindex == 3 then
-  -- DrawMap.PanMouse(camera, nil, nil, -value*10, 0, istouch)
-  -- end
-  -- if inputindex == 4 then
-  -- DrawMap.PanMouse(camera, nil, nil, 0 , -value*10 , istouch)
-  -- end
+  GamepadOne:InputAxis(camera, inputindex, value)
 end
 
 function love.gamepadpressed(gamepad, button)
   print(button)
-  Controls.JoystickButton(button)
+  Controls.JoystickButton(camera, gamepad, button)
 end
 
 function love.gamepadreleased(gamepad, button)

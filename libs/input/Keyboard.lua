@@ -14,7 +14,7 @@ end
 function keyboardIndex:IsPressed(key)
   local now = love.keyboard.isDown(key)
   local state = self.states[key]
-  
+
   if state then
     local last = state.last
     state.now = now
@@ -31,7 +31,7 @@ end
 function keyboardIndex:IsReleased(key)
   local now = love.keyboard.isDown(key)
   local state = self.states[key]
-  
+
   if state then
     local last = state.last
     state.now = now

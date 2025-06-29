@@ -261,6 +261,10 @@ function Node:SetTag(tag)
   self.tags[tag] = true
 end
 
+function Node:SetTagValue(tag, value)
+  self.tags[tag] = value
+end
+
 function Node:SetType(nodeType)
   self.nodeType = nodeType
 end

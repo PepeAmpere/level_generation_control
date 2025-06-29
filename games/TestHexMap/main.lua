@@ -9,7 +9,7 @@ EntityTypes = require(GAME_PATH .. "data.entityTypes")
 Simulation = require("libs.sim.Simulation")
 OneSim = Simulation.New(0, love.timer.getTime())
 
-NodeTypes = require(GAME_PATH .. "data.nodeTypes")
+HexTypes = require(GAME_PATH .. "data.hexTypes")
 
 HexBase = require("libs.map.HexBase")
 HexMap = require("libs.map.HexMap")
@@ -18,7 +18,8 @@ HexTurtle = require("libs.map.HexTurtle")
 local GetNodeTags = function()
   return {
     hex = true,
-    nodeType = TableExt.GetRandomValue(NodeTypes),
+    hexTypeName = TableExt.GetRandomValue(HexTypes).name,
+    randomDirection = math.random(1,6),
     --color = {math.random(),math.random(),math.random()}
   }
 end
@@ -27,18 +28,19 @@ local rootTags = GetNodeTags()
 levelMap = HexMap.new(0, 0, 0, rootTags)
 
 local SIZE = 5
-SCALE = 100
+local GAP_MULT = 1
+HEX_SIZE = 100
 
-for q = -SIZE, SIZE do
-  for r = -SIZE, SIZE do
-    for s = -SIZE, SIZE do
+for q = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
+  for r = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
+    for s = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
       if
         q + r + s == 0 and
         not (q == 0 and r == 0 and s == 0)
       then
-        local nodeID = q .. "|" .. r .. "|" .. s
+        local hexCoords = Hex3(q, r, s, HEX_SIZE)
+        local nodeID = hexCoords:ToKey()
         local nodeTags = GetNodeTags()
-        local hexCoords = Hex3(q, r, s)
         levelMap.nodes[nodeID] = Node.new(
           nodeID,
           hexCoords,
@@ -46,11 +48,17 @@ for q = -SIZE, SIZE do
           nodeTags
         )
 
-        local x, y = hexCoords:ToPixel(SCALE)
+        local x, y = hexCoords:ToPixel()
         local newEntity = OneSim:AddEntityOfType(
           EntityTypes.Person, {
             IDprefix = "person",
             position = Vec3(-y, x, 0)
+          }
+        )
+        OneSim:AddEntityOfType(
+          EntityTypes.Wagon, {
+            IDprefix = "wagon",
+            position = Vec3(-y, x, 0) + Vec3(math.random(-50, 50), math.random(-50, 50),0)
           }
         )
       end
