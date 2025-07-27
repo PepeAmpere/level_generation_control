@@ -33,6 +33,8 @@ UI_STATES = {
   sensorName = "Eye",
   scale = HEX_SIZE,
   selectedHexKey = nil,
+  rotateLeftSum = 0,
+  rotateRightSum = 0,
 }
 
 GamepadOne = Gamepad(1)
@@ -45,29 +47,17 @@ function DrawStuff()
   local scale = UI_STATES.scale
   for _, node in pairs(levelMap.nodes) do
     DrawPrimitives.NodeShape(node, scale)
+    DrawPrimitives.NodeTreeElements(node, scale)
 
     if UI_STATES.selectedHexKey == nil then UI_STATES.selectedHexKey = node:GetID() end
-    DrawPrimitives.NodeSelected(UI_STATES.selectedHexKey, scale)
-
-    local selectedHex = levelMap:GetNode(UI_STATES.selectedHexKey)
-    if selectedHex then
-      local rt = GamepadOne:GetRightTrigger()
-      if rt > 0.5 then
-        local direction = selectedHex:GetTagValue("randomDirection")
-        selectedHex:SetTagValue("randomDirection", ((direction + 1 ) % 6) + 1 )
-      end
-      local lt = GamepadOne:GetLeftTrigger()
-      if lt > 0.5 then
-        local direction = selectedHex:GetTagValue("randomDirection")
-        selectedHex:SetTagValue("randomDirection", ((direction - 1 ) % 6) + 1 )
-      end
-    end
 
     simPosition = node:GetPosition()
     if UI_STATES.debugOn then
       DrawPrimitives.Coordinates(simPosition, scale)
     end
   end
+
+  DrawPrimitives.NodeSelected(UI_STATES.selectedHexKey, scale)
 
   local step = OneSim:GetStep()
   local phaseStep = FPS_SIM
@@ -98,12 +88,17 @@ function love.draw()
   camera:draw(DrawStuff)
 
   local x, y = GamepadOne:GetRightStickXY()
-  --print("pan", x, y)
   DrawMap.PanMouse(camera, nil, nil, -x * 50, -y * 50, false)
+
   local x, y = GamepadOne:GetLeftStickXY()
-  --print("zoom", x, y)
   DrawMap.PadZoom(camera, 0, -y)
   DrawMap.PadRotate(camera, -x, 0)
+
+  -- temporary dirty mapping
+  local lt = GamepadOne:GetLeftTrigger()
+  Controls.JoystickTrigger(camera, GamePadOne, "a5", lt)
+  local rt = GamepadOne:GetRightTrigger()
+  Controls.JoystickTrigger(camera, GamePadOne, "a6", rt)
 
   if UI_STATES.debugOn then
     DrawMap.CameraAndCursorPosition(camera)
@@ -118,6 +113,8 @@ function love.draw()
     end
     DebugStep()
   end
+
+  DrawPrimitives.SensorsUI(camera, UI_STATES.sensorName)
 end
 
 function love.mousepressed(x, y, button)

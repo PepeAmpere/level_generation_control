@@ -9,17 +9,20 @@ EntityTypes = require(GAME_PATH .. "data.entityTypes")
 Simulation = require("libs.sim.Simulation")
 OneSim = Simulation.New(0, love.timer.getTime())
 
-HexTypes = require(GAME_PATH .. "data.hexTypes")
+HexTypesDefs = require(GAME_PATH .. "data.hexTypes")
+HexTreeTilesDefs = require(GAME_PATH .. "data.hexTreeTiles")
 
 HexBase = require("libs.map.HexBase")
 HexMap = require("libs.map.HexMap")
 HexTurtle = require("libs.map.HexTurtle")
 
+SensorTypesDefs = require(GAME_PATH .. "data.sensorTypes")
+
 local GetNodeTags = function()
   return {
     hex = true,
-    hexTypeName = TableExt.GetRandomValue(HexTypes).name,
-    randomDirection = math.random(1,6),
+    hexTypeName = TableExt.GetRandomValue(HexTypesDefs).name,
+    hexTreeTile = TableExt.GetRandomValue(HexTreeTilesDefs).name,
     --color = {math.random(),math.random(),math.random()}
   }
 end

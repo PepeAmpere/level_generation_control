@@ -168,15 +168,46 @@ function HexMap:GetConstructorTree()
   return self.constructorTree
 end
 
-function HexMap:GetAnyHexPosition(selectedHexKey, separator)
-  local selectedHex = self:GetNode(selectedHexKey)
-  local selectedHexPosition
-  if selectedHex then
-    selectedHexPosition = selectedHex:GetPosition()
+function HexMap:GetHexOnPosition(hexKey)
+  return self:GetNode(hexKey)
+end
+
+function HexMap:GetAnyHexPosition(hexKey, separator)
+  local hex = self:GetNode(hexKey)
+  local hexPosition
+  if hex then
+    hexPosition = hex:GetPosition()
   else
-    selectedHexPosition = HexBase.KeyToHex3(UI_STATES.selectedHexKey, separator)
+    hexPosition = HexBase.KeyToHex3(hexKey, separator)
   end
-  return selectedHexPosition
+  return hexPosition
+end
+
+local lookup = {
+  hexTypeName = HexTypesDefs,
+  hexTreeTile= HexTreeTilesDefs,
+}
+function HexMap:RotateHexLeft(hexKey, tagName)
+  local hex = self:GetNode(hexKey)
+  if hex then
+    local hexTypeName = hex:GetTagValue(tagName)
+    print(tagName, lookup[tagName])
+    local whereToLook = lookup[tagName]
+    if whereToLook[hexTypeName] then
+      hex:SetTagValue(tagName, whereToLook[hexTypeName].rotationLeft)
+    end
+  end
+end
+
+function HexMap:RotateHexRight(hexKey, tagName)
+  local hex = self:GetNode(hexKey)
+  if hex then
+    local hexTypeName = hex:GetTagValue(tagName)
+    local whereToLook = lookup[tagName]
+    if whereToLook[hexTypeName] then
+      hex:SetTagValue(tagName, whereToLook[hexTypeName].rotationRight)
+    end
+  end
 end
 
 return HexMap

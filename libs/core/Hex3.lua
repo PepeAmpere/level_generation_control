@@ -159,6 +159,24 @@ function hexIndex:ToCorners(cornerDistance)
   return points
 end
 
+local function PointSideCenter(x, y, size, i)
+  local angle_deg = 60 * i
+  local angle_rad = PI / 180 * angle_deg
+  return x + size * cos(angle_rad),
+      y + size * sin(angle_rad)
+end
+
+function hexIndex:ToSidePoints(sideDistance)
+  local xBase, yBase = self:ToPixel()
+  local points = {}
+  for i = 1, 6 do
+    local x, y = PointSideCenter(xBase, yBase, sideDistance, i)
+    points[#points + 1] = x
+    points[#points + 1] = y
+  end
+  return points
+end
+
 function hexIndex:RotateRight()
   return new(
     -self.r,

@@ -29,6 +29,16 @@ local function Export(tbl)
     return newTable
 end
 
+local function Extend(tbl, ...)
+  if tbl == nil then tbl = {} end
+  for _, extension in ipairs({...}) do
+    for key, value in pairs(extension) do
+      tbl[key] = value
+    end
+  end
+  return tbl
+end
+
 local function GetRandomKey(tbl)
   local keys = {}
   for key, _ in pairs(tbl) do
@@ -106,6 +116,7 @@ end
 return {
   DeepCopy = DeepCopy,
   Export = Export,
+  Extend = Extend,
   GetRandomKey = GetRandomKey,
   GetRandomValue = GetRandomValue,
   SaveToFile = SaveToFile,

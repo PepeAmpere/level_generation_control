@@ -27,6 +27,14 @@ return {
     return newArray
   end,
 
+  ShiftRight = function(array)
+    local last = array[#array]
+    for i=#array, 2, -1 do
+      array[i] = array[i-1]
+    end
+    array[1] = last
+  end,
+
   Shuffle = function(array)
     for i = #array, 2, -1 do
       local j = math.random(i)

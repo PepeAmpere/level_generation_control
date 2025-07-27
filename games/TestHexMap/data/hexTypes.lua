@@ -12,7 +12,7 @@ end
 return nodeTypesDefs
 ]]--
 
-local hexTypes = {
+local hexTypesDefs = {
   mapDesert = {
     drawDefs = {
       color = {1.0, 0.8, 0.1, 1},
@@ -35,8 +35,14 @@ local hexTypes = {
   },
 }
 
-for hexType, _ in pairs(hexTypes) do
-  hexTypes[hexType].name = hexType
+local hexTypesArray = {}
+for hexType, _ in pairs(hexTypesDefs) do
+  local newDefID = #hexTypesArray+1
+  hexTypesDefs[hexType].name = hexType
+  hexTypesDefs[hexType].defID = newDefID
+  hexTypesArray[#hexTypesArray+1] = hexTypesDefs[hexType]
 end
 
-return hexTypes
+for i,v in ipairs(hexTypesArray) do hexTypesDefs[i] = v end
+
+return hexTypesDefs
