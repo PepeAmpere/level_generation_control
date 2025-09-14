@@ -1,7 +1,8 @@
 local Controller = {}
 Controller.__index = Controller
+setmetatable(Controller, ComponentBase)
 
-function Controller.New()
+function Controller.new()
   local i = setmetatable({}, Controller) -- make new instance
   i.action = "none"
   i.actionParams = {}

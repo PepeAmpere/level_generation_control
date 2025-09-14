@@ -1,7 +1,7 @@
 local StatusReport = {}
 StatusReport.__index = StatusReport
 
-function StatusReport.New()
+function StatusReport.new()
 local i = setmetatable({}, StatusReport) -- make new instance
   return i
 end

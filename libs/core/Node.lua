@@ -10,12 +10,40 @@ Node.__index = Node
 function Node.new(ID, position, nodeType, tags, edgesOut, edgesIn)
   local i = setmetatable({}, Node) -- make new instance
   i.ID = ID
-  i.position = position or Vec3(0,0,0) -- Vector3
+  i.position = position -- Vec3 or Hex3
   i.nodeType = nodeType or "Undefined" -- string
   i.tags = tags or {} -- table: tag => true
   i.edgesOut = edgesOut or {} -- table: edgeID => edge
   i.edgesIn = edgesIn or {} -- table: edgeID => edge
   return i
+end
+
+function Node.load(nodeData)
+  local i = setmetatable({}, Node) -- make new instance
+  i.ID = nodeData.ID
+  i.position = load(nodeData.position)()
+  i.nodeType = nodeData.nodeType
+  i.tags = nodeData.tags
+  i.edgesOut = {}
+  i.edgesIn = {}
+  return i
+end
+
+function Node.loadEdges(nodeID, nodeData, graph)
+  local node = graph:GetNode(nodeID)
+  node.edgesOut = {}
+  for edgeID, _ in pairs(nodeData.edgesOut or {}) do
+    node.edgesOut[edgeID] = graph:GetEdge(edgeID)
+  end
+  node.edgesIn = {}
+  for edgeID, _ in pairs(nodeData.edgesIn or {}) do
+    node.edgesIn[edgeID] = graph:GetEdge(edgeID)
+  end
+  return node
+end
+
+function Node:Export(logLevel)
+  return TableExt.Export(self)
 end
 
 local function Connect(nodeA, nodeB, edge)
@@ -78,24 +106,6 @@ end
 
 function Node:DisconnectAll(nodes)
   return DisconnectAll(self, nodes)
-end
-
-function Node:Export()
-  local exportedObject = {}
-
-  -- export all keys automatically unless specifically handled
-  for k,v in pairs(self) do
-    if k == "edgesIn" or k == "edgesOut" then
-      exportedObject[k] = {}
-      for edgeID, _ in pairs(v) do
-        exportedObject[k][edgeID] = true
-      end
-    else
-      exportedObject[k] = v
-    end
-  end
-
-  return exportedObject
 end
 
 function Node:GetAllEdges(Matcher, inOut)

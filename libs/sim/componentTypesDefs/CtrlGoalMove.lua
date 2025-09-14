@@ -1,7 +1,8 @@
 local CtrlGoalMove = {}
 CtrlGoalMove.__index = CtrlGoalMove
+setmetatable(CtrlGoalMove, ComponentBase)
 
-function CtrlGoalMove.New(position)
+function CtrlGoalMove.new(position)
   local i = setmetatable({}, CtrlGoalMove) -- make new instance
   i.position = position
   return i

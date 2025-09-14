@@ -12,8 +12,8 @@ Simulation = require("libs.sim.Simulation")
 OneSim = nil
 
 -- THIS PART WILL BE LATER SERIALIZED
--- OneSim = Simulation.New(0, love.timer.getTime())
-OneSim = Simulation.New(0, 0)
+-- OneSim = Simulation.new(0, love.timer.getTime())
+OneSim = Simulation.new(0, 0)
 
 local STEP = 1200
 for i=-10, 20 do

@@ -1,7 +1,7 @@
 local Detection = {}
 Detection.__index = Detection
 
-function Detection.New()
+function Detection.new()
 local i = setmetatable({}, Detection) -- make new instance
   return i
 end

@@ -38,7 +38,7 @@ function Tile.newFromNode(node, tileSize)
   return i
 end
 
-function Node:Export()
+function Tile:Export()
   local exportedObject = {}
 
   -- export all keys automatically unless specifically handled

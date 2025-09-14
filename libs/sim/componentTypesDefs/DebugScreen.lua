@@ -1,7 +1,8 @@
 local DebugScreen = {}
 DebugScreen.__index = DebugScreen
+setmetatable(DebugScreen, ComponentBase)
 
-function DebugScreen.New(params)
+function DebugScreen.new(params)
   local i = setmetatable({}, DebugScreen) -- make new instance
   i.itemsArray = {} -- array
 

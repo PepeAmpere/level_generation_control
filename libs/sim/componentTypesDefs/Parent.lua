@@ -1,7 +1,8 @@
 local Parent = {}
 Parent.__index = Parent
+setmetatable(Parent, ComponentBase)
 
-function Parent.New()
+function Parent.new()
   local i = setmetatable({}, Parent) -- make new instance
   i.parentID = nil
   return i

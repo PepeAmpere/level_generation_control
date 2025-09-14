@@ -1,7 +1,7 @@
 local Simulation = {}
 Simulation.__index = Simulation
 
-function Simulation.New(step, startTime)
+function Simulation.new(step, startTime)
   local i = setmetatable({}, Simulation) -- make new instance
   i.step = step
   i.startTime = startTime -- outside constant
@@ -11,6 +11,36 @@ function Simulation.New(step, startTime)
   i.lastEntityIndex = 0
   i.systems = {}
   return i
+end
+
+function Simulation.load(simulationData)
+
+  -- print("-----")
+  -- for k,v in pairs(simulationData) do
+  --   print(k,v)
+  -- end
+
+  local i = setmetatable({}, Simulation) -- make new instance
+  i.step = simulationData.step
+  i.startTime = simulationData.startTime
+  i.t = 0
+
+  i.entities = {}
+  for entityID, entityData in pairs(simulationData.entities or {}) do
+    i.entities[entityID] = Entity.load(entityData)
+  end
+  i.lastEntityIndex = simulationData.lastEntityIndex
+
+  i.systems = {}
+  for systemName, systemData in pairs(simulationData.systems or {}) do
+    i.systems[systemName] = Systems[systemName].load(systemData)
+  end
+
+  return i
+end
+
+function Simulation:Export(logLevel)
+  return TableExt.Export(self)
 end
 
 function Simulation:GetStep()
@@ -42,7 +72,7 @@ function Simulation:AddEntity(params)
     params.ID = newID
   end
 
-  self.entities[newID] = Entity.New(params)
+  self.entities[newID] = Entity.new(params)
 
   return self.entities[newID]
 end
@@ -97,11 +127,23 @@ function Simulation:AddEntityComponentValue(entityID, componentName, value)
 end
 
 function Simulation:AddSystem(systemName, params)
-  self.systems[systemName] = Systems[systemName].New(params)
+  local newSystem = Systems[systemName].new(params)
+  self.systems[systemName] = newSystem
+  return newSystem
 end
 
 function Simulation:GetEntities()
   return self.entities
+end
+
+function Simulation:GetEntity(entityID)
+  return self.entities[entityID]
+end
+
+function Simulation:GetEntityCount()
+  local c = 0
+  for _,_ in pairs(self.entities) do c = c + 1 end
+  return c
 end
 
 -- generic getter, may not work for certain components

@@ -14,6 +14,29 @@ function Edge.new(id, nodesFrom, nodesTo, edgeType, tags)
   return i
 end
 
+function Edge.load(edgeData, graph)
+  local i = setmetatable({}, Edge) -- make new instance
+  i.id = edgeData.id
+  i.edgeType = edgeData.edgeType
+  i.tags = edgeData.tags
+
+  i.nodesFrom = edgeData.nodesFrom
+  i.nodesTo = edgeData.To
+  i.nodesFrom = {}
+  for nodeID, _ in pairs(edgeData.nodesFrom or {}) do
+    i.nodesFrom[nodeID] = graph:GetNode(nodeID)
+  end
+  i.nodesTo = {}
+  for nodeID, _ in pairs(edgeData.nodesTo or {}) do
+    i.nodesTo[nodeID] = graph:GetNode(nodeID)
+  end
+  return i
+end
+
+function Edge:Export()
+  return TableExt.Export(self)
+end
+
 function Edge:DisconnectFromNodes()
   for _, node in ipairs(self.nodesTo) do
     node:RemoveEdge(self)

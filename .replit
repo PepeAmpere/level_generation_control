@@ -10,3 +10,6 @@ start = ["lua-language-server"]
 
 [nix]
 channel = "stable-23_11"
+
+[agent]
+expertMode = true

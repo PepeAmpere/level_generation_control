@@ -1,7 +1,8 @@
 local AI = {}
 AI.__index = AI
+setmetatable(AI, ComponentBase)
 
-function AI.New()
+function AI.new()
   local i = setmetatable({}, AI) -- make new instance
   i.variables = {}
   return i

@@ -2,6 +2,7 @@
 -- libs
 
 LuaExt = require("libs.core.LuaExt")
+LU = require("libs.luaunit.luaunit")
 
 ArrayExt = require("libs.core.ArrayExt")
 TableExt = require("libs.core.TableExt")
@@ -16,6 +17,8 @@ Path = require("libs.core.Path")
 Tree = require("libs.core.Tree")
 
 JSON = require("libs.json.json")
+
+Saves = require("libs.archives.Saves")
 
 -- becomes game specfic, going to be removed
 MapExt = require("libs.map.MapExt") -- needed for Map & Tile to work

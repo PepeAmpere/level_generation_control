@@ -30,7 +30,7 @@ UI_STATES = {
   debugOn = true,
   pan = false,
   textfields = {},
-  sensorName = "Eye",
+  screenName = "Builder",
   scale = HEX_SIZE,
   selectedHexKey = nil,
   rotateLeftSum = 0,
@@ -64,7 +64,7 @@ function DrawStuff()
 
   DrawPrimitives.PersonAll(
     camera,
-    UI_STATES.sensorName,
+    UI_STATES.screenName,
     (step % phaseStep)/phaseStep
   )
 end
@@ -85,7 +85,12 @@ end
 function love.draw()
   love.graphics.setBackgroundColor(192, 192, 192)
 
-  camera:draw(DrawStuff)
+  if ScreenTypesDefs[UI_STATES.screenName].mapScreen then
+    camera:draw(DrawStuff)
+  else
+    -- temporary
+    DrawPrimitives.SavesUI(camera, UI_STATES.screenName)
+  end
 
   local x, y = GamepadOne:GetRightStickXY()
   DrawMap.PanMouse(camera, nil, nil, -x * 50, -y * 50, false)
@@ -114,7 +119,7 @@ function love.draw()
     DebugStep()
   end
 
-  DrawPrimitives.SensorsUI(camera, UI_STATES.sensorName)
+  DrawPrimitives.ScreensUI(camera, UI_STATES.screenName)
 end
 
 function love.mousepressed(x, y, button)

@@ -1,7 +1,8 @@
 local PatternMemoryLast = {}
 PatternMemoryLast.__index = PatternMemoryLast
+setmetatable(PatternMemoryLast, ComponentBase)
 
-function PatternMemoryLast.New(params)
+function PatternMemoryLast.new(params)
   params = params or {}
   local i = setmetatable({}, PatternMemoryLast) -- make new instance
 

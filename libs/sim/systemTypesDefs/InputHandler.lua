@@ -1,7 +1,7 @@
 local HandleInputs = {}
 HandleInputs.__index = HandleInputs
 
-function HandleInputs.New()
+function HandleInputs.new()
 local i = setmetatable({}, HandleInputs) -- make new instance
   return i
 end

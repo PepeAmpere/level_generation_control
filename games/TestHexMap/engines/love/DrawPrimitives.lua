@@ -151,14 +151,14 @@ return {
     end
   end,
 
-  PersonAll = function(camera, sensorName, phase)
+  PersonAll = function(camera, screenName, phase)
     local angle = camera:getAngle()
     local parts = {}
     local colors = {}
 
     for typeName, typeDef in pairs(EntityTypes) do
-      if typeDef.LoveDraw[sensorName] then
-        local partsTemplate, colorsTemplate = typeDef.LoveDraw[sensorName](phase)
+      if typeDef.LoveDraw[screenName] then
+        local partsTemplate, colorsTemplate = typeDef.LoveDraw[screenName](phase)
         local rotatedTemplate = RotateTemplate(partsTemplate, angle)
         parts[typeName] = rotatedTemplate
         colors[typeName] = colorsTemplate
@@ -193,17 +193,54 @@ return {
     end
   end,
 
-  SensorsUI = function(camera, sensorName, phase)
+  SavesUI = function(camera, screenName, phase)
+    local w, h = love.graphics.getDimensions()
+    local buttonSize = 80
+    local buttonSizeHalf = buttonSize/2
+    local buttonSizeQuarter = buttonSize/4
+    local paddingLeft = 5
+    local marginLeft = w/3
+    local bottomBottonH = h/3 - buttonSizeQuarter
+    local fileSlots = SavesStatus:GetFileSlots()
+    local fileStotsStatus = SavesStatus:GetSlotsStatus()
+    local ssIndex = SavesStatus:GetSelectedSaveIndex()
+    for i=1, #fileSlots do
+      local fileName = fileSlots[i]
+      if fileStotsStatus[i] then
+        fileName = "[FOUND] " .. fileName
+      else
+        fileName = "[EMPTY] " .. fileName
+      end
+
+      love.graphics.setColor(1, 1, 1, 0.8)
+      if i == ssIndex then love.graphics.setColor(0.8, 0.8, 0.8, 1) end
+      love.graphics.rectangle(
+        "fill",
+        marginLeft,
+        bottomBottonH + (i-1) * buttonSizeQuarter,
+        buttonSize*5,
+        buttonSizeQuarter
+      )
+      love.graphics.setColor(0, 0, 0, 1)
+      love.graphics.print(
+        tostring(fileName),
+        marginLeft + paddingLeft,
+        bottomBottonH + (i-1) * buttonSizeQuarter
+      )
+    end
+  end,
+
+  ScreensUI = function(camera, screenName, phase)
     local w, h = love.graphics.getDimensions()
     local buttonSize = 80
     local buttonSizeHalf = buttonSize/2
     local paddingLeft = 5
     local centerX = w/2
-    local marginLeft = centerX - (#SensorTypesDefs * buttonSizeHalf)
+    local marginLeft = centerX - (#ScreenTypesDefs * buttonSizeHalf)
     local bottomBottonH = h - buttonSize
-    for i,v in ipairs(SensorTypesDefs) do
+    for i,v in ipairs(ScreenTypesDefs) do
       love.graphics.setColor(1, 1, 1, 0.8)
-      if v.name == sensorName then love.graphics.setColor(0.8, 0.8, 0.8, 1) end
+      if v.name == screenName then love.graphics.setColor(0.8, 0.8, 0.8, 1) end
       love.graphics.rectangle(
         "fill",
         marginLeft + (i-1) * buttonSize,

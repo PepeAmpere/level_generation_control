@@ -1,13 +1,24 @@
 local Position = {}
 Position.__index = Position
+setmetatable(Position, ComponentBase)
 
-function Position.New(params)
+function Position.new(params)
   local i = setmetatable({}, Position) -- make new instance
 
-  if params.position.x == nil then
-    assert("[Position component]: " .. "position Vec3 not valid")
+  if
+    params.position.x == nil and
+    params.position.r == nil
+  then
+    assert("[Position component]: " .. "position not valid, not Vec3 nor Hex3")
   end
   i.position = params.position
+  return i
+end
+
+function Position.load(componentData)
+  local i = setmetatable({}, Position) -- make new instance
+
+  i.position = load(componentData.position)()
   return i
 end
 

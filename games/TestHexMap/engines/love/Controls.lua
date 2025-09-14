@@ -95,7 +95,7 @@ local SimulationControl = {
   end,
   IncreaseRotateLeft = function(camera, value)
     if value > 0.001 then
-      UI_STATES.rotateLeftSum = UI_STATES.rotateLeftSum + value*0.2
+      UI_STATES.rotateLeftSum = UI_STATES.rotateLeftSum + value * 0.2
       if UI_STATES.rotateLeftSum > 1 then
         UI_STATES.rotateLeftSum = UI_STATES.rotateLeftSum - 1
         levelMap:RotateHexLeft(UI_STATES.selectedHexKey, "hexTreeTile")
@@ -104,7 +104,7 @@ local SimulationControl = {
   end,
   IncreaseRotateRight = function(camera, value)
     if value > 0.001 then
-      UI_STATES.rotateRightSum = UI_STATES.rotateRightSum + value*0.2
+      UI_STATES.rotateRightSum = UI_STATES.rotateRightSum + value * 0.2
       if UI_STATES.rotateRightSum > 1 then
         UI_STATES.rotateRightSum = UI_STATES.rotateRightSum - 1
         levelMap:RotateHexRight(UI_STATES.selectedHexKey, "hexTreeTile")
@@ -122,13 +122,46 @@ local SimulationControl = {
   FourDirectionSelectionLeft = function(camera) UpdateHexSelection(camera, "left") end,
   FourDirectionSelectionRight = function(camera) UpdateHexSelection(camera, "right") end,
   FourDirectionSelectionUp = function(camera) UpdateHexSelection(camera, "up") end,
-  SelectSensorLeft = function()
-    UI_STATES.sensorName = GetSwitchLeft(SensorTypesDefs, UI_STATES.sensorName)
+  Save = function()
+    local fileName = SavesStatus:GetSelectedSaveFile()
+    fileName = (string.gsub(fileName, "%.", "/") .. ".lua")
+    local simExport = OneSim:Export("warning")
+
+    -- JSON.encode(TableExt.Export(simExport))
+    -- local jsonString = JSON.encode(simExport)
+    TableExt.SaveToFile(fileName, simExport)
+    -- TableExt.SaveToFile("games/levelMapExported.lua", simExport)
+    SavesStatus:UpdateSavesStatus()
   end,
-  SelectSensorRight = function()
-    UI_STATES.sensorName = GetSwitchRight(SensorTypesDefs, UI_STATES.sensorName)
+  Load = function()
+    local fileName = SavesStatus:GetSelectedSaveFile()
+    print("Loading: " .. fileName)
+
+    for packageName, _ in pairs(package.loaded) do
+      if
+          string.find(packageName, fileName)
+      then
+        -- print("Unloading " .. packageName)
+        package.loaded[packageName] = nil
+      end
+    end
+    local loadedTable = LuaExt.TryRequire(fileName)
+    OneSim = Simulation.load(loadedTable)
+    levelMap = OneSim.systems.HexMap -- shortcut
   end,
-  SwitchScreen = function(camera)
+  SelectScreenLeft = function()
+    UI_STATES.screenName = GetSwitchLeft(ScreenTypesDefs, UI_STATES.screenName)
+    if ScreenTypesDefs[UI_STATES.screenName].Preload then
+      ScreenTypesDefs[UI_STATES.screenName].Preload()
+    end
+  end,
+  SelectScreenRight = function()
+    UI_STATES.screenName = GetSwitchRight(ScreenTypesDefs, UI_STATES.screenName)
+    if ScreenTypesDefs[UI_STATES.screenName].Preload then
+      ScreenTypesDefs[UI_STATES.screenName].Preload()
+    end
+  end,
+  SwitchDisplay = function(camera)
     local width, height, mode = love.window.getMode()
     local count = love.window.getDisplayCount()
     local displayIndex = mode.display
@@ -137,26 +170,30 @@ local SimulationControl = {
     love.window.setPosition(0, 0, displayIndex)
   end,
   -- works only for the primary monitor
-  FullScreen = function(camera)
+  FullDisplay = function(camera)
     UI_STATES.modes = love.window.getFullscreenModes(count)
     table.sort(UI_STATES.modes, function(a, b) return a.width * a.height > b.width * b.height end)
     print(#UI_STATES.modes)
-    local screenMode = love.window.getFullscreen()
+    local displayMode = love.window.getFullscreen()
     local modeIndex = 1
-    if screenMode then
-      for index, mode in ipairs(UI_STATES.modes) do if mode.height < 1000 then
+    if displayMode then
+      for index, mode in ipairs(UI_STATES.modes) do
+        if mode.height < 1000 then
           modeIndex = index
           break
-        end end
+        end
+      end
     end
-    if not screenMode then
-      for index, mode in ipairs(UI_STATES.modes) do if mode.width <= 1920 then
+    if not displayMode then
+      for index, mode in ipairs(UI_STATES.modes) do
+        if mode.width <= 1920 then
           modeIndex = index
           break
-        end end
+        end
+      end
     end
     love.window.updateMode(UI_STATES.modes[modeIndex].width, UI_STATES.modes[modeIndex].height, {
-      fullscreen = not screenMode,
+      fullscreen = not displayMode,
       fullscreentype = "exclusive",
     })
     camera:setWindow(0, 0, UI_STATES.modes[modeIndex].width, UI_STATES.modes[modeIndex].height)
@@ -175,12 +212,12 @@ local globalControls = {
   kp4 = SimulationControl.FourDirectionSelectionLeft,
   kp6 = SimulationControl.FourDirectionSelectionRight,
   kp8 = SimulationControl.FourDirectionSelectionUp,
-  leftshoulder = SimulationControl.SelectSensorLeft,
-  rightshoulder = SimulationControl.SelectSensorRight,
-  kp7 = SimulationControl.SelectSensorLeft,
-  kp9 = SimulationControl.SelectSensorRight,
-  tab = SimulationControl.SwitchScreen,
-  escape = SimulationControl.FullScreen,
+  leftshoulder = SimulationControl.SelectScreenLeft,
+  rightshoulder = SimulationControl.SelectScreenRight,
+  kp7 = SimulationControl.SelectScreenLeft,
+  kp9 = SimulationControl.SelectScreenRight,
+  tab = SimulationControl.SwitchDisplay,
+  escape = SimulationControl.FullDisplay,
 }
 
 local ScreenToControl = {
@@ -201,36 +238,48 @@ local ScreenToControl = {
   Eye = TableExt.Extend({}, globalControls),
   ElectroOptic = TableExt.Extend({}, globalControls),
   SAR = TableExt.Extend({}, globalControls),
+  SaveLoad = TableExt.Extend(
+    {},
+    globalControls,
+    {
+      a = function() SimulationControl.Save() end,
+      x = function() SimulationControl.Load() end,
+      dpup = function() SavesStatus:SelectPrevious() end,
+      dpdown = function() SavesStatus:SelextNext() end,
+      kp2 = function() SavesStatus:SelextNext() end,
+      kp8 = function() SavesStatus:SelectPrevious() end,
+    }
+  ),
 }
 
 return {
   JoystickButton = function(camera, gamepad, button)
-    local sensorName = UI_STATES.sensorName
+    local screenName = UI_STATES.screenName
     if
-      ScreenToControl[sensorName] and
-      ScreenToControl[sensorName][button]
+        ScreenToControl[screenName] and
+        ScreenToControl[screenName][button]
     then
-      ScreenToControl[sensorName][button](camera)
+      ScreenToControl[screenName][button](camera)
     end
   end,
 
   JoystickTrigger = function(camera, gamepad, button, value)
-    local sensorName = UI_STATES.sensorName
+    local screenName = UI_STATES.screenName
     if
-      ScreenToControl[sensorName] and
-      ScreenToControl[sensorName][button]
+        ScreenToControl[screenName] and
+        ScreenToControl[screenName][button]
     then
-      ScreenToControl[sensorName][button](camera, value)
+      ScreenToControl[screenName][button](camera, value)
     end
   end,
 
   KeyboardButton = function(camera, key)
-    local sensorName = UI_STATES.sensorName
+    local screenName = UI_STATES.screenName
     if
-      ScreenToControl[sensorName] and
-      ScreenToControl[sensorName][key]
+        ScreenToControl[screenName] and
+        ScreenToControl[screenName][key]
     then
-       ScreenToControl[sensorName][key](camera)
+      ScreenToControl[screenName][key](camera)
     end
   end,
 }

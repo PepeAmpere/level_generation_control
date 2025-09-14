@@ -1,3 +1,5 @@
+ComponentBase = require("libs.sim.ComponentBase")
+
 local componentTypes = {
   "AI",
   "BB",

@@ -33,6 +33,10 @@ end
 
 local Hex3 = new
 
+function hexIndex:Export()
+  return "return Hex3(" .. self.q .. "," .. self.r .. "," .. self.s .. "," .. self.size .. ")"
+end
+
 -- operators
 function hexMeta:__add(hex)
   return new(
@@ -231,7 +235,9 @@ function hexIndex:NeighborDiagonal(directionIndex)
   )
 end
 
-function hexIndex:Length() -- should be multiplied by self.size, but defult is 1
+-- all lenghts and distances for absolute distance should be multiplied by self.size
+-- currently working with default 1 to calculate "unit" length, not clear what is needed
+function hexIndex:Length()
   return self:LengthSQ() ^ 0.5
 end
 

@@ -1,7 +1,8 @@
 local ChildrenOrders = {}
 ChildrenOrders.__index = ChildrenOrders
+setmetatable(ChildrenOrders, ComponentBase)
 
-function ChildrenOrders.New()
+function ChildrenOrders.new()
   local i = setmetatable({}, ChildrenOrders) -- make new instance
   i.childrenTable = {}
   return i

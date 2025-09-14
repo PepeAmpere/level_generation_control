@@ -13,20 +13,22 @@ local function DeepCopy(tbl, seen)
 end
 
 local function Export(tbl)
-    local newTable = {}
-    for key, value in pairs(tbl) do
-      if type(value) ~= "table" then
-        newTable[key] = value
+  local newTable = {}
+  for key, value in pairs(tbl) do
+    if type(value) ~= "table" then
+      newTable[key] = value
+    else
+      local ExportMethod = value.Export
+      -- print(ExportMethod, key, value)
+      if ExportMethod then
+        -- print(tbl, key, value, value.Export, type(value:Export(value)))
+        newTable[key] = value:Export(value)
       else
-        local ExportMethod = value.Export
-        if ExportMethod then
-          newTable[key] = value:Export(value)
-        else
-          newTable[key] = Export(value)
-        end
+        newTable[key] = Export(value)
       end
     end
-    return newTable
+  end
+  return newTable
 end
 
 local function Extend(tbl, ...)
@@ -49,19 +51,6 @@ end
 
 local function GetRandomValue(tbl)
   return tbl[GetRandomKey(tbl)]
-end
-
-local function SaveToFile(fileName, tbl)
-  local file = io.open(fileName, "w")
-  if file then
-    local function WriteToFile(stringToWrite)
-      file:write(stringToWrite)
-    end
-    WriteUsingFunction(tbl, WriteToFile, 0)
-    file:close()
-  else
-    print("Error: could not open file for writing")
-  end
 end
 
 local function ShallowCopy(tbl)
@@ -111,6 +100,23 @@ local function WriteUsingFunction(tbl, WriteFunction, indent)
   end
 
   WriteFunction(writeIndent .. "}")
+end
+
+local function SaveToFile(fileName, tbl)
+  local file = io.open(fileName, "w")
+
+  -- workaround for offline run
+  if file == nil then file = io.open("client/" .. fileName, "w") end
+
+  if file then
+    local function WriteToFile(stringToWrite)
+      file:write(stringToWrite)
+    end
+    WriteUsingFunction(tbl, WriteToFile, 0)
+    file:close()
+  else
+    print("Error: could not open file for writing")
+  end
 end
 
 return {

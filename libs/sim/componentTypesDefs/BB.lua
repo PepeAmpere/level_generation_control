@@ -1,7 +1,8 @@
 local BB = {}
 BB.__index = BB
+setmetatable(BB, ComponentBase)
 
-function BB.New()
+function BB.new()
   local i = setmetatable({}, BB) -- make new instance
   i.variables = {}
   return i

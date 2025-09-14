@@ -1,7 +1,7 @@
 local AIEval = {}
 AIEval.__index = AIEval
 
-function AIEval.New()
+function AIEval.new()
 local i = setmetatable({}, AIEval) -- make new instance
   return i
 end

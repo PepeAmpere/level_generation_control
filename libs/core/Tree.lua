@@ -25,6 +25,30 @@ function Tree.new(rootNode)
   return i
 end
 
+function Tree.load(treeData, graph)
+  local i = setmetatable({}, Tree)
+
+  i.nodes = {}
+  for nodeID, _ in pairs(treeData.nodes or {}) do
+    i.nodes[nodeID] = graph:GetNode(nodeID)
+  end
+  i.children = {}
+  for nodeID, _ in pairs(treeData.children or {}) do
+    i.children[nodeID] = graph:GetNode(nodeID)
+  end
+  i.parents = {}
+  for nodeID, _ in pairs(treeData.parents or {}) do
+    i.parents[nodeID] = graph:GetNode(nodeID)
+  end
+  i.rootNodeID = treeData.rootNodeID
+
+  return i
+end
+
+function Tree:Export()
+  return TableExt.Export(self)
+end
+
 function Tree:AddNode(node, parent) -- only simple addition as a leaf, both params node-objects
   local nodeID = node:GetID()
   local parentID = parent:GetID()

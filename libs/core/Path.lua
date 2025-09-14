@@ -32,6 +32,23 @@ function Path.new(orderedNodes)
   return i
 end
 
+function Path.load(pathData, graph)
+  local i = setmetatable({}, Path)
+  i.nodes = {}
+  i.nodesOrderedList = {}
+  i.nodeIDtoIndex = {}
+  for nodeID, _ in pairs(pathData.nodes or {}) do
+    i.nodes[nodeID] = graph:GetNode(nodeID)
+    i.nodeIDtoIndex[nodeID] = nodeData[nodeID].index
+    i.nodesOrderedList[nodeData[nodeID].index] = nodeID
+  end
+  return i
+end
+
+function Path:Export()
+  return TableExt.Export(self)
+end
+
 function Path:AppendNode(node)
   local nodeID = node:GetID()
   local newIndex = #self.nodesOrderedList+1

@@ -1,12 +1,6 @@
 -- taken out of https://bitbucket.org/notabots/core/src/master/
 -- version from 2023-11-12, updated separately before replit starts to support submodules
-local moduleInfo = {
-  name = "Vec3",
-  desc = "Vector object and its methods.",
-  author = "PepeAmpere", -- inspired by work of Gordon MacPherson and Michal Mojzik, wrote from scratch
-  date = "2017-09-08",
-  license = "MIT",
-}
+-- inspired by work of Gordon MacPherson and Michal Mojzik, wrote from scratch
 
 local sin = math.sin
 local cos = math.cos
@@ -40,6 +34,10 @@ local function is3DVector(vectorOne)
 end
 
 local Vec3 = new
+
+function vectorIndex:Export()
+  return "return Vec3(" .. self.x .. "," .. self.y .. "," .. self.z ..")"
+end
 
 -- operators
 function vectorMeta:__add(vectorOne)
@@ -168,7 +166,7 @@ function vectorIndex:DistanceToLine(lineVectorOne, lineVectorTwo)
   local rotBeta = atan2(
     - (cos(rotAlpha) * lineVector.y - sin(rotAlpha) * lineVector.z),
     lineVector.x
-  )	
+  )
   local matrix = {
     cos(rotBeta), -sin(rotBeta) * cos(rotAlpha), sin(rotBeta) * sin(rotAlpha),
     sin(rotBeta), cos(rotBeta) * cos(rotAlpha), -cos(rotBeta) * sin(rotAlpha),

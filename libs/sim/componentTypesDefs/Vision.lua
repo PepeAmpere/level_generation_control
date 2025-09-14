@@ -1,7 +1,8 @@
 local Vision = {}
 Vision.__index = Vision
+setmetatable(Vision, ComponentBase)
 
-function Vision.New(params)
+function Vision.new(params)
   local i = setmetatable({}, Vision) -- make new instance
   i.range = params.range
   i.visibleEntities = {}

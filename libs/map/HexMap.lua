@@ -11,14 +11,14 @@ local HexMap = {}
 HexMap.__index = HexMap
 setmetatable(HexMap, Graph)
 
-function HexMap.new(q, r, s, rootNodeTags)
+function HexMap.new(params)
   local i = setmetatable({}, HexMap) -- make new instance
 
   i.nodes = {}
 
-  local rootPosition = Hex3(q,r,s)
+  local rootPosition = Hex3(params.q, params.r, params.s)
   local rootNodeID = rootPosition:ToKey()
-  local rootNodesTagsCopy = TableExt.ShallowCopy(rootNodeTags)
+  local rootNodesTagsCopy = TableExt.ShallowCopy(params.rootNodeTags)
   local rootNode = Node.new(
     rootNodeID,
     rootPosition,
@@ -26,6 +26,8 @@ function HexMap.new(q, r, s, rootNodeTags)
     rootNodesTagsCopy
   )
   i.nodes[rootNodeID] = rootNode
+  i.edges = {}
+  i.paths = {}
 
   i.constructorTree = Tree.new(rootNode)
   i.constructorScores = {
@@ -33,10 +35,47 @@ function HexMap.new(q, r, s, rootNodeTags)
     forumulas = {},
     transformers = {},
   }
-  i.edges = {}
-  i.paths = {}
 
   return i
+end
+
+function HexMap.load(mapData)
+  local i = setmetatable({}, HexMap) -- make new instance
+
+  -- basic load of nodes
+  i.nodes = {}
+  for nodeID, nodeData in pairs(mapData.nodes or {}) do
+    i.nodes[nodeID] = Node.load(nodeData)
+  end
+
+  -- basic load of edges
+  i.edges = {}
+  for edgeID, edgeData in pairs(mapData.edges or {}) do
+    i.edges[edgeID] = Edge.load(edgeData, i)
+  end
+  -- load edges into nodes
+  for nodeID, nodeData in pairs(mapData.nodes or {}) do
+    Node.loadEdges(nodeID, nodeData, i)
+  end
+
+  -- basic load of paths
+  i.paths = {}
+  for pathID, pathData in pairs(mapData.paths or {}) do
+    i.paths[pathID] = Path.load(pathData, i)
+  end
+
+  i.constructorTree = Tree.load(mapData.constructorTree, i)
+  i.constructorScores = {
+    rules = {},
+    forumulas = {},
+    transformers = {},
+  }
+
+  return i
+end
+
+function HexMap:Export(logLevel)
+  return TableExt.Export(self)
 end
 
 function HexMap:ContructByLayout(layoutSteps, ruleDefs)

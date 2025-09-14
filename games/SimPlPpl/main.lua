@@ -7,7 +7,7 @@ Entity = require("libs.sim.Entity")
 EntityTypes = require(GAME_PATH .. "data.entityTypes")
 
 Simulation = require("libs.sim.Simulation")
-OneSim = Simulation.New(0, love.timer.getTime())
+OneSim = Simulation.new(0, love.timer.getTime())
 
 for i=1, 4 do
   local newEntity = OneSim:AddEntityOfType(EntityTypes.Person,

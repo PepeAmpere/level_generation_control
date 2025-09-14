@@ -10,25 +10,17 @@ Graph.__index = Graph
 function Graph.new(nodesList, edgesList)
   local i = setmetatable({}, Graph) -- make new instance
 
-  local nodes = {} -- node key => object reference
-
-  if nodesList == nil then nodesList = {} end
-  for _, node in ipairs(nodesList) do
+  i.nodes = {} -- node key => object reference
+  for _, node in ipairs(nodesList or {}) do
     local nodeID = node:GetID()
-    nodes[nodeID] = node
+    i.nodes[nodeID] = node
   end
 
-  i.nodes = nodes
-
-  local edges = {} -- edge key => object reference
-
-  if edgesList == nil then edgesList = {} end
+  i.edges = {} -- edge key => object reference
   for _, edge in ipairs(edgesList) do
     local edgeID = edge:GetID()
-    edges[edgeID] = edge
+    i.edges[edgeID] = edge
   end
-
-  i.edges = edges
 
   return i
 end
