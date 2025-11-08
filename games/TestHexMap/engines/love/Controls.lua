@@ -51,8 +51,9 @@ local function UpdateHexSelection(camera, direction)
   local selectedHexPosition = levelMap:GetAnyHexPosition(UI_STATES.selectedHexKey, "_")
 
   -- later move to map drawing
+  local scale = levelMap:GetSale()
   local x1, y1, x2, y2, x3, y3, x4, y4 = camera:getVisibleCorners()
-  local x, y = selectedHexPosition:ToPixel()
+  local x, y = selectedHexPosition:ToPixel(scale)
 
   local directionIndex = SelectIndex(direction, degrees)
   print(direction, degrees, "=>", directionIndex)
@@ -75,6 +76,7 @@ local function GetSwitchLeft(tbl, currentValue)
 end
 
 local SimulationControl = {
+
   ChangeHexTypeRight = function()
     local selectedNode = levelMap:GetNode(UI_STATES.selectedHexKey)
     if selectedNode ~= nil then
@@ -84,6 +86,7 @@ local SimulationControl = {
       end
     end
   end,
+
   ChangeHexTypeLeft = function()
     local selectedNode = levelMap:GetNode(UI_STATES.selectedHexKey)
     if selectedNode ~= nil then
@@ -93,6 +96,7 @@ local SimulationControl = {
       end
     end
   end,
+
   IncreaseRotateLeft = function(camera, value)
     if value > 0.001 then
       UI_STATES.rotateLeftSum = UI_STATES.rotateLeftSum + value * 0.2
@@ -102,6 +106,7 @@ local SimulationControl = {
       end
     end
   end,
+
   IncreaseRotateRight = function(camera, value)
     if value > 0.001 then
       UI_STATES.rotateRightSum = UI_STATES.rotateRightSum + value * 0.2
@@ -111,17 +116,21 @@ local SimulationControl = {
       end
     end
   end,
+
   RotateHexLeft = function()
     levelMap:RotateHexLeft(UI_STATES.selectedHexKey, "hexTreeTile")
   end,
+
   RotateHexRight = function()
     levelMap:RotateHexRight(UI_STATES.selectedHexKey, "hexTreeTile")
   end,
+
   DebugOnOff = function() UI_STATES.debugOn = not UI_STATES.debugOn end,
   FourDirectionSelectionDown = function(camera) UpdateHexSelection(camera, "down") end,
   FourDirectionSelectionLeft = function(camera) UpdateHexSelection(camera, "left") end,
   FourDirectionSelectionRight = function(camera) UpdateHexSelection(camera, "right") end,
   FourDirectionSelectionUp = function(camera) UpdateHexSelection(camera, "up") end,
+
   Save = function()
     local fileName = SavesStatus:GetSelectedSaveFile()
     fileName = (string.gsub(fileName, "%.", "/") .. ".lua")
@@ -133,6 +142,7 @@ local SimulationControl = {
     -- TableExt.SaveToFile("games/levelMapExported.lua", simExport)
     SavesStatus:UpdateSavesStatus()
   end,
+
   Load = function()
     local fileName = SavesStatus:GetSelectedSaveFile()
     print("Loading: " .. fileName)
@@ -149,18 +159,21 @@ local SimulationControl = {
     OneSim = Simulation.load(loadedTable)
     levelMap = OneSim.systems.HexMap -- shortcut
   end,
+
   SelectScreenLeft = function()
     UI_STATES.screenName = GetSwitchLeft(ScreenTypesDefs, UI_STATES.screenName)
     if ScreenTypesDefs[UI_STATES.screenName].Preload then
       ScreenTypesDefs[UI_STATES.screenName].Preload()
     end
   end,
+
   SelectScreenRight = function()
     UI_STATES.screenName = GetSwitchRight(ScreenTypesDefs, UI_STATES.screenName)
     if ScreenTypesDefs[UI_STATES.screenName].Preload then
       ScreenTypesDefs[UI_STATES.screenName].Preload()
     end
   end,
+
   SwitchDisplay = function(camera)
     local width, height, mode = love.window.getMode()
     local count = love.window.getDisplayCount()
@@ -169,6 +182,7 @@ local SimulationControl = {
     if displayIndex > 2 then displayIndex = 1 end
     love.window.setPosition(0, 0, displayIndex)
   end,
+
   -- works only for the primary monitor
   FullDisplay = function(camera)
     UI_STATES.modes = love.window.getFullscreenModes(count)
@@ -198,6 +212,7 @@ local SimulationControl = {
     })
     camera:setWindow(0, 0, UI_STATES.modes[modeIndex].width, UI_STATES.modes[modeIndex].height)
   end,
+
   TestControl = function(camera) print("TestControl") end,
 }
 

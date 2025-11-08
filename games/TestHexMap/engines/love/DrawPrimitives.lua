@@ -31,9 +31,9 @@ local function RotateTemplate(template, angle)
 end
 
 return {
-  Coordinates = function(simPosition)
+  Coordinates = function(simPosition, scale)
     local stringToWrite = tostring(simPosition)
-    local x, y = simPosition:ToPixel()
+    local x, y = simPosition:ToPixel(scale)
     local drawCoords = Vec3(x, y, 0)
     if UI_STATES.textfields[stringToWrite] then
       local textColor = { 0.5, 1, 0.5, 1 }
@@ -65,7 +65,7 @@ return {
 
   NodeSelected = function(selectedHexKey, scale)
     local selectedHexPosition = levelMap:GetAnyHexPosition(selectedHexKey, "_")
-    local vertices = selectedHexPosition:ToCorners(scale * 0.9)
+    local vertices = selectedHexPosition:ToCorners(scale, scale * 0.9)
     local latestColor = { 0.7, 0.7, 0.7, 0.5 }
     love.graphics.setLineWidth(10)
     love.graphics.setLineStyle("rough")
@@ -75,7 +75,7 @@ return {
       "line"
     )
     local counter = 0
-    local basex, basey = selectedHexPosition:ToPixel()
+    local basex, basey = selectedHexPosition:ToPixel(scale)
     local selectedHex = levelMap:GetHexOnPosition(selectedHexKey)
     local hexTypeName
     if selectedHex then
@@ -97,7 +97,7 @@ return {
 
   NodeShape = function(node, scale)
     local hexCoords = node:GetPosition()
-    local vertices = hexCoords:ToCorners(scale * 0.8)
+    local vertices = hexCoords:ToCorners(scale, scale * 0.8)
 
     local latestColor = { 0.5, 1, 0.5, 0.5 }
     local hexTypeName
@@ -111,6 +111,32 @@ return {
       vertices,
       latestColor
     )
+    if HexTypesDefs[hexTypeName].drawDefs.icon then
+      local nodeID = node:GetID()
+      if UI_STATES.icons[nodeID] then
+        local icon = HexTypesDefs[hexTypeName].drawDefs.icon
+         for _, data in ipairs(UI_STATES.icons[nodeID]) do
+          Draw.Quad(
+            icon,
+            data.quad,
+            data.position
+          )
+        end
+      else
+        local iV = hexCoords:ToCorners(scale, scale * 0.5)
+        UI_STATES.icons[nodeID] = {}
+        local c = 0
+        for i=1, #iV, 2 do
+          c=c+1
+          UI_STATES.icons[nodeID][c] = {
+            position = Vec3(iV[i], iV[i+1],0) - Vec3(-8,8,0),
+            quad = love.graphics.newQuad(
+              0, 0, 16, 16, HexTypesDefs[hexTypeName].drawDefs.icon
+            )
+          }
+        end
+      end
+    end
   end,
 
   NodeTreeElements = function(node, scale)
@@ -123,8 +149,8 @@ return {
         latestColor = HexTreeTilesDefs[hexTreeTileName].drawDefs.color
       end
     end
-    local basex, basey = hexCoords:ToPixel()
-    local sideVertices = hexCoords:ToSidePoints(scale * 0.8)
+    local basex, basey = hexCoords:ToPixel(scale)
+    local sideVertices = hexCoords:ToSidePoints(scale, scale * 0.8)
     if hexTreeTileName and HexTreeTilesDefs[hexTreeTileName] then
       local drawTable = HexTreeTilesDefs[hexTreeTileName].drawDefs.drawTable
       if drawTable then

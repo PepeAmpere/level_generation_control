@@ -236,6 +236,13 @@ local function CameraAndCursorPosition(camera)
   love.graphics.print("scale: " .. tostring(camera:getScale()), 0, 40)
   love.graphics.print("angle: " .. math.floor(angle * 180 / math.pi), 0, 50)
 
+  love.graphics.setColor(1, 1, 1, 0.7)
+  love.graphics.rectangle("fill", 0, 80, 150, 40)
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.print("Current FPS: ".. tostring(love.timer.getFPS( )), 0, 80)
+  love.graphics.print("Simstep: " .. OneSim:GetStep(), 0, 90)
+  love.graphics.print("Simtime: " .. OneSim:GetTime(), 0, 100)
+  
   -- middle
   local centerX = w/2
   local centerY = h/2

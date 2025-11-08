@@ -35,6 +35,7 @@ function HexMap.new(params)
     forumulas = {},
     transformers = {},
   }
+  i.scale = params.scale or 1
 
   return i
 end
@@ -70,6 +71,13 @@ function HexMap.load(mapData)
     forumulas = {},
     transformers = {},
   }
+
+  if mapData.scale == nil then
+    i.scale = HEX_SIZE
+    print(("HexMap.load: scale not found in save file, using default: " .. HEX_SIZE))
+  else
+    i.scale = mapData.scale
+  end
 
   return i
 end
@@ -172,7 +180,7 @@ end
 
 function HexMap:ConstructionGetScoresCopy()
   local scores = {}
-  for k,v in pairs(self.constructorScores) do
+  for k, v in pairs(self.constructorScores) do
     scores[k] = v
   end
   return scores
@@ -198,17 +206,9 @@ function HexMap:ConstructionUpdateScoreByRule(ruleFn)
 end
 
 function HexMap:ConstructionUpdateScores(newScores)
-  for k,v in pairs(newScores) do
-      self.constructorScores[k] = v
+  for k, v in pairs(newScores) do
+    self.constructorScores[k] = v
   end
-end
-
-function HexMap:GetConstructorTree()
-  return self.constructorTree
-end
-
-function HexMap:GetHexOnPosition(hexKey)
-  return self:GetNode(hexKey)
 end
 
 function HexMap:GetAnyHexPosition(hexKey, separator)
@@ -222,9 +222,21 @@ function HexMap:GetAnyHexPosition(hexKey, separator)
   return hexPosition
 end
 
+function HexMap:GetConstructorTree()
+  return self.constructorTree
+end
+
+function HexMap:GetHexOnPosition(hexKey)
+  return self:GetNode(hexKey)
+end
+
+function HexMap:GetSale()
+  return self.scale
+end
+
 local lookup = {
   hexTypeName = HexTypesDefs,
-  hexTreeTile= HexTreeTilesDefs,
+  hexTreeTile = HexTreeTilesDefs,
 }
 function HexMap:RotateHexLeft(hexKey, tagName)
   local hex = self:GetNode(hexKey)

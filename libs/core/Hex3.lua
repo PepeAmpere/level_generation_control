@@ -9,15 +9,12 @@ local hexIndex = {}
 local hexMeta = {}
 hexMeta.__index = hexIndex
 
-local function new(q, r, s, size)
+local function new(q, r, s)
   return setmetatable(
     {
       q = q or 0,
       r = r or 0,
       s = s or 0,
-      size = size or 1,
-      -- size = grid size
-      -- scale = visual size of one hex
     },
     hexMeta
   )
@@ -34,7 +31,7 @@ end
 local Hex3 = new
 
 function hexIndex:Export()
-  return "return Hex3(" .. self.q .. "," .. self.r .. "," .. self.s .. "," .. self.size .. ")"
+  return "return Hex3(" .. self.q .. "," .. self.r .. "," .. self.s .. ")"
 end
 
 -- operators
@@ -140,9 +137,9 @@ function hexIndex:S()
   return self.s
 end
 
-function hexIndex:ToPixel()
-  return self.size * (sqrt3 * self.q + sqrt3_half * self.r),
-      self.size * (1.5 * self.r)
+function hexIndex:ToPixel(size)
+  return size * (sqrt3 * self.q + sqrt3_half * self.r),
+      size * (1.5 * self.r)
 end
 
 local function PointCorner(x, y, size, i)
@@ -152,8 +149,8 @@ local function PointCorner(x, y, size, i)
       y + size * sin(angle_rad)
 end
 
-function hexIndex:ToCorners(cornerDistance)
-  local xBase, yBase = self:ToPixel()
+function hexIndex:ToCorners(size, cornerDistance)
+  local xBase, yBase = self:ToPixel(size)
   local points = {}
   for i = 1, 6 do
     local x, y = PointCorner(xBase, yBase, cornerDistance, i)
@@ -171,7 +168,7 @@ local function PointSideCenter(x, y, size, i)
 end
 
 function hexIndex:ToSidePoints(sideDistance)
-  local xBase, yBase = self:ToPixel()
+  local xBase, yBase = self:ToPixel(sideDistance)
   local points = {}
   for i = 1, 6 do
     local x, y = PointSideCenter(xBase, yBase, sideDistance, i)
@@ -225,7 +222,7 @@ local DIAGONALS = {
   { 1,  -2, 1 }
 }
 
-function hexIndex:NeighborDiagonal(directionIndex)
+function hexIndex:NeighborDiagonal(directionIndex, distance)
   distance = distance or 1
   local d = DIAGONALS[directionIndex]
   return new(
@@ -235,8 +232,6 @@ function hexIndex:NeighborDiagonal(directionIndex)
   )
 end
 
--- all lenghts and distances for absolute distance should be multiplied by self.size
--- currently working with default 1 to calculate "unit" length, not clear what is needed
 function hexIndex:Length()
   return self:LengthSQ() ^ 0.5
 end

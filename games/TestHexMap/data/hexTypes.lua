@@ -13,6 +13,12 @@ return nodeTypesDefs
 ]]--
 
 local hexTypesDefs = {
+  mapCity = {
+    drawDefs = {
+      color = {0.5, 0.5, 0.5, 1},
+      icon = love.graphics.newImage(string.gsub(GAME_PATH, "%.", "/") .. "data/img/house.png"),
+    }
+  },
   mapDesert = {
     drawDefs = {
       color = {1.0, 0.8, 0.1, 1},
@@ -26,6 +32,13 @@ local hexTypesDefs = {
   mapForest = {
     drawDefs = {
       color = {0.01, 0.6, 0.25, 1},
+      icon = love.graphics.newImage(string.gsub(GAME_PATH, "%.", "/") .. "data/img/tree.png"), -- ! engine specific
+    }
+  },
+  mapMountains = {
+    drawDefs = {
+      color = {0.7, 0.5, 0.6, 1},
+      icon = love.graphics.newImage(string.gsub(GAME_PATH, "%.", "/") .. "data/img/mountain.png"),
     }
   },
   mapSea = {

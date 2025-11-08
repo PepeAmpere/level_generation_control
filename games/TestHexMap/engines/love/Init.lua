@@ -30,6 +30,7 @@ UI_STATES = {
   debugOn = true,
   pan = false,
   textfields = {},
+  icons = {},
   screenName = "Builder",
   scale = HEX_SIZE,
   selectedHexKey = nil,
@@ -110,13 +111,6 @@ function love.draw()
     DrawMap.DebugControl(camera)
     DrawPrimitives.DebugUIStates()
     GamepadOne:DrawDebug()
-
-    local function DebugStep()
-      love.graphics.setColor(0, 0, 0, 255)
-      love.graphics.print("Simstep: " .. OneSim:GetStep(), 600, 240)
-      love.graphics.print("Simtime: " .. OneSim:GetTime(), 600, 260)
-    end
-    DebugStep()
   end
 
   DrawPrimitives.ScreensUI(camera, UI_STATES.screenName)

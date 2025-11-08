@@ -9,18 +9,20 @@ end
 
 local rootTags = GetNodeTags()
 
-levelMap = OneSim:AddSystem(
-  "HexMap",
-  {
-    q = 0, r = 0, s = 0,
-    rootNodeTags = rootTags,
-  }
-)
 
 local SIZE = 5
 local GAP_MULT = 1
 local ENTITY_LIMIT = 10
 HEX_SIZE = 100
+
+levelMap = OneSim:AddSystem(
+  "HexMap",
+  {
+    q = 0, r = 0, s = 0,
+    rootNodeTags = rootTags,
+    scale = HEX_SIZE,
+  }
+)
 
 for q = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
   for r = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
@@ -29,7 +31,7 @@ for q = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
         q + r + s == 0 and
         not (q == 0 and r == 0 and s == 0)
       then
-        local hexCoords = Hex3(q, r, s, HEX_SIZE)
+        local hexCoords = Hex3(q, r, s)
         local nodeID = hexCoords:ToKey()
         local nodeTags = GetNodeTags()
         levelMap.nodes[nodeID] = Node.new(
@@ -40,7 +42,7 @@ for q = -GAP_MULT*SIZE, GAP_MULT*SIZE, GAP_MULT do
         )
 
         if OneSim:GetEntityCount() < ENTITY_LIMIT then
-          local x, y = hexCoords:ToPixel()
+          local x, y = hexCoords:ToPixel(HEX_SIZE)
           local newEntity = OneSim:AddEntityOfType(
             EntityTypes.Person, {
               IDprefix = "person",

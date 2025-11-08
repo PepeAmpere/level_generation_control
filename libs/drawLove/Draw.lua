@@ -152,12 +152,23 @@ local function Path(path, color, width)
   end
 end
 
+local function Quad(texture, quad, position)
+  love.graphics.setColor(1,1,1,1)
+  love.graphics.draw(
+    texture,
+    quad,
+    position:Y(),
+    -position:X()
+  )
+end
+
 return {
   Circle = Circle,
-  Line = Line,
-  Polygon = Polygon,
-  Text = Text,
   Edge = Edge,
+  Line = Line,
   Node = Node,
   Path = Path,
+  Polygon = Polygon,
+  Quad = Quad,
+  Text = Text,
 }

@@ -61,6 +61,7 @@ local function Simulation_test()
           hexTypeName = TableExt.GetRandomValue(HexTypesDefs).name,
           hexTreeTile = TableExt.GetRandomValue(HexTreeTilesDefs).name,
         },
+        scale = 10,
       }
     )
     local exportedSystemData = testSystemA:Export()
