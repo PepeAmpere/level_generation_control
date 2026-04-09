@@ -13,6 +13,16 @@ return nodeTypesDefs
 ]]--
 
 local hexTypesDefs = {
+  Undefined = {
+    drawDefs = {
+      color = {0.1, 0.1, 0.1, 0.25},
+    }
+  },
+  UnsupportedLegacyType = {
+    drawDefs = {
+      color = {0.9, 0.1, 0.1, 0.25},
+    }
+  },
   mapCity = {
     drawDefs = {
       color = {0.5, 0.5, 0.5, 1},

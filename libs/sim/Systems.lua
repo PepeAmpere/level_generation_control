@@ -19,7 +19,7 @@ for systemName, _ in pairs(systemTypesDefs) do
   local newDefID = #systemTypesArray+1
   systemTypesDefs[systemName].name = systemName
   systemTypesDefs[systemName].defID = newDefID
-  systemTypesArray[#systemTypesArray+1] = systemTypesDefs[hexType]
+  systemTypesArray[#systemTypesArray+1] = systemTypesDefs[systemName]
 end
 
 for i,v in ipairs(systemTypesArray) do systemTypesDefs[i] = v end

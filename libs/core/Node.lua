@@ -18,7 +18,7 @@ function Node.new(ID, position, nodeType, tags, edgesOut, edgesIn)
   return i
 end
 
-function Node.load(nodeData)
+function Node.load(nodeData, nodeLoadPostProcessing)
   local i = setmetatable({}, Node) -- make new instance
   i.ID = nodeData.ID
   i.position = load(nodeData.position)()
@@ -26,6 +26,11 @@ function Node.load(nodeData)
   i.tags = nodeData.tags
   i.edgesOut = {}
   i.edgesIn = {}
+
+  -- all post processing functions
+  for k, PPF in pairs(nodeLoadPostProcessing) do
+    PPF(i)
+  end
   return i
 end
 

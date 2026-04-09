@@ -22,7 +22,7 @@ function HexMap.new(params)
   local rootNode = Node.new(
     rootNodeID,
     rootPosition,
-    "Hex",
+    nil,
     rootNodesTagsCopy
   )
   i.nodes[rootNodeID] = rootNode
@@ -43,10 +43,21 @@ end
 function HexMap.load(mapData)
   local i = setmetatable({}, HexMap) -- make new instance
 
-  -- basic load of nodes
+  -- validator and remapping of the nodeType
+  local function ValidateNodeType(node)
+    if HexTypesDefs[node.nodeType] == nil then
+      node.nodeType = "UnsupportedLegacyType"
+    end
+    node.nodeType = node.nodeType
+  end
+  local nodeLoadPostProcessing = {
+    nodeType = ValidateNodeType,
+  }
+      
+  -- basic load of nodes with validator of nodeType
   i.nodes = {}
   for nodeID, nodeData in pairs(mapData.nodes or {}) do
-    i.nodes[nodeID] = Node.load(nodeData)
+    i.nodes[nodeID] = Node.load(nodeData, nodeLoadPostProcessing)
   end
 
   -- basic load of edges
