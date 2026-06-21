@@ -27,7 +27,7 @@ Map = require("libs.map.Map")
 TTE = require("libs.map.TTE")
 
 -- GAME SELECTION
-GAME = "TestHexMap"
+GAME = "TestSystemDebug"
 GAME_PATH = "games." .. GAME .. "."
 Game = require(GAME_PATH .. "main") -- main.lua of the game
 
@@ -37,13 +37,13 @@ ENGINE_PATH = "engines." .. ENGINE .. "."
 
 EngineInit = LuaExt.TryRequire(ENGINE_PATH .. "Init")
 EngineControl = LuaExt.TryRequire(ENGINE_PATH .. "Control")
-EngineEvent = LuaExt.TryRequire(ENGINE_PATH ..  "Event")
+EngineEvent = LuaExt.TryRequire(ENGINE_PATH .. "Event")
 EngineRead = LuaExt.TryRequire(ENGINE_PATH .. "Read")
 
 -- GAME SPECIFIC ENGINE INIT (if exists)
 GAME_ENGINE_PATH = GAME_PATH .. ENGINE_PATH
 
-GameEngineInit = LuaExt.TryRequire(GAME_ENGINE_PATH  .. "Init")
+GameEngineInit = LuaExt.TryRequire(GAME_ENGINE_PATH .. "Init")
 
 -- ================================================================ --
 -- ================================================================ --
@@ -54,4 +54,5 @@ GameEngineInit = LuaExt.TryRequire(GAME_ENGINE_PATH  .. "Init")
 print(_VERSION)
 if math.type then print(math.type(3)) end
 if love then print(love.getVersion()) end
-]]--
+]]
+   --

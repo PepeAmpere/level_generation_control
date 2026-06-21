@@ -148,22 +148,13 @@ function love.keyreleased(key, scancode)
 DrawMap.ControlKeys(camera, key, scancode)
 end
 ]]
-   --
 
 function love.keyreleased(key, scancode)
   LASTKEY = key
-  local direction
-  if key == "a" or key == "left" then direction = "left" end
-  if key == "d" or key == "right" then direction = "right" end
-  if key == "w" or key == "up" then direction = "up" end
-  if key == "s" or key == "down" then direction = "down" end
-  if key == "q" then ADMIN = not ADMIN end
 end
 
 function love.gamepadaxis(gamepad, axis, value)
   local inputtype, inputindex, hatdirection = gamepad:getGamepadMapping(axis)
-  -- print(inputtype, inputindex, hatdirection, value)
-
   GamepadOne:InputAxis(camera, inputindex, value)
 end
 
@@ -176,10 +167,5 @@ function love.gamepadreleased(gamepad, button)
   LASTKEY = button
   mappingstring = gamepad:getGamepadMappingString()
   print(mappingstring)
-  local direction
-  if button == "dpleft" or button == "leftshoulder" then direction = "left" end
-  if button == "dpright" or button == "rightshoulder" then direction = "right" end
-  if button == "dpup" then direction = "up" end
-  if button == "dpdown" then direction = "down" end
   DrawMap.ControlKeys(camera, LASTKEY, scancode)
 end
